@@ -166,6 +166,34 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
 .badge-condo  { background: rgba(52,152,219,0.3);   border-color: rgba(52,152,219,0.6);   color: #b3d9ff; }
 .badge-villa  { background: rgba(255,193,7,0.3);    border-color: rgba(255,193,7,0.6);    color: #ffecaa; }
 
+/* ─── STATUS BADGE (พร้อม / ประกาศล่วงหน้า) ─── */
+.status-badge {
+  position: absolute; top: 10px; left: 10px;
+  font-size: 0.68rem; padding: 4px 10px; border-radius: 50px;
+  font-weight: 800; letter-spacing: 0.3px;
+  display: inline-flex; align-items: center; gap: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  backdrop-filter: blur(4px);
+}
+.status-ready {
+  background: linear-gradient(135deg, #2ecc71, #27ae60);
+  color: white; border: 1px solid rgba(255,255,255,0.4);
+}
+.status-ready::before { content: "✓"; font-weight: 900; }
+.status-soon {
+  background: linear-gradient(135deg, #ff9f43, #ee5a24);
+  color: white; border: 1px solid rgba(255,255,255,0.4);
+}
+.status-soon::before { content: "📅"; }
+
+/* status row ใน modal */
+.status-pill {
+  display: inline-block; padding: 3px 11px; border-radius: 50px;
+  font-size: 0.78rem; font-weight: 700;
+}
+.status-pill.ready { background: #d4f5e1; color: #1e8449; }
+.status-pill.soon  { background: #ffe7d1; color: #c4501a; }
+
 .card-body { padding: 13px 14px 10px; flex: 1; }
 .price { font-size: 1.28rem; font-weight: 800; color: #e74c3c; margin-bottom: 9px; }
 .price span { font-size: 0.7rem; color: #aaa; font-weight: 400; }
@@ -360,6 +388,11 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
       <option value="3">3 นอน</option>
       <option value="4">4+ นอน</option>
     </select>
+    <select class="filter-select" id="selStatus" onchange="applyFilters()">
+      <option value="all">📋 ทุกสถานะ</option>
+      <option value="ready">✓ พร้อมเข้าพัก</option>
+      <option value="soon">📅 ประกาศล่วงหน้า</option>
+    </select>
   </div>
 </div>
 
@@ -406,6 +439,7 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
       <div class="modal-sub"   id="dSub"></div>
       <div class="modal-price">฿<span id="dPrice"></span><small>บาท / เดือน</small></div>
       <div class="modal-rows">
+        <div class="modal-row"><span class="lbl">สถานะ</span>        <span class="val" id="dStatus"></span></div>
         <div class="modal-row"><span class="lbl">ทำเล</span>         <span class="val" id="dLocation"></span></div>
         <div class="modal-row"><span class="lbl">ประเภท</span>       <span class="val" id="dType"></span></div>
         <div class="modal-row"><span class="lbl">ห้องนอน</span>     <span class="val" id="dBed"></span></div>
@@ -484,6 +518,7 @@ function applyFilters() {
   var priceMax = parseInt(document.getElementById('selMax').value);
   var bed      = document.getElementById('selBed').value;
   var sort     = document.getElementById('selSort').value;
+  var statusF  = (document.getElementById('selStatus') || {}).value || 'all';
 
   var filtered = allData.filter(function(p) {
     if (activeType !== 'all' && p.type !== activeType) return false;
@@ -495,6 +530,8 @@ function applyFilters() {
       if (bed === '4' && br < 4) return false;
       if (bed !== '4' && br !== parseInt(bed)) return false;
     }
+    if (statusF === 'ready' && !p.ready) return false;
+    if (statusF === 'soon'  &&  p.ready) return false;
     if (search) {
       var hay = ((p.code||'') + ' ' + (p.project||'') + ' ' + (p.location||'') + ' ' + (p.type||'')).toLowerCase();
       if (hay.indexOf(search) === -1) return false;
@@ -503,10 +540,14 @@ function applyFilters() {
   });
 
   filtered.sort(function(a, b) {
+    // จัด "พร้อม" ขึ้นก่อน "ประกาศล่วงหน้า" เสมอ
+    if (a.ready !== b.ready) return a.ready ? -1 : 1;
     if (sort === 'price_asc')  return (a.price||0) - (b.price||0);
     if (sort === 'price_desc') return (b.price||0) - (a.price||0);
     if (sort === 'name_asc')   return (a.project||'').localeCompare(b.project||'');
     if (sort === 'bed_asc')    return (parseInt(a.bedroom)||0) - (parseInt(b.bedroom)||0);
+    // ภายในกลุ่ม "ประกาศล่วงหน้า" → เรียงตามวันที่เข้าพักก่อนหลัง
+    if (!a.ready && !b.ready) return (a.availableDate||'').localeCompare(b.availableDate||'');
     return 0;
   });
 
@@ -540,6 +581,31 @@ function fmtPrice(p) {
   return Number(p).toLocaleString('th-TH');
 }
 
+// ─── STATUS HELPERS ────────────────────────────────────────
+// แปลง 'yyyy-MM-dd' → 'DD/MM/พ.ศ.' สำหรับแสดงผล (ปีไทย)
+function fmtAvailableDate(iso) {
+  if (!iso) return '';
+  var m = iso.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!m) return iso;
+  var yyyy = parseInt(m[1], 10);
+  var be   = yyyy + 543;
+  return m[3] + '/' + m[2] + '/' + String(be).slice(-2);
+}
+function fmtAvailableDateShort(iso) {
+  if (!iso) return '';
+  var m = iso.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!m) return iso;
+  return m[3] + '/' + m[2];
+}
+// HTML สำหรับ status badge ที่มุมรูปบนการ์ด
+function statusBadgeHtml(p) {
+  if (p.ready) {
+    return '<span class="status-badge status-ready">พร้อม</span>';
+  }
+  var d = fmtAvailableDateShort(p.availableDate);
+  return '<span class="status-badge status-soon">พร้อม ' + (d || 'เร็วๆ นี้') + '</span>';
+}
+
 // ★ FIX: ถ้ารูปโหลดไม่ได้ ลอง fallback URL ก่อนค่อยขึ้น placeholder
 function onPhotoError(img, fallbackId) {
   if (!img.dataset.fallbackTried && fallbackId) {
@@ -564,10 +630,11 @@ function showGrid(data) {
   g.innerHTML = data.map(function(p) {
     var pj = JSON.stringify(p).replace(/"/g, '&quot;');
 
-    // ★ NEW: รูปบนการ์ด
+    // ★ NEW: รูปบนการ์ด + status badge ที่มุมซ้ายบน
+    var sBadge = statusBadgeHtml(p);
     var photoBlock = p.thumb
-      ? '<div class="card-photo"><img src="' + photoUrl(p.thumb, 400) + '" loading="lazy" alt="' + (p.project||'') + '" onerror="onPhotoError(this,\'' + p.thumb + '\')"></div>'
-      : '<div class="card-photo"><div class="card-photo-placeholder"><span class="ph-icon">🏠</span><span>ยังไม่มีรูป</span></div></div>';
+      ? '<div class="card-photo"><img src="' + photoUrl(p.thumb, 400) + '" loading="lazy" alt="' + (p.project||'') + '" onerror="onPhotoError(this,\'' + p.thumb + '\')">' + sBadge + '</div>'
+      : '<div class="card-photo"><div class="card-photo-placeholder"><span class="ph-icon">🏠</span><span>ยังไม่มีรูป</span></div>' + sBadge + '</div>';
 
     return '<div class="card" onclick=\'openDetail(' + pj + ')\'>' +
       photoBlock +
@@ -622,6 +689,16 @@ function openDetail(p) {
   document.getElementById('dProject').textContent  = p.project  || '–';
   document.getElementById('dSub').textContent      = (p.code||'') + (p.location ? ' · 📍 ' + p.location : '');
   document.getElementById('dPrice').textContent    = fmtPrice(p.price);
+
+  // สถานะ (พร้อม / พร้อมเข้าพัก DD/MM/พ.ศ.)
+  var statusEl = document.getElementById('dStatus');
+  if (p.ready) {
+    statusEl.innerHTML = '<span class="status-pill ready">✓ พร้อมเข้าพัก</span>';
+  } else {
+    var dStr = fmtAvailableDate(p.availableDate);
+    statusEl.innerHTML = '<span class="status-pill soon">📅 พร้อมเข้าพัก ' + (dStr || 'เร็วๆ นี้') + '</span>';
+  }
+
   document.getElementById('dLocation').textContent = p.location || '–';
   document.getElementById('dType').textContent     = typeEmoji(p.type);
   document.getElementById('dBed').textContent      = (p.bedroom||'–')  + ' ห้อง';
