@@ -371,6 +371,9 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
     <button class="filter-btn" onclick="setType('พูลวิลล่า',this)">🏊 พูลวิลล่า</button>
     <button class="filter-btn" onclick="setType('บ้าน',this)">🏠 บ้าน</button>
     <div class="filter-sep"></div>
+    <button class="filter-btn" id="btnAgentDirect" onclick="setAgent('direct',this)">📌 ติดทรัพย์</button>
+    <button class="filter-btn" id="btnAgentCo" onclick="setAgent('co',this)">🤝 Co</button>
+    <div class="filter-sep"></div>
     <select class="filter-select" id="selPet" onchange="applyFilters()">
       <option value="all">🐾 สัตว์เลี้ยง</option>
       <option value="yes">✅ รับได้</option>
@@ -482,8 +485,9 @@ function photoUrlFallback(id) {
   return 'https://drive.usercontent.google.com/download?id=' + id + '&export=view';
 }
 
-var allData    = [];
-var activeType = 'all';
+var allData     = [];
+var activeType  = 'all';
+var activeAgent = 'all';   // 'all' | 'direct' | 'co'
 
 window.onload = function() { loadData(false); };
 
@@ -515,10 +519,31 @@ function loadData(manual) {
 }
 
 // ─── FILTER & SORT ─────────────────────────────────────────
+// ปุ่ม "ทั้งหมด/บ้านเดี่ยว/ทาวน์/คอนโด/พูลวิลล่า/บ้าน" — เฉพาะ type group
 function setType(val, btn) {
   activeType = val;
-  document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
+  // active เฉพาะกลุ่ม type — ไม่แตะปุ่ม Co/ติดทรัพย์
+  var typeBtns = btn.parentElement.querySelectorAll('.filter-btn');
+  // จัดการเฉพาะ 6 ปุ่มแรก (type group) — กันไม่ให้ปุ่ม Co/ติดทรัพย์ถูกล้าง
+  // ใช้วิธี: ลบ active ออกจากปุ่มที่ไม่มี id (type group ทั้งหมดไม่มี id)
+  typeBtns.forEach(function(b) {
+    if (!b.id) b.classList.remove('active');
+  });
   btn.classList.add('active');
+  applyFilters();
+}
+
+// ปุ่ม "ติดทรัพย์ / Co" — toggle: คลิกซ้ำ = ปิด กลับไป 'all'
+function setAgent(val, btn) {
+  if (activeAgent === val) {
+    activeAgent = 'all';
+    btn.classList.remove('active');
+  } else {
+    activeAgent = val;
+    document.getElementById('btnAgentDirect').classList.remove('active');
+    document.getElementById('btnAgentCo').classList.remove('active');
+    btn.classList.add('active');
+  }
   applyFilters();
 }
 
@@ -543,6 +568,8 @@ function applyFilters() {
     }
     if (statusF === 'ready' && !p.ready) return false;
     if (statusF === 'soon'  &&  p.ready) return false;
+    if (activeAgent === 'co'     && !p.coAgent) return false;
+    if (activeAgent === 'direct' &&  p.coAgent) return false;
     if (search) {
       var hay = ((p.code||'') + ' ' + (p.project||'') + ' ' + (p.location||'') + ' ' + (p.type||'')).toLowerCase();
       if (hay.indexOf(search) === -1) return false;
