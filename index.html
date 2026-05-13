@@ -186,6 +186,17 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
 }
 .status-soon::before { content: "📅"; }
 
+/* ─── Co-AGENT BADGE (มุมขวาบนของรูป) ─── */
+.co-badge {
+  position: absolute; top: 10px; right: 10px;
+  font-size: 0.72rem; font-weight: 900; letter-spacing: 0.5px;
+  padding: 4px 11px; border-radius: 50px;
+  background: linear-gradient(135deg, #f1c40f, #d4a017);
+  color: #4a2c00; border: 1px solid rgba(255,255,255,0.5);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  text-shadow: 0 1px 0 rgba(255,255,255,0.3);
+}
+
 /* status row ใน modal */
 .status-pill {
   display: inline-block; padding: 3px 11px; border-radius: 50px;
@@ -630,11 +641,12 @@ function showGrid(data) {
   g.innerHTML = data.map(function(p) {
     var pj = JSON.stringify(p).replace(/"/g, '&quot;');
 
-    // ★ NEW: รูปบนการ์ด + status badge ที่มุมซ้ายบน
-    var sBadge = statusBadgeHtml(p);
+    // ★ NEW: รูปบนการ์ด + status badge (ซ้ายบน) + Co badge (ขวาบน)
+    var sBadge  = statusBadgeHtml(p);
+    var coBadge = p.coAgent ? '<span class="co-badge">Co</span>' : '';
     var photoBlock = p.thumb
-      ? '<div class="card-photo"><img src="' + photoUrl(p.thumb, 400) + '" loading="lazy" alt="' + (p.project||'') + '" onerror="onPhotoError(this,\'' + p.thumb + '\')">' + sBadge + '</div>'
-      : '<div class="card-photo"><div class="card-photo-placeholder"><span class="ph-icon">🏠</span><span>ยังไม่มีรูป</span></div>' + sBadge + '</div>';
+      ? '<div class="card-photo"><img src="' + photoUrl(p.thumb, 400) + '" loading="lazy" alt="' + (p.project||'') + '" onerror="onPhotoError(this,\'' + p.thumb + '\')">' + sBadge + coBadge + '</div>'
+      : '<div class="card-photo"><div class="card-photo-placeholder"><span class="ph-icon">🏠</span><span>ยังไม่มีรูป</span></div>' + sBadge + coBadge + '</div>';
 
     return '<div class="card" onclick=\'openDetail(' + pj + ')\'>' +
       photoBlock +
