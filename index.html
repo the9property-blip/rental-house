@@ -950,6 +950,137 @@ function showToast(msg) {
 // ═══════════════════════════════════════════════════════════
 // ─── GEO SEARCH: ค้นหาทรัพย์ใกล้สถานที่ที่ระบุ ─────────────
 // ═══════════════════════════════════════════════════════════
+
+// ─── ALIASES: แปลคำย่อ → ชื่อเต็มก่อนส่ง Nominatim ─────────
+// แก้/เพิ่มได้ตามต้องการ — key เป็น lower-case
+var GEO_ALIASES = {
+  // มหาวิทยาลัย
+  'มช':                 'มหาวิทยาลัยเชียงใหม่',
+  'ม.ช':                'มหาวิทยาลัยเชียงใหม่',
+  'ม.ช.':               'มหาวิทยาลัยเชียงใหม่',
+  'มอชอ':               'มหาวิทยาลัยเชียงใหม่',
+  'cmu':                'มหาวิทยาลัยเชียงใหม่',
+  'แม่โจ้':              'มหาวิทยาลัยแม่โจ้',
+  'ม.แม่โจ้':            'มหาวิทยาลัยแม่โจ้',
+  'พายัพ':              'มหาวิทยาลัยพายัพ เชียงใหม่',
+  'ม.พายัพ':            'มหาวิทยาลัยพายัพ เชียงใหม่',
+  'ราชภัฏ':             'มหาวิทยาลัยราชภัฏเชียงใหม่',
+  'มร.ชม':              'มหาวิทยาลัยราชภัฏเชียงใหม่',
+  'ฟาร์อีส':            'มหาวิทยาลัยฟาร์อีสเทอร์น เชียงใหม่',
+  'ฟาร์อีสเทอร์น':       'มหาวิทยาลัยฟาร์อีสเทอร์น เชียงใหม่',
+
+  // ห้างสรรพสินค้า
+  'เซ็นเฟส':            'เซ็นทรัล เฟสติวัล เชียงใหม่',
+  'เซน':                'เซ็นทรัล เฟสติวัล เชียงใหม่',
+  'เซ็นทรัลเฟส':         'เซ็นทรัล เฟสติวัล เชียงใหม่',
+  'เซ็นทรัลเฟสติวัล':    'เซ็นทรัล เฟสติวัล เชียงใหม่',
+  'central festival':   'เซ็นทรัล เฟสติวัล เชียงใหม่',
+  'เซ็นแอร์':           'เซ็นทรัล แอร์พอร์ต เชียงใหม่',
+  'เซ็นทรัลแอร์':        'เซ็นทรัล แอร์พอร์ต เชียงใหม่',
+  'แอร์พอร์ตพลาซ่า':     'เซ็นทรัล แอร์พอร์ต เชียงใหม่',
+  'central airport':    'เซ็นทรัล แอร์พอร์ต เชียงใหม่',
+  'เมญ่า':              'เมญ่า ไลฟ์สไตล์ ช็อปปิ้ง เซ็นเตอร์ เชียงใหม่',
+  'maya':               'เมญ่า ไลฟ์สไตล์ ช็อปปิ้ง เซ็นเตอร์ เชียงใหม่',
+  'พรอมเมนาดา':         'พรอมเมนาดา รีสอร์ท มอลล์ เชียงใหม่',
+  'promenada':          'พรอมเมนาดา รีสอร์ท มอลล์ เชียงใหม่',
+  'one nimman':         'One Nimman เชียงใหม่',
+  'วันนิมมาน':           'One Nimman เชียงใหม่',
+  'think park':         'Think Park เชียงใหม่',
+  'thinkpark':          'Think Park เชียงใหม่',
+
+  // โรงพยาบาล
+  'รพ.มหาราช':          'โรงพยาบาลมหาราชนครเชียงใหม่',
+  'มหาราช':             'โรงพยาบาลมหาราชนครเชียงใหม่',
+  'สวนดอก':             'โรงพยาบาลมหาราชนครเชียงใหม่',
+  'รพ.แมคคอ':           'โรงพยาบาลแมคคอร์มิค เชียงใหม่',
+  'แมคคอ':              'โรงพยาบาลแมคคอร์มิค เชียงใหม่',
+  'แมคคอร์มิค':          'โรงพยาบาลแมคคอร์มิค เชียงใหม่',
+  'รพ.ลานนา':           'โรงพยาบาลลานนา เชียงใหม่',
+  'ลานนา':              'โรงพยาบาลลานนา เชียงใหม่',
+  'รพ.กรุงเทพ':          'โรงพยาบาลกรุงเทพ เชียงใหม่',
+  'รพ.ราม':             'โรงพยาบาลเชียงใหม่ราม',
+  'เชียงใหม่ราม':        'โรงพยาบาลเชียงใหม่ราม',
+  'รพ.เซ็นทรัล':         'โรงพยาบาลเซ็นทรัลเชียงใหม่เมโมเรียล',
+
+  // โรงเรียน
+  'วารี':              'โรงเรียนนานาชาติวารี เชียงใหม่',
+  'นานาชาติวารี':       'โรงเรียนนานาชาติวารี เชียงใหม่',
+  'รร.วารี':            'โรงเรียนนานาชาติวารี เชียงใหม่',
+  'ปรินส์รอยัล':         'โรงเรียนปรินส์รอยัลส์วิทยาลัย เชียงใหม่',
+  'รร.ปรินส์รอยัล':      'โรงเรียนปรินส์รอยัลส์วิทยาลัย เชียงใหม่',
+  'มงฟอร์ต':           'โรงเรียนมงฟอร์ตวิทยาลัย เชียงใหม่',
+  'รร.มงฟอร์ต':         'โรงเรียนมงฟอร์ตวิทยาลัย เชียงใหม่',
+  'ดารา':              'โรงเรียนดาราวิทยาลัย เชียงใหม่',
+  'ยุพราช':            'โรงเรียนยุพราชวิทยาลัย เชียงใหม่',
+  'รร.ยุพราช':          'โรงเรียนยุพราชวิทยาลัย เชียงใหม่',
+
+  // ถนน / ทำเล
+  'นิมมาน':             'ถนนนิมมานเหมินท์ เชียงใหม่',
+  'ซ.นิมมาน':           'ถนนนิมมานเหมินท์ เชียงใหม่',
+  'ถ.นิมมาน':           'ถนนนิมมานเหมินท์ เชียงใหม่',
+  'ห้วยแก้ว':           'ถนนห้วยแก้ว เชียงใหม่',
+  'ถ.ห้วยแก้ว':          'ถนนห้วยแก้ว เชียงใหม่',
+  'มหิดล':              'ถนนมหิดล เชียงใหม่',
+  'ถ.มหิดล':            'ถนนมหิดล เชียงใหม่',
+  'ช้างคลาน':           'ถนนช้างคลาน เชียงใหม่',
+  'ท่าแพ':              'ถนนท่าแพ เชียงใหม่',
+  'สันติธรรม':           'ถนนสันติธรรม เชียงใหม่',
+  'เจริญประเทศ':        'ถนนเจริญประเทศ เชียงใหม่',
+
+  // สนามบิน + ตลาด
+  'สนามบิน':            'ท่าอากาศยานเชียงใหม่',
+  'เชียงใหม่แอร์พอร์ต':   'ท่าอากาศยานเชียงใหม่',
+  'cnx':                'ท่าอากาศยานเชียงใหม่',
+  'ตลาดวโรรส':         'ตลาดวโรรส เชียงใหม่',
+  'กาดหลวง':           'ตลาดวโรรส เชียงใหม่',
+  'ไนท์บาซาร์':         'ไนท์บาซาร์ เชียงใหม่',
+  'ตลาดไนท์':           'ไนท์บาซาร์ เชียงใหม่',
+  'กาดสวนแก้ว':         'กาดสวนแก้ว เชียงใหม่',
+  'ตลาดต้นพยอม':       'ตลาดต้นพยอม เชียงใหม่'
+};
+
+// ขยายคำย่อ → ชื่อเต็ม (ใช้ก่อนส่ง Nominatim)
+function expandAlias(q) {
+  if (!q) return q;
+  var key = q.trim().toLowerCase();
+  if (GEO_ALIASES[key]) return GEO_ALIASES[key];
+  // ลองตัดช่องว่างภายในออกแล้วเทียบใหม่
+  var compact = key.replace(/\s+/g, '');
+  for (var k in GEO_ALIASES) {
+    if (k.replace(/\s+/g, '') === compact) return GEO_ALIASES[k];
+  }
+  return q;
+}
+
+// ─── localStorage CACHE สำหรับผลค้นหา ─────────────────────
+var GEO_CACHE_KEY  = 'geo_search_cache_v1';
+var GEO_CACHE_TTL  = 7 * 24 * 60 * 60 * 1000; // 7 วัน
+var GEO_CACHE_MAX  = 80;
+
+function geoCacheGet(key) {
+  try {
+    var c = JSON.parse(localStorage.getItem(GEO_CACHE_KEY) || '{}');
+    var e = c[key];
+    if (!e) return null;
+    if (Date.now() - e.ts > GEO_CACHE_TTL) return null;
+    return e.results;
+  } catch(err) { return null; }
+}
+function geoCacheSet(key, results) {
+  try {
+    var c = JSON.parse(localStorage.getItem(GEO_CACHE_KEY) || '{}');
+    c[key] = { ts: Date.now(), results: results };
+    // ตัดของเก่าทิ้งถ้าเกิน max
+    var keys = Object.keys(c);
+    if (keys.length > GEO_CACHE_MAX) {
+      keys.sort(function(a, b) { return c[a].ts - c[b].ts; });
+      var remove = keys.length - GEO_CACHE_MAX;
+      for (var i = 0; i < remove; i++) delete c[keys[i]];
+    }
+    localStorage.setItem(GEO_CACHE_KEY, JSON.stringify(c));
+  } catch(err) {}
+}
+
 function haversineKm(lat1, lng1, lat2, lng2) {
   var R = 6371;
   var toRad = function(d) { return d * Math.PI / 180; };
@@ -974,13 +1105,29 @@ function quickGeo(q) {
 }
 
 function searchByLocation() {
-  var q = document.getElementById('geoInput').value.trim();
-  if (!q) { showToast('กรุณาพิมพ์สถานที่ที่ต้องการค้นหา'); return; }
+  var rawQ = document.getElementById('geoInput').value.trim();
+  if (!rawQ) { showToast('กรุณาพิมพ์สถานที่ที่ต้องการค้นหา'); return; }
+
+  // ★ ขยายคำย่อก่อน เช่น "เซ็นเฟส" → "เซ็นทรัล เฟสติวัล เชียงใหม่"
+  var q = expandAlias(rawQ);
+  var aliasUsed = (q !== rawQ);
 
   var dd  = document.getElementById('geoDropdown');
   var btn = document.getElementById('geoBtnSearch');
+
+  // ★ ลอง cache ก่อน — ถ้าเจอ ใช้ทันทีไม่เรียก server
+  var cached = geoCacheGet(q);
+  if (cached) {
+    btn.disabled = false;
+    _renderGeoResults(cached, q, dd, aliasUsed ? rawQ : null);
+    return;
+  }
+
   btn.disabled = true;
-  dd.innerHTML = '<div class="geo-dropdown-loading">กำลังค้นหา "' + escapeHtml(q) + '"…</div>';
+  var loadingLabel = aliasUsed
+    ? 'กำลังค้นหา "' + escapeHtml(rawQ) + '" → ' + escapeHtml(q) + '…'
+    : 'กำลังค้นหา "' + escapeHtml(q) + '"…';
+  dd.innerHTML = '<div class="geo-dropdown-loading">' + loadingLabel + '</div>';
   dd.classList.add('open');
 
   var viewbox = '98.0,17.5,100.0,20.5';
@@ -998,34 +1145,10 @@ function searchByLocation() {
     .then(function(r) { return r.json(); })
     .then(function(results) {
       btn.disabled = false;
-      if (!Array.isArray(results) || results.length === 0) {
-        dd.innerHTML = '<div class="geo-dropdown-empty">' +
-          '😕 ไม่พบสถานที่ "' + escapeHtml(q) + '"<br>' +
-          '<small style="color:#aaa;font-size:0.78rem;">ลองพิมพ์ชื่อเต็ม</small>' +
-        '</div>';
-        return;
+      if (Array.isArray(results) && results.length > 0) {
+        geoCacheSet(q, results);  // เก็บ cache
       }
-      if (results.length === 1) {
-        dd.classList.remove('open');
-        applyGeoOrigin(results[0]);
-        return;
-      }
-      dd.innerHTML = results.map(function(r) {
-        var name = r.display_name || '';
-        var parts = name.split(',');
-        var main = parts[0].trim();
-        var sub  = parts.slice(1, 4).map(function(s){return s.trim();}).filter(Boolean).join(', ');
-        var data = encodeURIComponent(JSON.stringify({
-          lat: parseFloat(r.lat),
-          lng: parseFloat(r.lon),
-          label: main,
-          full: name
-        }));
-        return '<div class="geo-dropdown-item" onclick="applyGeoOriginEncoded(\'' + data + '\')">' +
-                 '<div class="gd-name">' + escapeHtml(main) + '</div>' +
-                 (sub ? '<div class="gd-sub">' + escapeHtml(sub) + '</div>' : '') +
-               '</div>';
-      }).join('');
+      _renderGeoResults(results, q, dd, aliasUsed ? rawQ : null);
     })
     .catch(function(err) {
       btn.disabled = false;
@@ -1034,6 +1157,38 @@ function searchByLocation() {
         '<small style="color:#aaa;font-size:0.78rem;">' + escapeHtml(err.message || '') + '</small>' +
       '</div>';
     });
+}
+
+// แสดงผลลัพธ์ใน dropdown — แยกออกมาเพื่อใช้กับ cache hit ด้วย
+function _renderGeoResults(results, q, dd, originalQuery) {
+  if (!Array.isArray(results) || results.length === 0) {
+    dd.innerHTML = '<div class="geo-dropdown-empty">' +
+      '😕 ไม่พบสถานที่ "' + escapeHtml(originalQuery || q) + '"<br>' +
+      '<small style="color:#aaa;font-size:0.78rem;">ลองพิมพ์ชื่อเต็ม หรือกด chip ลัดด้านล่าง</small>' +
+    '</div>';
+    return;
+  }
+  if (results.length === 1) {
+    dd.classList.remove('open');
+    applyGeoOrigin(results[0]);
+    return;
+  }
+  dd.innerHTML = results.map(function(r) {
+    var name = r.display_name || '';
+    var parts = name.split(',');
+    var main = parts[0].trim();
+    var sub  = parts.slice(1, 4).map(function(s){return s.trim();}).filter(Boolean).join(', ');
+    var data = encodeURIComponent(JSON.stringify({
+      lat: parseFloat(r.lat),
+      lng: parseFloat(r.lon),
+      label: main,
+      full: name
+    }));
+    return '<div class="geo-dropdown-item" onclick="applyGeoOriginEncoded(\'' + data + '\')">' +
+             '<div class="gd-name">' + escapeHtml(main) + '</div>' +
+             (sub ? '<div class="gd-sub">' + escapeHtml(sub) + '</div>' : '') +
+           '</div>';
+  }).join('');
 }
 
 function applyGeoOriginEncoded(encoded) {
