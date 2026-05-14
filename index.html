@@ -584,11 +584,20 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
         <div class="modal-row"><span class="lbl">ห้องน้ำ</span>     <span class="val" id="dBath"></span></div>
         <div class="modal-row"><span class="lbl">สัตว์เลี้ยง</span> <span class="val" id="dPet"></span></div>
         <div class="modal-row"><span class="lbl">รหัสทรัพย์</span>  <span class="val" id="dCode"></span></div>
+        <div class="modal-row" id="dLocationRow" style="display:none;">
+          <span class="lbl">พิกัด</span>
+          <span class="val" id="dCoords"></span>
+        </div>
       </div>
     </div>
     <div class="modal-actions">
       <button class="btn-call" onclick="window.location.href='tel:0809945497'">📞 โทรสอบถาม</button>
       <button class="btn-line" onclick="alert('Line ID: @the9property หรือโทร 0809945497')">💬 Line</button>
+    </div>
+    <div class="modal-actions" id="dMapsRow" style="display:none;padding-top:0;">
+      <a class="btn-detail" id="dMapsLink" target="_blank" rel="noopener" style="flex:1;text-decoration:none;text-align:center;">
+        🗺 ดูพิกัดใน Google Maps
+      </a>
     </div>
   </div>
 </div>
@@ -914,6 +923,21 @@ function openDetail(p) {
   document.getElementById('dBath').textContent     = (p.bathroom||'–') + ' ห้อง';
   document.getElementById('dPet').textContent      = petLabel(p.pet);
   document.getElementById('dCode').textContent     = p.code || '–';
+
+  // ★ GEO: แสดงพิกัด + ลิงก์ Maps ถ้ามี → ตรวจได้ว่า pin ตรงไหม
+  var coordsRow = document.getElementById('dLocationRow');
+  var mapsRow   = document.getElementById('dMapsRow');
+  if (typeof p.lat === 'number' && typeof p.lng === 'number') {
+    document.getElementById('dCoords').textContent =
+      p.lat.toFixed(6) + ', ' + p.lng.toFixed(6);
+    coordsRow.style.display = '';
+    document.getElementById('dMapsLink').href =
+      'https://www.google.com/maps?q=' + p.lat + ',' + p.lng;
+    mapsRow.style.display = '';
+  } else {
+    coordsRow.style.display = 'none';
+    mapsRow.style.display = 'none';
+  }
 
   document.getElementById('detailOverlay').classList.add('open');
   var modal = document.querySelector('.modal');
