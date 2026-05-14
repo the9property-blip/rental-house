@@ -350,6 +350,103 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
   .modal-photo { height: 200px; }
   .card-photo { height: 200px; }
 }
+
+/* ─── GEO SEARCH (ค้นหาตำแหน่งใกล้เคียง) ─── */
+.geo-row {
+  display: flex; align-items: center; gap: 6px; margin-top: 7px;
+  overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none;
+}
+.geo-row::-webkit-scrollbar { display: none; }
+.geo-search-container { position: relative; flex: 0 0 auto; }
+.geo-input-wrap {
+  flex: 0 0 auto; display: flex; align-items: center; gap: 4px;
+  background: rgba(255,255,255,0.95); border-radius: 50px;
+  padding: 3px 4px 3px 12px; min-width: 220px;
+}
+.geo-input-wrap input {
+  flex: 1; border: none; outline: none; padding: 4px 0;
+  font-size: 0.78rem; font-family: inherit; background: transparent;
+  color: #333; min-width: 130px;
+}
+.geo-btn-search {
+  background: #0f3460; color: white; border: none;
+  width: 26px; height: 26px; border-radius: 50%;
+  cursor: pointer; font-size: 0.78rem; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.geo-btn-search:disabled { opacity: 0.5; cursor: wait; }
+.geo-chip {
+  flex-shrink: 0; padding: 4px 11px; border-radius: 50px;
+  border: 1.5px solid rgba(255,255,255,0.35);
+  background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.9);
+  font-size: 0.72rem; cursor: pointer; transition: all 0.2s;
+  font-family: inherit; white-space: nowrap;
+}
+.geo-chip:hover { background: rgba(255,255,255,0.18); }
+.geo-chip-label {
+  flex-shrink: 0; font-size: 0.7rem; color: rgba(255,255,255,0.55);
+  white-space: nowrap; padding-right: 2px;
+}
+.geo-dropdown {
+  position: absolute; top: 100%; left: 0; min-width: 280px;
+  background: white; border-radius: 12px;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.22);
+  max-height: 320px; overflow-y: auto; z-index: 200;
+  display: none; margin-top: 6px;
+}
+.geo-dropdown.open { display: block; }
+.geo-dropdown-item {
+  padding: 11px 14px; cursor: pointer; border-bottom: 1px solid #f3f3f3;
+  font-size: 0.85rem; color: #222; line-height: 1.4;
+}
+.geo-dropdown-item:last-child { border-bottom: none; }
+.geo-dropdown-item:hover, .geo-dropdown-item:active { background: #f5f7fb; }
+.geo-dropdown-item .gd-name { font-weight: 600; color: #0f3460; }
+.geo-dropdown-item .gd-sub  { font-size: 0.75rem; color: #888; margin-top: 2px; }
+.geo-dropdown-empty {
+  padding: 22px 14px; text-align: center; color: #999; font-size: 0.85rem;
+}
+.geo-dropdown-loading {
+  padding: 20px 14px; text-align: center; color: #0f3460; font-size: 0.82rem;
+}
+.geo-dropdown-loading::before {
+  content: ""; display: inline-block;
+  width: 14px; height: 14px;
+  border: 2px solid #e0e0e0; border-top-color: #0f3460;
+  border-radius: 50%; animation: spin 0.7s linear infinite;
+  vertical-align: middle; margin-right: 8px;
+}
+.geo-active-pill {
+  display: none; align-items: center; gap: 8px;
+  background: linear-gradient(135deg, #0f3460, #16213e);
+  color: white; padding: 6px 6px 6px 14px; border-radius: 50px;
+  font-size: 0.78rem;
+}
+.geo-active-pill.visible { display: inline-flex; }
+.geo-active-pill .pill-text { white-space: nowrap; max-width: 220px; overflow: hidden; text-overflow: ellipsis; }
+.geo-active-pill button {
+  background: rgba(255,255,255,0.22); border: none; color: white;
+  width: 22px; height: 22px; border-radius: 50%; cursor: pointer;
+  font-size: 0.78rem; flex-shrink: 0;
+}
+.geo-active-pill button:hover { background: rgba(255,255,255,0.4); }
+.dist-badge {
+  display: inline-flex; align-items: center; gap: 3px;
+  background: #0f3460; color: white;
+  font-size: 0.7rem; padding: 3px 8px; border-radius: 50px;
+  font-weight: 700;
+}
+.dist-badge.far { background: #888; }
+.dist-badge.unknown { background: #ccc; color: #666; }
+.card-distance-row {
+  display: flex; align-items: center; gap: 6px;
+  margin-bottom: 8px;
+}
+.sort-select:disabled { opacity: 0.5; cursor: not-allowed; }
+@media (max-width: 580px) {
+  .geo-input-wrap { min-width: 180px; }
+  .geo-input-wrap input { min-width: 90px; }
+}
 </style>
 </head>
 <body>
@@ -408,11 +505,38 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
       <option value="soon">📅 ประกาศล่วงหน้า</option>
     </select>
   </div>
+
+  <!-- GEO ROW: ค้นหาตำแหน่งใกล้เคียง -->
+  <div class="geo-row">
+    <div class="geo-search-container">
+      <div class="geo-input-wrap">
+        <input type="text" id="geoInput" placeholder="📍 ค้นหาใกล้... เช่น วารีเชียงใหม่, มช., เซ็นทรัล"
+               onkeydown="if(event.key==='Enter') searchByLocation()">
+        <button class="geo-btn-search" id="geoBtnSearch" onclick="searchByLocation()" title="ค้นหา">🔍</button>
+      </div>
+      <div class="geo-dropdown" id="geoDropdown"></div>
+    </div>
+    <span class="geo-chip-label">ลัด:</span>
+    <button class="geo-chip" onclick="quickGeo('มหาวิทยาลัยเชียงใหม่')">มช.</button>
+    <button class="geo-chip" onclick="quickGeo('เซ็นทรัล เฟสติวัล เชียงใหม่')">เซ็นทรัลเฟสติวัล</button>
+    <button class="geo-chip" onclick="quickGeo('เซ็นทรัล แอร์พอร์ต เชียงใหม่')">เซ็นทรัลแอร์พอร์ต</button>
+    <button class="geo-chip" onclick="quickGeo('ท่าอากาศยานเชียงใหม่')">สนามบิน</button>
+    <button class="geo-chip" onclick="quickGeo('ถนนนิมมานเหมินท์ เชียงใหม่')">นิมมาน</button>
+    <button class="geo-chip" onclick="quickGeo('โรงพยาบาลมหาราชนครเชียงใหม่')">รพ.มหาราช</button>
+    <button class="geo-chip" onclick="quickGeo('โรงเรียนนานาชาติวารี เชียงใหม่')">วารีเชียงใหม่</button>
+    <button class="geo-chip" onclick="quickGeo('ถนนมหิดล เชียงใหม่')">ถ.มหิดล</button>
+  </div>
 </div>
 
 <!-- STATS BAR -->
 <div class="stats-bar">
-  <div>แสดง <strong id="countDisplay">–</strong> รายการ</div>
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+    <span>แสดง <strong id="countDisplay">–</strong> รายการ</span>
+    <span class="geo-active-pill" id="geoActivePill">
+      <span class="pill-text" id="geoActiveText"></span>
+      <button onclick="clearGeoSearch()" title="ล้างการค้นหาตำแหน่ง">✕</button>
+    </span>
+  </div>
   <div class="stats-right">
     <select class="sort-select" id="selSort" onchange="applyFilters()">
       <option value="price_asc">ราคา ถูก→แพง</option>
@@ -489,7 +613,21 @@ var allData     = [];
 var activeType  = 'all';
 var activeAgent = 'all';   // 'all' | 'direct' | 'co'
 
+// ─── GEO STATE ───────────────────────────────────────────
+var geoOrigin = null;  // { lat, lng, label } เมื่อค้นหาตามตำแหน่ง
+
 window.onload = function() { loadData(false); };
+
+// ปิด dropdown เมื่อคลิกที่อื่น
+document.addEventListener('click', function(e) {
+  var dd = document.getElementById('geoDropdown');
+  if (!dd || !dd.classList.contains('open')) return;
+  var input = document.getElementById('geoInput');
+  var btn = document.getElementById('geoBtnSearch');
+  if (e.target === input || e.target === btn) return;
+  if (dd.contains(e.target)) return;
+  dd.classList.remove('open');
+});
 
 // ─── LOAD DATA ─────────────────────────────────────────────
 // manual = true  → ส่ง ?refresh=1 บังคับ scan รูปใหม่บน server
@@ -577,17 +715,37 @@ function applyFilters() {
     return true;
   });
 
-  filtered.sort(function(a, b) {
-    // จัด "พร้อม" ขึ้นก่อน "ประกาศล่วงหน้า" เสมอ
-    if (a.ready !== b.ready) return a.ready ? -1 : 1;
-    if (sort === 'price_asc')  return (a.price||0) - (b.price||0);
-    if (sort === 'price_desc') return (b.price||0) - (a.price||0);
-    if (sort === 'name_asc')   return (a.project||'').localeCompare(b.project||'');
-    if (sort === 'bed_asc')    return (parseInt(a.bedroom)||0) - (parseInt(b.bedroom)||0);
-    // ภายในกลุ่ม "ประกาศล่วงหน้า" → เรียงตามวันที่เข้าพักก่อนหลัง
-    if (!a.ready && !b.ready) return (a.availableDate||'').localeCompare(b.availableDate||'');
-    return 0;
-  });
+  // ★ GEO: คำนวณระยะทางจาก geoOrigin (ถ้ามี)
+  if (geoOrigin) {
+    filtered.forEach(function(p) {
+      if (typeof p.lat === 'number' && typeof p.lng === 'number') {
+        p._dist = haversineKm(geoOrigin.lat, geoOrigin.lng, p.lat, p.lng);
+      } else {
+        p._dist = null;
+      }
+    });
+    // เรียง: พร้อม > ประกาศล่วงหน้า, ภายในกลุ่ม → ระยะใกล้-ไกล, ไม่มีพิกัด → ท้าย
+    filtered.sort(function(a, b) {
+      if (a.ready !== b.ready) return a.ready ? -1 : 1;
+      if (a._dist == null && b._dist == null) return 0;
+      if (a._dist == null) return 1;
+      if (b._dist == null) return -1;
+      return a._dist - b._dist;
+    });
+  } else {
+    filtered.forEach(function(p) { p._dist = undefined; });
+    filtered.sort(function(a, b) {
+      // จัด "พร้อม" ขึ้นก่อน "ประกาศล่วงหน้า" เสมอ
+      if (a.ready !== b.ready) return a.ready ? -1 : 1;
+      if (sort === 'price_asc')  return (a.price||0) - (b.price||0);
+      if (sort === 'price_desc') return (b.price||0) - (a.price||0);
+      if (sort === 'name_asc')   return (a.project||'').localeCompare(b.project||'');
+      if (sort === 'bed_asc')    return (parseInt(a.bedroom)||0) - (parseInt(b.bedroom)||0);
+      // ภายในกลุ่ม "ประกาศล่วงหน้า" → เรียงตามวันที่เข้าพักก่อนหลัง
+      if (!a.ready && !b.ready) return (a.availableDate||'').localeCompare(b.availableDate||'');
+      return 0;
+    });
+  }
 
   showGrid(filtered);
   document.getElementById('countDisplay').textContent = filtered.length;
@@ -675,6 +833,17 @@ function showGrid(data) {
       ? '<div class="card-photo"><img src="' + photoUrl(p.thumb, 400) + '" loading="lazy" alt="' + (p.project||'') + '" onerror="onPhotoError(this,\'' + p.thumb + '\')">' + sBadge + coBadge + '</div>'
       : '<div class="card-photo"><div class="card-photo-placeholder"><span class="ph-icon">🏠</span><span>ยังไม่มีรูป</span></div>' + sBadge + coBadge + '</div>';
 
+    // ★ GEO: badge ระยะทางเมื่อกำลังค้นหาตามตำแหน่ง
+    var distBlock = '';
+    if (geoOrigin) {
+      if (typeof p._dist === 'number') {
+        var dCls = p._dist > 5 ? 'dist-badge far' : 'dist-badge';
+        distBlock = '<div class="card-distance-row"><span class="' + dCls + '">📍 ' + fmtDist(p._dist) + '</span></div>';
+      } else {
+        distBlock = '<div class="card-distance-row"><span class="dist-badge unknown">📍 ไม่ระบุพิกัด</span></div>';
+      }
+    }
+
     return '<div class="card" onclick=\'openDetail(' + pj + ')\'>' +
       photoBlock +
       '<div class="card-header">' +
@@ -684,6 +853,7 @@ function showGrid(data) {
         '<span class="card-type-badge ' + badgeClass(p.type) + '">' + (p.type||'') + '</span>' +
       '</div>' +
       '<div class="card-body">' +
+        distBlock +
         '<div class="price">฿' + fmtPrice(p.price) + ' <span>บาท/เดือน</span></div>' +
         '<div class="card-tags">' +
           (p.bedroom  ? '<span class="tag">🛏 ' + p.bedroom  + ' นอน</span>' : '') +
@@ -775,6 +945,148 @@ function showToast(msg) {
   t.classList.add('show');
   clearTimeout(t._t);
   t._t = setTimeout(function() { t.classList.remove('show'); }, 2800);
+}
+
+// ═══════════════════════════════════════════════════════════
+// ─── GEO SEARCH: ค้นหาทรัพย์ใกล้สถานที่ที่ระบุ ─────────────
+// ═══════════════════════════════════════════════════════════
+function haversineKm(lat1, lng1, lat2, lng2) {
+  var R = 6371;
+  var toRad = function(d) { return d * Math.PI / 180; };
+  var dLat = toRad(lat2 - lat1);
+  var dLng = toRad(lng2 - lng1);
+  var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+          Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+          Math.sin(dLng/2) * Math.sin(dLng/2);
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function fmtDist(km) {
+  if (km == null || isNaN(km)) return '–';
+  if (km < 1)  return Math.round(km * 1000) + ' ม.';
+  if (km < 10) return km.toFixed(1) + ' กม.';
+  return Math.round(km) + ' กม.';
+}
+
+function quickGeo(q) {
+  document.getElementById('geoInput').value = q;
+  searchByLocation();
+}
+
+function searchByLocation() {
+  var q = document.getElementById('geoInput').value.trim();
+  if (!q) { showToast('กรุณาพิมพ์สถานที่ที่ต้องการค้นหา'); return; }
+
+  var dd  = document.getElementById('geoDropdown');
+  var btn = document.getElementById('geoBtnSearch');
+  btn.disabled = true;
+  dd.innerHTML = '<div class="geo-dropdown-loading">กำลังค้นหา "' + escapeHtml(q) + '"…</div>';
+  dd.classList.add('open');
+
+  var viewbox = '98.0,17.5,100.0,20.5';
+  var url = 'https://nominatim.openstreetmap.org/search'
+          + '?q=' + encodeURIComponent(q)
+          + '&format=json'
+          + '&addressdetails=1'
+          + '&limit=6'
+          + '&countrycodes=th'
+          + '&viewbox=' + viewbox
+          + '&bounded=0'
+          + '&accept-language=th';
+
+  fetch(url, { headers: { 'Accept-Language': 'th' } })
+    .then(function(r) { return r.json(); })
+    .then(function(results) {
+      btn.disabled = false;
+      if (!Array.isArray(results) || results.length === 0) {
+        dd.innerHTML = '<div class="geo-dropdown-empty">' +
+          '😕 ไม่พบสถานที่ "' + escapeHtml(q) + '"<br>' +
+          '<small style="color:#aaa;font-size:0.78rem;">ลองพิมพ์ชื่อเต็ม</small>' +
+        '</div>';
+        return;
+      }
+      if (results.length === 1) {
+        dd.classList.remove('open');
+        applyGeoOrigin(results[0]);
+        return;
+      }
+      dd.innerHTML = results.map(function(r) {
+        var name = r.display_name || '';
+        var parts = name.split(',');
+        var main = parts[0].trim();
+        var sub  = parts.slice(1, 4).map(function(s){return s.trim();}).filter(Boolean).join(', ');
+        var data = encodeURIComponent(JSON.stringify({
+          lat: parseFloat(r.lat),
+          lng: parseFloat(r.lon),
+          label: main,
+          full: name
+        }));
+        return '<div class="geo-dropdown-item" onclick="applyGeoOriginEncoded(\'' + data + '\')">' +
+                 '<div class="gd-name">' + escapeHtml(main) + '</div>' +
+                 (sub ? '<div class="gd-sub">' + escapeHtml(sub) + '</div>' : '') +
+               '</div>';
+      }).join('');
+    })
+    .catch(function(err) {
+      btn.disabled = false;
+      dd.innerHTML = '<div class="geo-dropdown-empty">' +
+        '⚠️ เชื่อมต่อบริการค้นหาไม่ได้<br>' +
+        '<small style="color:#aaa;font-size:0.78rem;">' + escapeHtml(err.message || '') + '</small>' +
+      '</div>';
+    });
+}
+
+function applyGeoOriginEncoded(encoded) {
+  try {
+    var data = JSON.parse(decodeURIComponent(encoded));
+    applyGeoOrigin({ lat: data.lat, lon: data.lng, display_name: data.full, _label: data.label });
+  } catch(e) {}
+}
+
+function applyGeoOrigin(result) {
+  var lat = parseFloat(result.lat);
+  var lng = parseFloat(result.lon != null ? result.lon : result.lng);
+  if (isNaN(lat) || isNaN(lng)) { showToast('พิกัดไม่ถูกต้อง'); return; }
+
+  var label = result._label || (result.display_name || '').split(',')[0].trim() || 'ตำแหน่งที่เลือก';
+  geoOrigin = { lat: lat, lng: lng, label: label };
+
+  document.getElementById('geoDropdown').classList.remove('open');
+  document.getElementById('geoInput').value = label;
+  var pill = document.getElementById('geoActivePill');
+  document.getElementById('geoActiveText').textContent = '📍 ใกล้ ' + label;
+  pill.classList.add('visible');
+
+  var selSort = document.getElementById('selSort');
+  selSort.disabled = true;
+
+  applyFilters();
+
+  var withGeo = allData.filter(function(p) { return typeof p.lat === 'number'; }).length;
+  if (withGeo === 0) {
+    showToast('⚠️ ยังไม่มีทรัพย์ที่มีพิกัดในระบบ');
+  } else {
+    showToast('✅ แสดงทรัพย์เรียงระยะใกล้-ไกล (' + withGeo + ' หลังมีพิกัด)');
+  }
+}
+
+function clearGeoSearch() {
+  geoOrigin = null;
+  document.getElementById('geoInput').value = '';
+  document.getElementById('geoDropdown').classList.remove('open');
+  document.getElementById('geoActivePill').classList.remove('visible');
+  document.getElementById('selSort').disabled = false;
+  applyFilters();
+}
+
+function escapeHtml(s) {
+  if (s == null) return '';
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 </script>
 </body>
