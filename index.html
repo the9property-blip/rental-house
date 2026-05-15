@@ -447,6 +447,73 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
   .geo-input-wrap { min-width: 180px; }
   .geo-input-wrap input { min-width: 90px; }
 }
+
+/* ─── STAFF LOGIN ─── */
+.staff-btn {
+  background: rgba(255,255,255,0.15); color: white; border: 1.5px solid rgba(255,255,255,0.3);
+  padding: 4px 11px; border-radius: 50px; font-size: 0.73rem;
+  cursor: pointer; font-family: inherit; flex-shrink: 0;
+  display: inline-flex; align-items: center; gap: 4px;
+}
+.staff-btn:hover { background: rgba(255,255,255,0.25); }
+.staff-btn.logged-in { background: #f6c244; color: #1a1a2e; border-color: #f6c244; font-weight: 700; }
+
+.staff-modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.65); z-index: 1500;
+  align-items: center; justify-content: center; padding: 16px;
+}
+.staff-modal-overlay.open { display: flex; }
+.staff-modal {
+  background: white; border-radius: 18px; padding: 26px 24px 22px;
+  max-width: 360px; width: 100%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+.staff-modal h3 { font-size: 1.15rem; color: #0f3460; margin-bottom: 4px; }
+.staff-modal .sub { font-size: 0.82rem; color: #888; margin-bottom: 16px; }
+.staff-modal input[type=password] {
+  width: 100%; padding: 12px 14px; border-radius: 10px;
+  border: 1.5px solid #ddd; font-size: 1rem; outline: none; font-family: inherit;
+  margin-bottom: 12px;
+}
+.staff-modal input[type=password]:focus { border-color: #0f3460; }
+.staff-modal .err { color: #c0392b; font-size: 0.82rem; margin-bottom: 10px; min-height: 18px; }
+.staff-modal-buttons { display: flex; gap: 10px; }
+.staff-modal-buttons button {
+  flex: 1; padding: 11px; border-radius: 10px; font-size: 0.92rem; font-weight: 700;
+  cursor: pointer; font-family: inherit; border: none;
+}
+.btn-login-go {
+  background: linear-gradient(135deg, #0f3460, #16213e); color: white;
+}
+.btn-login-cancel {
+  background: #f0f0f0; color: #555;
+}
+
+/* Staff-only section in detail modal */
+.staff-section {
+  background: linear-gradient(135deg, #fff4d6, #fff8e6);
+  border: 1px solid #f6c244; border-radius: 12px;
+  padding: 12px 14px; margin: 12px 20px;
+}
+.staff-section .staff-title {
+  font-size: 0.78rem; color: #b8860b; font-weight: 700;
+  margin-bottom: 10px; display: flex; align-items: center; gap: 5px;
+}
+.staff-section .modal-row { padding: 6px 0; font-size: 0.85rem; }
+.staff-section .modal-row .lbl { color: #8a6d1a; }
+.staff-section .modal-row .val { color: #1a1a2e; font-weight: 600; }
+.staff-section .staff-actions {
+  display: flex; gap: 8px; margin-top: 10px;
+}
+.staff-section .staff-actions a {
+  flex: 1; padding: 8px; border-radius: 8px;
+  text-align: center; text-decoration: none;
+  font-size: 0.8rem; font-weight: 600;
+  background: #0f3460; color: white;
+}
+.staff-section .staff-actions a.line { background: #06c755; }
+.staff-section .staff-actions a.maps { background: #4285f4; }
 </style>
 </head>
 <body>
@@ -459,6 +526,7 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
       <input type="text" id="searchInput" placeholder="ค้นหาโครงการ, ทำเล, รหัส..." oninput="applyFilters()">
       <span class="search-icon">🔍</span>
     </div>
+    <button class="staff-btn" id="staffBtn" onclick="staffBtnClick()">🔐 Staff</button>
   </div>
   <div class="header-row2">
     <button class="filter-btn active" onclick="setType('all',this)">ทั้งหมด</button>
@@ -586,9 +654,38 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
         <div class="modal-row"><span class="lbl">รหัสทรัพย์</span>  <span class="val" id="dCode"></span></div>
       </div>
     </div>
+
+    <!-- STAFF-ONLY SECTION: shown only when logged in -->
+    <div class="staff-section" id="dStaffSection" style="display:none;">
+      <div class="staff-title">⭐ ข้อมูลทีมงาน (Staff Only)</div>
+      <div class="modal-row"><span class="lbl">เจ้าของ</span> <span class="val" id="dOwnerName">–</span></div>
+      <div class="modal-row"><span class="lbl">เบอร์โทร</span> <span class="val" id="dOwnerTel">–</span></div>
+      <div class="modal-row" id="dContactRow" style="display:none;"><span class="lbl">ติดต่ออื่น</span> <span class="val" id="dContact">–</span></div>
+      <div class="modal-row"><span class="lbl">พิกัด</span> <span class="val" id="dCoords">–</span></div>
+      <div class="staff-actions">
+        <a id="dCallOwner" href="#">📞 โทรเจ้าของ</a>
+        <a id="dMapsLink" class="maps" href="#" target="_blank" rel="noopener">🗺 ดูใน Maps</a>
+      </div>
+    </div>
+
     <div class="modal-actions">
       <button class="btn-call" onclick="window.location.href='tel:0809945497'">📞 โทรสอบถาม</button>
       <button class="btn-line" onclick="alert('Line ID: @the9property หรือโทร 0809945497')">💬 Line</button>
+    </div>
+  </div>
+</div>
+
+<!-- STAFF LOGIN MODAL -->
+<div class="staff-modal-overlay" id="staffLoginModal" onclick="if(event.target===this)closeStaffModal()">
+  <div class="staff-modal">
+    <h3>🔐 เข้าสู่ระบบทีมงาน</h3>
+    <div class="sub">เฉพาะทีมงาน The 9 Property — หลังเข้าสู่ระบบจะเห็นพิกัด, เบอร์เจ้าของ, ลิงก์ Maps</div>
+    <input type="password" id="staffPasswordInput" placeholder="รหัสผ่าน"
+           onkeydown="if(event.key==='Enter') doStaffLogin()" autocomplete="current-password">
+    <div class="err" id="staffLoginErr"></div>
+    <div class="staff-modal-buttons">
+      <button class="btn-login-cancel" onclick="closeStaffModal()">ยกเลิก</button>
+      <button class="btn-login-go" onclick="doStaffLogin()">เข้าสู่ระบบ</button>
     </div>
   </div>
 </div>
@@ -616,7 +713,86 @@ var activeAgent = 'all';   // 'all' | 'direct' | 'co'
 // ─── GEO STATE ───────────────────────────────────────────
 var geoOrigin = null;  // { lat, lng, label } เมื่อค้นหาตามตำแหน่ง
 
-window.onload = function() { loadData(false); };
+// ─── STAFF AUTH ──────────────────────────────────────────
+function getStaffToken() {
+  try { return sessionStorage.getItem('staff_token') || ''; } catch(e) { return ''; }
+}
+function isStaffLoggedIn() { return !!getStaffToken(); }
+
+function updateStaffBtn() {
+  var btn = document.getElementById('staffBtn');
+  if (!btn) return;
+  if (isStaffLoggedIn()) {
+    btn.textContent = '⭐ Staff (ออก)';
+    btn.classList.add('logged-in');
+  } else {
+    btn.textContent = '🔐 Staff';
+    btn.classList.remove('logged-in');
+  }
+}
+
+function staffBtnClick() {
+  if (isStaffLoggedIn()) {
+    if (confirm('ออกจากระบบทีมงาน?')) {
+      try { sessionStorage.removeItem('staff_token'); } catch(e) {}
+      updateStaffBtn();
+      loadData(true);
+      showToast('👋 ออกจากระบบแล้ว');
+    }
+  } else {
+    openStaffModal();
+  }
+}
+
+function openStaffModal() {
+  document.getElementById('staffLoginErr').textContent = '';
+  document.getElementById('staffPasswordInput').value = '';
+  document.getElementById('staffLoginModal').classList.add('open');
+  setTimeout(function() { document.getElementById('staffPasswordInput').focus(); }, 50);
+}
+function closeStaffModal() {
+  document.getElementById('staffLoginModal').classList.remove('open');
+}
+
+function doStaffLogin() {
+  var pw = document.getElementById('staffPasswordInput').value;
+  if (!pw) { document.getElementById('staffLoginErr').textContent = 'กรุณาใส่รหัสผ่าน'; return; }
+
+  document.getElementById('staffLoginErr').textContent = '⏳ กำลังตรวจสอบ...';
+  // เก็บ token ชั่วคราว แล้วลองโหลดข้อมูล — ถ้า server บอก staff:true = รหัสถูก
+  try { sessionStorage.setItem('staff_token', pw); } catch(e) {}
+
+  fetch(SCRIPT_URL + '?token=' + encodeURIComponent(pw))
+    .then(function(r) { return r.json(); })
+    .then(function(json) {
+      if (json.staff === true) {
+        closeStaffModal();
+        updateStaffBtn();
+        allData = json.data || [];
+        applyFilters();
+        showToast('✅ เข้าสู่ระบบสำเร็จ');
+      } else {
+        try { sessionStorage.removeItem('staff_token'); } catch(e) {}
+        document.getElementById('staffLoginErr').textContent = '❌ รหัสผ่านไม่ถูกต้อง';
+      }
+    })
+    .catch(function(err) {
+      try { sessionStorage.removeItem('staff_token'); } catch(e) {}
+      document.getElementById('staffLoginErr').textContent = '⚠️ เชื่อมต่อไม่ได้: ' + err.message;
+    });
+}
+
+window.onload = function() {
+  updateStaffBtn();
+  loadData(false);
+};
+
+// ปิด login modal ด้วย Escape
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape' && document.getElementById('staffLoginModal').classList.contains('open')) {
+    closeStaffModal();
+  }
+});
 
 // ปิด dropdown เมื่อคลิกที่อื่น
 document.addEventListener('click', function(e) {
@@ -638,7 +814,11 @@ function loadData(manual) {
   btn.disabled = true;
   showLoading();
 
-  var url = SCRIPT_URL + (manual ? '?refresh=1' : '');
+  var params = [];
+  if (manual) params.push('refresh=1');
+  var token = getStaffToken();
+  if (token) params.push('token=' + encodeURIComponent(token));
+  var url = SCRIPT_URL + (params.length ? '?' + params.join('&') : '');
   fetch(url)
     .then(function(r) { return r.json(); })
     .then(function(json) {
@@ -914,6 +1094,45 @@ function openDetail(p) {
   document.getElementById('dBath').textContent     = (p.bathroom||'–') + ' ห้อง';
   document.getElementById('dPet').textContent      = petLabel(p.pet);
   document.getElementById('dCode').textContent     = p.code || '–';
+
+  // ★ STAFF SECTION — แสดงเฉพาะเมื่อ login + มีข้อมูลส่งมาจาก server
+  var staffSec = document.getElementById('dStaffSection');
+  if (isStaffLoggedIn() && (p.ownerName || p.ownerTel)) {
+    document.getElementById('dOwnerName').textContent = p.ownerName || '–';
+    var tel = (p.ownerTel || '').replace(/\s+/g, '');
+    document.getElementById('dOwnerTel').textContent = p.ownerTel || '–';
+    document.getElementById('dCallOwner').href = tel ? ('tel:' + tel) : '#';
+    document.getElementById('dCallOwner').style.opacity = tel ? '1' : '0.4';
+
+    // ช่องทางติดต่ออื่น (Line/etc)
+    var contactRow = document.getElementById('dContactRow');
+    if (p.contact) {
+      document.getElementById('dContact').textContent = p.contact;
+      contactRow.style.display = '';
+    } else {
+      contactRow.style.display = 'none';
+    }
+
+    // พิกัด + ปุ่ม Maps
+    var latNum = parseFloat(p.lat), lngNum = parseFloat(p.lng);
+    var mapsLink = document.getElementById('dMapsLink');
+    if (!isNaN(latNum) && !isNaN(lngNum)) {
+      document.getElementById('dCoords').textContent =
+        latNum.toFixed(6) + ', ' + lngNum.toFixed(6);
+      mapsLink.href = 'https://www.google.com/maps?q=' + latNum + ',' + lngNum;
+      mapsLink.style.opacity = '1';
+      mapsLink.style.pointerEvents = '';
+    } else {
+      document.getElementById('dCoords').textContent = '— ไม่ระบุพิกัด';
+      mapsLink.href = '#';
+      mapsLink.style.opacity = '0.4';
+      mapsLink.style.pointerEvents = 'none';
+    }
+
+    staffSec.style.display = '';
+  } else {
+    staffSec.style.display = 'none';
+  }
 
   document.getElementById('detailOverlay').classList.add('open');
   var modal = document.querySelector('.modal');
