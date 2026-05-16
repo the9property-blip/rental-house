@@ -472,6 +472,27 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
 .schedule-btn.visible { display: inline-flex; }
 .schedule-btn:hover { filter: brightness(1.15); }
 
+/* รหัสทรัพย์ในการ์ด — ถ้า login แล้ว + มี folderUrl จะกลายเป็นลิงก์ไป Drive */
+.card-code a.code-link {
+  color: #2c7a4b; text-decoration: none; font-weight: 700;
+  font-size: 0.78rem; letter-spacing: 1px; opacity: 1;
+}
+.card-code a.code-link:hover { text-decoration: underline; color: #1a365d; }
+  /* Wrapper ที่ทำให้ Staff button + Schedule button stack แนวตั้ง */
+.staff-controls { display: flex; flex-direction: column; gap: 6px; align-items: stretch; flex-shrink: 0; }
+
+/* ปุ่มลิงก์ไปหน้า "ตารางโพสทรัพย์" — แสดงเฉพาะตอน login */
+.schedule-btn {
+  display: none;
+  background: linear-gradient(135deg, #2c7a4b, #1a365d);
+  color: white; border: 1.5px solid rgba(255,255,255,0.3);
+  padding: 4px 11px; border-radius: 50px; font-size: 0.73rem;
+  cursor: pointer; font-family: inherit; text-decoration: none;
+  align-items: center; justify-content: center; gap: 4px; white-space: nowrap;
+}
+.schedule-btn.visible { display: inline-flex; }
+.schedule-btn:hover { filter: brightness(1.15); }
+
 .staff-modal-overlay {
   display: none; position: fixed; inset: 0;
   background: rgba(0,0,0,0.65); z-index: 1500;
@@ -540,8 +561,12 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
       <input type="text" id="searchInput" placeholder="ค้นหาโครงการ, ทำเล, รหัส..." oninput="applyFilters()">
       <span class="search-icon">🔍</span>
     </div>
-    <div class="staff-controls">
+<div class="staff-controls">
       <button class="staff-btn" id="staffBtn" onclick="staffBtnClick()">🔐 Staff</button>
+      <a class="schedule-btn" id="scheduleBtn"
+         href="https://the9property-blip.github.io/property-posting-schedule/"
+         target="_blank" rel="noopener">📋 ตารางโพสทรัพย์</a>
+    </div>
       <a class="schedule-btn" id="scheduleBtn"
          href="https://the9property-blip.github.io/property-posting-schedule/"
          target="_blank" rel="noopener">📋 ตารางโพสทรัพย์</a>
@@ -1049,7 +1074,8 @@ function showGrid(data) {
     return '<div class="card" onclick=\'openDetail(' + pj + ')\'>' +
       photoBlock +
       '<div class="card-header">' +
-        '<div class="card-code">' + (p.code||'') + '</div>' +
+        '<div class="card-code">' + (isStaffLoggedIn() && p.folderUrl
+          ? '<a class="code-link" href
         '<div class="card-project">' + (p.project||'ไม่ระบุโครงการ') + '</div>' +
         '<div class="card-location">' + (p.location||'ไม่ระบุทำเล') + '</div>' +
         '<span class="card-type-badge ' + badgeClass(p.type) + '">' + (p.type||'') + '</span>' +
