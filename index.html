@@ -33,7 +33,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230f3460'/%3E%3Cpath d='M50 22 L20 48 L28 48 L28 78 L44 78 L44 60 L56 60 L56 78 L72 78 L72 48 L80 48 Z' fill='white'/%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230f3460'/%3E%3Cpath d='M50 22 L20 48 L28 48 L28 78 L44 78 L44 60 L56 60 L56 78 L72 78 L72 48 L80 48 Z' fill='white'/%3E%3C/svg%3E">
 
-<!-- ─── Google Analytics 4 (แทน G-XXXXXXXXXX ด้วย Tracking ID ของคุณ) ─── -->
+<!-- ─── Google Analytics 4 ─── -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -127,7 +127,6 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
 .card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.13); }
 .card:active { transform: translateY(-1px); }
 
-/* ★ NEW: รูปบนการ์ด */
 .card-photo {
   width: 100%; height: 170px; overflow: hidden;
   background: #e8ecf0; position: relative; flex-shrink: 0;
@@ -166,7 +165,6 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
 .badge-condo  { background: rgba(52,152,219,0.3);   border-color: rgba(52,152,219,0.6);   color: #b3d9ff; }
 .badge-villa  { background: rgba(255,193,7,0.3);    border-color: rgba(255,193,7,0.6);    color: #ffecaa; }
 
-/* ─── STATUS BADGE (พร้อม / ประกาศล่วงหน้า) ─── */
 .status-badge {
   position: absolute; top: 10px; left: 10px;
   font-size: 0.68rem; padding: 4px 10px; border-radius: 50px;
@@ -179,14 +177,13 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
   background: linear-gradient(135deg, #2ecc71, #27ae60);
   color: white; border: 1px solid rgba(255,255,255,0.4);
 }
-.status-ready::before { content: "✓"; font-weight: 900; }
+.status-ready::before { content: "✓ "; font-weight: 900; }
 .status-soon {
   background: linear-gradient(135deg, #ff9f43, #ee5a24);
   color: white; border: 1px solid rgba(255,255,255,0.4);
 }
-.status-soon::before { content: "📅"; }
+.status-soon::before { content: "📅 "; }
 
-/* ─── Co-AGENT BADGE (มุมขวาบนของรูป) ─── */
 .co-badge {
   position: absolute; top: 10px; right: 10px;
   font-size: 0.72rem; font-weight: 900; letter-spacing: 0.5px;
@@ -195,9 +192,9 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
   color: #4a2c00; border: 1px solid rgba(255,255,255,0.5);
   box-shadow: 0 2px 8px rgba(0,0,0,0.2);
   text-shadow: 0 1px 0 rgba(255,255,255,0.3);
+  z-index: 2;
 }
 
-/* status row ใน modal */
 .status-pill {
   display: inline-block; padding: 3px 11px; border-radius: 50px;
   font-size: 0.78rem; font-weight: 700;
@@ -231,7 +228,7 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
 .btn-contact-card {
   flex: 1; background: #06c755; color: white; border: none; padding: 8px 10px;
   border-radius: 9px; font-size: 0.76rem; cursor: pointer;
-  font-family: inherit; font-weight: 600;
+  font-family: inherit; font-weight: 600; text-align: center; text-decoration: none;
 }
 
 .state-box { grid-column: 1 / -1; text-align: center; padding: 70px 20px; color: #aaa; }
@@ -277,11 +274,6 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
   color: #b0bec5; gap: 8px; font-size: 0.85rem;
 }
 .modal-photo-placeholder .ph-icon { font-size: 3rem; opacity: 0.45; }
-.modal-photo-badge {
-  position: absolute; bottom: 10px; left: 12px;
-  font-size: 0.7rem; padding: 4px 10px; border-radius: 50px;
-  font-weight: 700; border: 1px solid;
-}
 
 .modal-close {
   position: absolute; top: 12px; right: 12px; z-index: 10;
@@ -307,8 +299,8 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
 .modal-row .val { font-weight: 600; color: #222; }
 
 .modal-actions { padding: 14px 20px 20px; display: flex; gap: 10px; }
-.btn-call { flex: 1; background: #0f3460; color: white; border: none; padding: 13px; border-radius: 11px; font-size: 0.88rem; cursor: pointer; font-family: inherit; font-weight: 700; }
-.btn-line { flex: 1; background: #06c755; color: white; border: none; padding: 13px; border-radius: 11px; font-size: 0.88rem; cursor: pointer; font-family: inherit; font-weight: 700; }
+.btn-call { flex: 1; background: #0f3460; color: white; border: none; padding: 13px; border-radius: 11px; font-size: 0.88rem; cursor: pointer; font-family: inherit; font-weight: 700; text-decoration: none; text-align: center;}
+.btn-line { flex: 1; background: #06c755; color: white; border: none; padding: 13px; border-radius: 11px; font-size: 0.88rem; cursor: pointer; font-family: inherit; font-weight: 700; text-decoration: none; text-align: center;}
 
 .contact-bar {
   position: fixed; bottom: 0; left: 0; right: 0; z-index: 400;
@@ -351,7 +343,7 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
   .card-photo { height: 200px; }
 }
 
-/* ─── GEO SEARCH (ค้นหาตำแหน่งใกล้เคียง) ─── */
+/* ─── GEO SEARCH ─── */
 .geo-row {
   display: flex; align-items: center; gap: 6px; margin-top: 7px;
   overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none;
@@ -403,12 +395,8 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
 .geo-dropdown-item:hover, .geo-dropdown-item:active { background: #f5f7fb; }
 .geo-dropdown-item .gd-name { font-weight: 600; color: #0f3460; }
 .geo-dropdown-item .gd-sub  { font-size: 0.75rem; color: #888; margin-top: 2px; }
-.geo-dropdown-empty {
-  padding: 22px 14px; text-align: center; color: #999; font-size: 0.85rem;
-}
-.geo-dropdown-loading {
-  padding: 20px 14px; text-align: center; color: #0f3460; font-size: 0.82rem;
-}
+.geo-dropdown-empty { padding: 22px 14px; text-align: center; color: #999; font-size: 0.85rem; }
+.geo-dropdown-loading { padding: 20px 14px; text-align: center; color: #0f3460; font-size: 0.82rem; }
 .geo-dropdown-loading::before {
   content: ""; display: inline-block;
   width: 14px; height: 14px;
@@ -438,15 +426,8 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
 }
 .dist-badge.far { background: #888; }
 .dist-badge.unknown { background: #ccc; color: #666; }
-.card-distance-row {
-  display: flex; align-items: center; gap: 6px;
-  margin-bottom: 8px;
-}
+.card-distance-row { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
 .sort-select:disabled { opacity: 0.5; cursor: not-allowed; }
-@media (max-width: 580px) {
-  .geo-input-wrap { min-width: 180px; }
-  .geo-input-wrap input { min-width: 90px; }
-}
 
 /* ─── STAFF LOGIN ─── */
 .staff-btn {
@@ -457,10 +438,8 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
 }
 .staff-btn:hover { background: rgba(255,255,255,0.25); }
 .staff-btn.logged-in { background: #f6c244; color: #1a1a2e; border-color: #f6c244; font-weight: 700; }
-  /* Wrapper ที่ทำให้ Staff button + Schedule button stack แนวตั้ง */
 .staff-controls { display: flex; flex-direction: column; gap: 6px; align-items: stretch; flex-shrink: 0; }
 
-/* ปุ่มลิงก์ไปหน้า "ตารางโพสทรัพย์" — แสดงเฉพาะตอน login */
 .schedule-btn {
   display: none;
   background: linear-gradient(135deg, #2c7a4b, #1a365d);
@@ -472,26 +451,11 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
 .schedule-btn.visible { display: inline-flex; }
 .schedule-btn:hover { filter: brightness(1.15); }
 
-/* รหัสทรัพย์ในการ์ด — ถ้า login แล้ว + มี folderUrl จะกลายเป็นลิงก์ไป Drive */
 .card-code a.code-link {
-  color: #2c7a4b; text-decoration: none; font-weight: 700;
-  font-size: 0.78rem; letter-spacing: 1px; opacity: 1;
+  color: #f1c40f; text-decoration: none; font-weight: 700;
+  font-size: 0.72rem; letter-spacing: 1px; opacity: 1;
 }
-.card-code a.code-link:hover { text-decoration: underline; color: #1a365d; }
-  /* Wrapper ที่ทำให้ Staff button + Schedule button stack แนวตั้ง */
-.staff-controls { display: flex; flex-direction: column; gap: 6px; align-items: stretch; flex-shrink: 0; }
-
-/* ปุ่มลิงก์ไปหน้า "ตารางโพสทรัพย์" — แสดงเฉพาะตอน login */
-.schedule-btn {
-  display: none;
-  background: linear-gradient(135deg, #2c7a4b, #1a365d);
-  color: white; border: 1.5px solid rgba(255,255,255,0.3);
-  padding: 4px 11px; border-radius: 50px; font-size: 0.73rem;
-  cursor: pointer; font-family: inherit; text-decoration: none;
-  align-items: center; justify-content: center; gap: 4px; white-space: nowrap;
-}
-.schedule-btn.visible { display: inline-flex; }
-.schedule-btn:hover { filter: brightness(1.15); }
+.card-code a.code-link:hover { text-decoration: underline; color: #fff; }
 
 .staff-modal-overlay {
   display: none; position: fixed; inset: 0;
@@ -518,14 +482,9 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
   flex: 1; padding: 11px; border-radius: 10px; font-size: 0.92rem; font-weight: 700;
   cursor: pointer; font-family: inherit; border: none;
 }
-.btn-login-go {
-  background: linear-gradient(135deg, #0f3460, #16213e); color: white;
-}
-.btn-login-cancel {
-  background: #f0f0f0; color: #555;
-}
+.btn-login-go { background: linear-gradient(135deg, #0f3460, #16213e); color: white; }
+.btn-login-cancel { background: #f0f0f0; color: #555; }
 
-/* Staff-only section in detail modal */
 .staff-section {
   background: linear-gradient(135deg, #fff4d6, #fff8e6);
   border: 1px solid #f6c244; border-radius: 12px;
@@ -538,9 +497,7 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
 .staff-section .modal-row { padding: 6px 0; font-size: 0.85rem; }
 .staff-section .modal-row .lbl { color: #8a6d1a; }
 .staff-section .modal-row .val { color: #1a1a2e; font-weight: 600; }
-.staff-section .staff-actions {
-  display: flex; gap: 8px; margin-top: 10px;
-}
+.staff-section .staff-actions { display: flex; gap: 8px; margin-top: 10px; }
 .staff-section .staff-actions a {
   flex: 1; padding: 8px; border-radius: 8px;
   text-align: center; text-decoration: none;
@@ -561,21 +518,15 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
       <input type="text" id="searchInput" placeholder="ค้นหาโครงการ, ทำเล, รหัส..." oninput="applyFilters()">
       <span class="search-icon">🔍</span>
     </div>
-<div class="staff-controls">
+    <div class="staff-controls">
       <button class="staff-btn" id="staffBtn" onclick="staffBtnClick()">🔐 Staff</button>
-      <a class="schedule-btn" id="scheduleBtn"
-         href="https://the9property-blip.github.io/property-posting-schedule/"
-         target="_blank" rel="noopener">📋 ตารางโพสทรัพย์</a>
-    </div>
-      <a class="schedule-btn" id="scheduleBtn"
-         href="https://the9property-blip.github.io/property-posting-schedule/"
-         target="_blank" rel="noopener">📋 ตารางโพสทรัพย์</a>
+      <a class="schedule-btn" id="scheduleBtn" href="https://the9property-blip.github.io/property-posting-schedule/" target="_blank" rel="noopener">📋 ตารางโพสทรัพย์</a>
     </div>
   </div>
   <div class="header-row2">
     <button class="filter-btn active" onclick="setType('all',this)">ทั้งหมด</button>
     <button class="filter-btn" onclick="setType('บ้านเดี่ยว',this)">🏡 บ้านเดี่ยว</button>
-    <button class="filter-btn" onclick="setType('ทาวน์เฮ้าส์',this)">🏘 ทาวน์</button>
+    <button class="filter-btn" onclick="setType('ทาวน์เฮ้าส์',this)">🎄 ทาวน์</button>
     <button class="filter-btn" onclick="setType('คอนโด',this)">🏢 คอนโด</button>
     <button class="filter-btn" onclick="setType('พูลวิลล่า',this)">🏊 พูลวิลล่า</button>
     <button class="filter-btn" onclick="setType('บ้าน',this)">🏠 บ้าน</button>
@@ -618,12 +569,11 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
     </select>
   </div>
 
-  <!-- GEO ROW: ค้นหาตำแหน่งใกล้เคียง -->
+  <!-- GEO ROW -->
   <div class="geo-row">
     <div class="geo-search-container">
       <div class="geo-input-wrap">
-        <input type="text" id="geoInput" placeholder="📍 ค้นหาใกล้... เช่น วารีเชียงใหม่, มช., เซ็นทรัล"
-               onkeydown="if(event.key==='Enter') searchByLocation()">
+        <input type="text" id="geoInput" placeholder="📍 ค้นหาใกล้... เช่น วารีเชียงใหม่, มช., เซ็นทรัล" onkeydown="if(event.key==='Enter') searchByLocation()">
         <button class="geo-btn-search" id="geoBtnSearch" onclick="searchByLocation()" title="ค้นหา">🔍</button>
       </div>
       <div class="geo-dropdown" id="geoDropdown"></div>
@@ -686,7 +636,7 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
 
     <div class="modal-info">
       <div class="modal-title" id="dProject"></div>
-      <div class="modal-sub"   id="dSub"></div>
+      <div class="modal-sub" id="dSub"></div>
       <div class="modal-price">฿<span id="dPrice"></span><small>บาท / เดือน</small></div>
       <div class="modal-rows">
         <div class="modal-row"><span class="lbl">สถานะ</span>        <span class="val" id="dStatus"></span></div>
@@ -699,7 +649,7 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
       </div>
     </div>
 
-    <!-- STAFF-ONLY SECTION: shown only when logged in -->
+    <!-- STAFF-ONLY SECTION -->
     <div class="staff-section" id="dStaffSection" style="display:none;">
       <div class="staff-title">⭐ ข้อมูลทีมงาน (Staff Only)</div>
       <div class="modal-row"><span class="lbl">เจ้าของ</span> <span class="val" id="dOwnerName">–</span></div>
@@ -713,23 +663,22 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
     </div>
 
     <div class="modal-actions">
-      <button class="btn-call" onclick="window.location.href='tel:0809945497'">📞 โทรสอบถาม</button>
-      <button class="btn-line" onclick="alert('Line ID: @the9property หรือโทร 0809945497')">💬 Line</button>
+      <a class="btn-call" href="tel:0809945497">📞 โทรสอบถาม</a>
+      <a class="btn-line" href="https://line.me/ti/p/@the9property" target="_blank">💬 ติดต่อ Line</a>
     </div>
   </div>
 </div>
 
 <!-- STAFF LOGIN MODAL -->
-<div class="staff-modal-overlay" id="staffLoginModal" onclick="if(event.target===this)closeStaffModal()">
+<div class="staff-modal-overlay" id="staffModalOverlay" onclick="if(event.target===this)closeStaffModal()">
   <div class="staff-modal">
-    <h3>🔐 เข้าสู่ระบบทีมงาน</h3>
-    <div class="sub">เฉพาะทีมงาน The 9 Property — หลังเข้าสู่ระบบจะเห็นพิกัด, เบอร์เจ้าของ, ลิงก์ Maps</div>
-    <input type="password" id="staffPasswordInput" placeholder="รหัสผ่าน"
-           onkeydown="if(event.key==='Enter') doStaffLogin()" autocomplete="current-password">
+    <h3>🔐 Staff Authentication</h3>
+    <div class="sub">กรอกรหัสผ่านเพื่อเข้าใช้งานระบบภายในกลุ่มทีมงาน</div>
+    <input type="password" id="staffPassword" placeholder="ระบุรหัสผ่านพนักงาน" onkeydown="if(event.key==='Enter') handleLogin()">
     <div class="err" id="staffLoginErr"></div>
     <div class="staff-modal-buttons">
       <button class="btn-login-cancel" onclick="closeStaffModal()">ยกเลิก</button>
-      <button class="btn-login-go" onclick="doStaffLogin()">เข้าสู่ระบบ</button>
+      <button class="btn-login-go" onclick="handleLogin()">เข้าสู่ระบบ</button>
     </div>
   </div>
 </div>
@@ -737,968 +686,394 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
+<!-- ─── JAVASCRIPT SYSTEM ENGINE ─── -->
 <script>
-const BROKER_PHONE = '0809945497';
-const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbwiYT1Ah95Fdy2ofSpMUSfjeAkfzMVZ5yu2m7qZyAGvw8BtZJUSqqfnU7ybpT8sAE572Q/exec';
+// ข้อมูลจำลองในเชียงใหม่ (Mock Data สำหรับทดสอบระบบ)
+const mockProperties = [
+  { code: "TH-01", project: "ทาวน์โฮม ดีญ่า วาเล่ย์", location: "หางดง", type: "ทาวน์เฮ้าส์", agent: "direct", pet: "yes", price: 12000, bed: 2, bath: 2, status: "ready", photo: "", ownerName: "คุณสมชาย", ownerTel: "081-234-5678", contact: "Line: somchai_hd", lat: 18.7324, lng: 98.9345, folderUrl: "https://drive.google.com" },
+  { code: "CD-02", project: "ดีคอนโด พิงค์", location: "ฟ้าฮ่าม (ใกล้เซ็นทรัลเฟส)", type: "คอนโด", agent: "co", pet: "no", price: 15000, bed: 1, bath: 1, status: "ready", photo: "", ownerName: "คุณวิภา", ownerTel: "089-876-5432", contact: "", lat: 18.8025, lng: 99.0195, folderUrl: "" },
+  { code: "SH-03", project: "บ้านเดี่ยว ศุภาลัย การ์เด้นวิลล์", location: "สันผีเสื้อ", type: "บ้านเดี่ยว", agent: "direct", pet: "other", price: 32000, bed: 3, bath: 3, status: "soon", photo: "", ownerName: "คุณนพดล", ownerTel: "086-555-4433", contact: "แฟนเจ้าของดุมาก", lat: 18.8412, lng: 98.9961, folderUrl: "https://drive.google.com" },
+  { code: "VL-04", project: "พูลวิลล่าหรู นิมมาน ซอย 9", location: "สุเทพ (นิมมาน)", type: "พูลวิลล่า", agent: "direct", pet: "yes", price: 65000, bed: 4, bath: 5, status: "ready", photo: "", ownerName: "Agent โบว์ (ติดทรัพย์)", ownerTel: "085-111-2222", contact: "", lat: 18.7990, lng: 98.9675, folderUrl: "" },
+  { code: "SH-05", project: "บ้านเช่าใกล้ มช. เชียงใหม่", location: "สุเทพ", type: "บ้าน", agent: "co", pet: "yes", price: 18000, bed: 3, bath: 2, status: "ready", photo: "", ownerName: "อาจารย์สมพงษ์", ownerTel: "084-999-8888", contact: "ลุงเฝ้าบ้านเบอร์ 081-xx", lat: 18.7952, lng: 98.9535, folderUrl: "" }
+];
 
-// ★ FIX: ใช้ lh3.googleusercontent.com แทน drive.google.com/thumbnail
-// URL primary และ fallback — ถ้าตัวแรกโหลดไม่ได้ จะลองตัวที่สอง
-function photoUrl(id, size) {
-  return 'https://lh3.googleusercontent.com/d/' + id + '=w' + (size || 800);
-}
-function photoUrlFallback(id) {
-  return 'https://drive.usercontent.google.com/download?id=' + id + '&export=view';
-}
-
-var allData     = [];
-var activeType  = 'all';
-var activeAgent = 'all';   // 'all' | 'direct' | 'co'
-
-// ─── GEO STATE ───────────────────────────────────────────
-var geoOrigin = null;  // { lat, lng, label } เมื่อค้นหาตามตำแหน่ง
-
-// ─── STAFF AUTH ──────────────────────────────────────────
-function getStaffToken() {
-  try { return sessionStorage.getItem('staff_token') || ''; } catch(e) { return ''; }
-}
-function isStaffLoggedIn() { return !!getStaffToken(); }
-
-function updateStaffBtn() {
-  var btn = document.getElementById('staffBtn');
-  var sch = document.getElementById('scheduleBtn');
-  if (!btn) return;
-  if (isStaffLoggedIn()) {
-    btn.textContent = '⭐ Staff (ออก)';
-    btn.classList.add('logged-in');
-    if (sch) sch.classList.add('visible');
-  } else {
-    btn.textContent = '🔐 Staff';
-    btn.classList.remove('logged-in');
-    if (sch) sch.classList.remove('visible');
-  }
-}
-
-function staffBtnClick() {
-  if (isStaffLoggedIn()) {
-    if (confirm('ออกจากระบบทีมงาน?')) {
-      try { sessionStorage.removeItem('staff_token'); } catch(e) {}
-      updateStaffBtn();
-      loadData(true);
-      showToast('👋 ออกจากระบบแล้ว');
-    }
-  } else {
-    openStaffModal();
-  }
-}
-
-function openStaffModal() {
-  document.getElementById('staffLoginErr').textContent = '';
-  document.getElementById('staffPasswordInput').value = '';
-  document.getElementById('staffLoginModal').classList.add('open');
-  setTimeout(function() { document.getElementById('staffPasswordInput').focus(); }, 50);
-}
-function closeStaffModal() {
-  document.getElementById('staffLoginModal').classList.remove('open');
-}
-
-function doStaffLogin() {
-  var pw = document.getElementById('staffPasswordInput').value;
-  if (!pw) { document.getElementById('staffLoginErr').textContent = 'กรุณาใส่รหัสผ่าน'; return; }
-
-  document.getElementById('staffLoginErr').textContent = '⏳ กำลังตรวจสอบ...';
-  // เก็บ token ชั่วคราว แล้วลองโหลดข้อมูล — ถ้า server บอก staff:true = รหัสถูก
-  try { sessionStorage.setItem('staff_token', pw); } catch(e) {}
-
-  fetch(SCRIPT_URL + '?token=' + encodeURIComponent(pw))
-    .then(function(r) { return r.json(); })
-    .then(function(json) {
-      if (json.staff === true) {
-        closeStaffModal();
-        updateStaffBtn();
-        allData = json.data || [];
-        applyFilters();
-        showToast('✅ เข้าสู่ระบบสำเร็จ');
-      } else {
-        try { sessionStorage.removeItem('staff_token'); } catch(e) {}
-        document.getElementById('staffLoginErr').textContent = '❌ รหัสผ่านไม่ถูกต้อง';
-      }
-    })
-    .catch(function(err) {
-      try { sessionStorage.removeItem('staff_token'); } catch(e) {}
-      document.getElementById('staffLoginErr').textContent = '⚠️ เชื่อมต่อไม่ได้: ' + err.message;
-    });
-}
-
-window.onload = function() {
-  updateStaffBtn();
-  loadData(false);
+// พิกัดจุดลัดยอดนิยมในเชียงใหม่ (สำหรับฟังก์ชัน Geo Search)
+const geoShortcuts = {
+  "มหาวิทยาลัยเชียงใหม่": { lat: 18.8027, lng: 98.9515, name: "มช." },
+  "เซ็นทรัล เฟสติวัล เชียงใหม่": { lat: 18.8012, lng: 99.0185, name: "เซ็นทรัลเฟสติวัล" },
+  "เซ็นทรัล แอร์พอร์ต เชียงใหม่": { lat: 18.7690, lng: 98.9752, name: "เซ็นทรัลแอร์พอร์ต" },
+  "ท่าอากาศยานเชียงใหม่": { lat: 18.7679, lng: 98.9634, name: "สนามบิน" },
+  "ถนนนิมมานเหมินท์ เชียงใหม่": { lat: 18.7995, lng: 98.9680, name: "นิมมาน" },
+  "โรงพยาบาลมหาราชนครเชียงใหม่": { lat: 18.7896, lng: 98.9740, name: "รพ.มหาราช" },
+  "โรงเรียนนานาชาติวารี เชียงใหม่": { lat: 18.7652, lng: 99.0104, name: "วารีเชียงใหม่" },
+  "ถนนมหิดล เชียงใหม่": { lat: 18.7670, lng: 98.9950, name: "ถ.มหิดล" }
 };
 
-// ปิด login modal ด้วย Escape
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape' && document.getElementById('staffLoginModal').classList.contains('open')) {
-    closeStaffModal();
-  }
+let properties = [];
+let activeFilters = {
+  type: 'all',
+  agent: 'all', // 'all', 'direct', 'co'
+};
+let geoSearchTarget = null; // { lat, lng, name }
+let isStaffLoggedIn = false;
+
+// เริ่มต้นระบบ
+window.addEventListener('DOMContentLoaded', () => {
+  loadData(false);
+  setupGeoAutocomplete();
 });
 
-// ปิด dropdown เมื่อคลิกที่อื่น
-document.addEventListener('click', function(e) {
-  var dd = document.getElementById('geoDropdown');
-  if (!dd || !dd.classList.contains('open')) return;
-  var input = document.getElementById('geoInput');
-  var btn = document.getElementById('geoBtnSearch');
-  if (e.target === input || e.target === btn) return;
-  if (dd.contains(e.target)) return;
-  dd.classList.remove('open');
-});
-
-// ─── LOAD DATA ─────────────────────────────────────────────
-// manual = true  → ส่ง ?refresh=1 บังคับ scan รูปใหม่บน server
-// manual = false → ใช้ cache (เร็วกว่า)
-function loadData(manual) {
-  var btn = document.getElementById('btnRefresh');
-  btn.classList.add('spinning');
-  btn.disabled = true;
-  showLoading();
-
-  var params = [];
-  if (manual) params.push('refresh=1');
-  var token = getStaffToken();
-  if (token) params.push('token=' + encodeURIComponent(token));
-  var url = SCRIPT_URL + (params.length ? '?' + params.join('&') : '');
-  fetch(url)
-    .then(function(r) { return r.json(); })
-    .then(function(json) {
-      btn.classList.remove('spinning');
-      btn.disabled = false;
-      if (json.error || !json.ok) { showError(json.error || json.msg || 'ไม่ทราบสาเหตุ'); return; }
-      allData = json.data || [];
-      applyFilters();
-      if (manual) showToast('✅ โหลดข้อมูลสำเร็จ ' + allData.length + ' รายการ');
-    })
-    .catch(function(err) {
-      btn.classList.remove('spinning');
-      btn.disabled = false;
-      showError('เชื่อมต่อไม่ได้: ' + err.message);
-    });
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.innerText = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2500);
 }
 
-// ─── FILTER & SORT ─────────────────────────────────────────
-// ปุ่ม "ทั้งหมด/บ้านเดี่ยว/ทาวน์/คอนโด/พูลวิลล่า/บ้าน" — เฉพาะ type group
-function setType(val, btn) {
-  activeType = val;
-  // active เฉพาะกลุ่ม type — ไม่แตะปุ่ม Co/ติดทรัพย์
-  var typeBtns = btn.parentElement.querySelectorAll('.filter-btn');
-  // จัดการเฉพาะ 6 ปุ่มแรก (type group) — กันไม่ให้ปุ่ม Co/ติดทรัพย์ถูกล้าง
-  // ใช้วิธี: ลบ active ออกจากปุ่มที่ไม่มี id (type group ทั้งหมดไม่มี id)
-  typeBtns.forEach(function(b) {
-    if (!b.id) b.classList.remove('active');
+function loadData(forceRefresh) {
+  const btn = document.getElementById('btnRefresh');
+  if (forceRefresh) btn.classList.add('spinning');
+
+  document.getElementById('grid').innerHTML = `
+    <div class="state-box">
+      <div class="spinner"></div>
+      <h3>กำลังโหลดข้อมูล...</h3>
+    </div>`;
+
+  setTimeout(() => {
+    properties = [...mockProperties];
+    if (forceRefresh) btn.classList.remove('spinning');
+    applyFilters();
+    if (forceRefresh) showToast("อัปเดตข้อมูลล่าสุดเรียบร้อย");
+  }, forceRefresh ? 600 : 100);
+}
+
+function setType(type, element) {
+  activeFilters.type = type;
+  document.querySelectorAll('.header-row2 .filter-btn').forEach(b => {
+    if(!b.id.includes('Agent')) b.classList.remove('active');
   });
-  btn.classList.add('active');
+  element.classList.add('active');
   applyFilters();
 }
 
-// ปุ่ม "ติดทรัพย์ / Co" — toggle: คลิกซ้ำ = ปิด กลับไป 'all'
-function setAgent(val, btn) {
-  if (activeAgent === val) {
-    activeAgent = 'all';
-    btn.classList.remove('active');
+function setAgent(agent, element) {
+  if (activeFilters.agent === agent) {
+    activeFilters.agent = 'all';
+    element.classList.remove('active');
   } else {
-    activeAgent = val;
+    activeFilters.agent = agent;
     document.getElementById('btnAgentDirect').classList.remove('active');
     document.getElementById('btnAgentCo').classList.remove('active');
-    btn.classList.add('active');
+    element.classList.add('active');
   }
   applyFilters();
+}
+
+// คำนวณระยะห่างทางภูมิศาสตร์อย่างง่าย (หน่วย: กิโลเมตร)
+function calculateDistance(lat1, lon1, lat2, lon2) {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLon/2) * Math.sin(dLon/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return R * c;
 }
 
 function applyFilters() {
-  var search   = document.getElementById('searchInput').value.toLowerCase().trim();
-  var pet      = document.getElementById('selPet').value;
-  var priceMin = parseInt(document.getElementById('selMin').value);
-  var priceMax = parseInt(document.getElementById('selMax').value);
-  var bed      = document.getElementById('selBed').value;
-  var sort     = document.getElementById('selSort').value;
-  var statusF  = (document.getElementById('selStatus') || {}).value || 'all';
+  const searchTxt = document.getElementById('searchInput').value.trim().toLowerCase();
+  const petVal = document.getElementById('selPet').value;
+  const minPrice = parseInt(document.getElementById('selMin').value) || 0;
+  const maxPrice = parseInt(document.getElementById('selMax').value) || 9999999;
+  const bedVal = document.getElementById('selBed').value;
+  const statusVal = document.getElementById('selStatus').value;
+  const sortVal = document.getElementById('selSort').value;
 
-  var filtered = allData.filter(function(p) {
-    if (activeType !== 'all' && p.type !== activeType) return false;
-    if (p.price > 0 && (p.price < priceMin || p.price > priceMax)) return false;
-    if (pet === 'yes' && !(p.pet||'').includes('รับ'))  return false;
-    if (pet === 'no'  && !(p.pet||'').includes('ไม่'))  return false;
-    if (bed !== 'all') {
-      var br = parseInt(p.bedroom) || 0;
-      if (bed === '4' && br < 4) return false;
-      if (bed !== '4' && br !== parseInt(bed)) return false;
+  let filtered = properties.map(p => {
+    let distance = null;
+    if (geoSearchTarget) {
+      distance = calculateDistance(geoSearchTarget.lat, geoSearchTarget.lng, p.lat, p.lng);
     }
-    if (statusF === 'ready' && !p.ready) return false;
-    if (statusF === 'soon'  &&  p.ready) return false;
-    if (activeAgent === 'co'     && !p.coAgent) return false;
-    if (activeAgent === 'direct' &&  p.coAgent) return false;
-    if (search) {
-      var hay = ((p.code||'') + ' ' + (p.project||'') + ' ' + (p.location||'') + ' ' + (p.type||'')).toLowerCase();
-      if (hay.indexOf(search) === -1) return false;
+    return { ...p, currentDistance: distance };
+  });
+
+  filtered = filtered.filter(p => {
+    // กรองประเภททรัพย์
+    if (activeFilters.type !== 'all' && p.type !== activeFilters.type) return false;
+    // กรองรูปแบบเอเจนท์
+    if (activeFilters.agent !== 'all' && p.agent !== activeFilters.agent) return false;
+    // กรองสัตว์เลี้ยง
+    if (petVal !== 'all' && p.pet !== petVal) return false;
+    // กรองราคาช่วง ต่ำสุด-สูงสุด
+    if (p.price < minPrice || p.price > maxPrice) return false;
+    // กรองห้องนอน
+    if (bedVal !== 'all') {
+      if (bedVal === '4' && p.bed < 4) return false;
+      if (bedVal !== '4' && p.bed !== parseInt(bedVal)) return false;
+    }
+    // กรองสถานะทรัพย์
+    if (statusVal !== 'all' && p.status !== statusVal) return false;
+    // ค้นหาแบบ Text
+    if (searchTxt) {
+      const matchText = (p.project + " " + p.location + " " + p.code).toLowerCase();
+      if (!matchText.includes(searchTxt)) return false;
     }
     return true;
   });
 
-  // ★ GEO: คำนวณระยะทางจาก geoOrigin (ถ้ามี)
-  if (geoOrigin) {
-    filtered.forEach(function(p) {
-      if (typeof p.lat === 'number' && typeof p.lng === 'number') {
-        p._dist = haversineKm(geoOrigin.lat, geoOrigin.lng, p.lat, p.lng);
-      } else {
-        p._dist = null;
-      }
-    });
-    // เรียง: พร้อม > ประกาศล่วงหน้า, ภายในกลุ่ม → ระยะใกล้-ไกล, ไม่มีพิกัด → ท้าย
-    filtered.sort(function(a, b) {
-      if (a.ready !== b.ready) return a.ready ? -1 : 1;
-      if (a._dist == null && b._dist == null) return 0;
-      if (a._dist == null) return 1;
-      if (b._dist == null) return -1;
-      return a._dist - b._dist;
-    });
-  } else {
-    filtered.forEach(function(p) { p._dist = undefined; });
-    filtered.sort(function(a, b) {
-      // จัด "พร้อม" ขึ้นก่อน "ประกาศล่วงหน้า" เสมอ
-      if (a.ready !== b.ready) return a.ready ? -1 : 1;
-      if (sort === 'price_asc')  return (a.price||0) - (b.price||0);
-      if (sort === 'price_desc') return (b.price||0) - (a.price||0);
-      if (sort === 'name_asc')   return (a.project||'').localeCompare(b.project||'');
-      if (sort === 'bed_asc')    return (parseInt(a.bedroom)||0) - (parseInt(b.bedroom)||0);
-      // ภายในกลุ่ม "ประกาศล่วงหน้า" → เรียงตามวันที่เข้าพักก่อนหลัง
-      if (!a.ready && !b.ready) return (a.availableDate||'').localeCompare(b.availableDate||'');
-      return 0;
-    });
-  }
+  // การจัดเรียงลำดับ (Sorting)
+  if (sortVal === 'price_asc') filtered.sort((a,b) => a.price - b.price);
+  else if (sortVal === 'price_desc') filtered.sort((a,b) => b.price - a.price);
+  else if (sortVal === 'name_asc') filtered.sort((a,b) => a.project.localeCompare(b.project, 'th'));
+  else if (sortVal === 'bed_asc') filtered.sort((a,b) => a.bed - b.bed);
+  else if (sortVal === 'dist_asc' && geoSearchTarget) filtered.sort((a,b) => a.currentDistance - b.currentDistance);
 
-  showGrid(filtered);
-  document.getElementById('countDisplay').textContent = filtered.length;
+  document.getElementById('countDisplay').innerText = filtered.length;
+  renderGrid(filtered);
 }
 
-// ─── HELPERS ───────────────────────────────────────────────
-function badgeClass(t) {
-  if (t === 'พูลวิลล่า')   return 'badge-villa';
-  if (t === 'คอนโด')       return 'badge-condo';
-  if (t === 'ทาวน์เฮ้าส์') return 'badge-town';
-  return 'badge-single';
-}
-function petClass(p) {
-  if (!p || p.includes('ไม่')) return 'tag-pet-no';
-  if (p === 'รับ')              return 'tag-pet-yes';
-  return 'tag-pet-other';
-}
-function petLabel(p) {
-  if (!p || p.includes('ไม่')) return '❌ ไม่รับสัตว์';
-  if (p === 'รับ')              return '✅ รับสัตว์เลี้ยง';
-  return '🐾 ' + p;
-}
-function typeEmoji(t) {
-  var m = {'บ้านเดี่ยว':'🏡','ทาวน์เฮ้าส์':'🏘','คอนโด':'🏢','พูลวิลล่า':'🏊','บ้าน':'🏠'};
-  return (m[t]||'🏠') + ' ' + (t||'–');
-}
-function fmtPrice(p) {
-  if (!p) return '–';
-  return Number(p).toLocaleString('th-TH');
-}
-
-// ─── STATUS HELPERS ────────────────────────────────────────
-// แปลง 'yyyy-MM-dd' → 'DD/MM/พ.ศ.' สำหรับแสดงผล (ปีไทย)
-function fmtAvailableDate(iso) {
-  if (!iso) return '';
-  var m = iso.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-  if (!m) return iso;
-  var yyyy = parseInt(m[1], 10);
-  var be   = yyyy + 543;
-  return m[3] + '/' + m[2] + '/' + String(be).slice(-2);
-}
-function fmtAvailableDateShort(iso) {
-  if (!iso) return '';
-  var m = iso.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-  if (!m) return iso;
-  return m[3] + '/' + m[2];
-}
-// HTML สำหรับ status badge ที่มุมรูปบนการ์ด
-function statusBadgeHtml(p) {
-  if (p.ready) {
-    return '<span class="status-badge status-ready">พร้อม</span>';
-  }
-  var d = fmtAvailableDateShort(p.availableDate);
-  return '<span class="status-badge status-soon">พร้อม ' + (d || 'เร็วๆ นี้') + '</span>';
-}
-
-// ★ FIX: ถ้ารูปโหลดไม่ได้ ลอง fallback URL ก่อนค่อยขึ้น placeholder
-function onPhotoError(img, fallbackId) {
-  if (!img.dataset.fallbackTried && fallbackId) {
-    img.dataset.fallbackTried = '1';
-    img.src = photoUrlFallback(fallbackId);
+function renderGrid(items) {
+  const grid = document.getElementById('grid');
+  if (items.length === 0) {
+    grid.innerHTML = `
+      <div class="state-box">
+        <div class="icon">🔍</div>
+        <h3>ไม่พบรายการทรัพย์ที่ตรงกับเงื่อนไข</h3>
+        <p>ลองปรับหรือล้างตัวกรองเพื่อค้นหาใหม่อีกครั้ง</p>
+      </div>`;
     return;
   }
-  // ลองทั้งสองแล้ว — แสดง placeholder
-  var parent = img.parentElement;
-  parent.innerHTML = '<div class="card-photo-placeholder"><span class="ph-icon">🏠</span><span>ไม่มีรูปภาพ</span></div>';
-}
 
-// ─── RENDER GRID ───────────────────────────────────────────
-function showGrid(data) {
-  var g = document.getElementById('grid');
-  if (data.length === 0 && allData.length > 0) {
-    g.innerHTML = '<div class="state-box"><div class="icon">🔍</div><h3>ไม่พบรายการที่ตรงกัน</h3><p>ลองเปลี่ยนตัวกรองหรือค้นหาใหม่</p></div>';
-    return;
-  }
-  if (data.length === 0) { g.innerHTML = ''; return; }
+  grid.innerHTML = items.map((p, idx) => {
+    let badgeClass = 'badge-single';
+    if(p.type==='ทาวน์เฮ้าส์') badgeClass='badge-town';
+    else if(p.type==='คอนโด') badgeClass='badge-condo';
+    else if(p.type==='พูลวิลล่า') badgeClass='badge-villa';
 
-  g.innerHTML = data.map(function(p) {
-    var pj = JSON.stringify(p).replace(/"/g, '&quot;');
+    let petLabel = 'ไม่รับสัตว์เลี้ยง', petClass = 'tag-pet-no';
+    if(p.pet==='yes') { petLabel = 'รับสัตว์เลี้ยง'; petClass = 'tag-pet-yes'; }
+    else if(p.pet==='other') { petLabel = 'รับเฉพาะสัตว์เล็ก'; petClass = 'tag-pet-other'; }
 
-    // ★ NEW: รูปบนการ์ด + status badge (ซ้ายบน) + Co badge (ขวาบน)
-    var sBadge  = statusBadgeHtml(p);
-    var coBadge = p.coAgent ? '<span class="co-badge">Co</span>' : '';
-    var photoBlock = p.thumb
-      ? '<div class="card-photo"><img src="' + photoUrl(p.thumb, 400) + '" loading="lazy" alt="' + (p.project||'') + '" onerror="onPhotoError(this,\'' + p.thumb + '\')">' + sBadge + coBadge + '</div>'
-      : '<div class="card-photo"><div class="card-photo-placeholder"><span class="ph-icon">🏠</span><span>ยังไม่มีรูป</span></div>' + sBadge + coBadge + '</div>';
-
-    // ★ GEO: badge ระยะทางเมื่อกำลังค้นหาตามตำแหน่ง
-    var distBlock = '';
-    if (geoOrigin) {
-      if (typeof p._dist === 'number') {
-        var dCls = p._dist > 5 ? 'dist-badge far' : 'dist-badge';
-        distBlock = '<div class="card-distance-row"><span class="' + dCls + '">📍 ' + fmtDist(p._dist) + '</span></div>';
-      } else {
-        distBlock = '<div class="card-distance-row"><span class="dist-badge unknown">📍 ไม่ระบุพิกัด</span></div>';
-      }
+    let codeDisplay = p.code;
+    if(isStaffLoggedIn && p.folderUrl) {
+      codeDisplay = `<a class="code-link" href="${p.folderUrl}" target="_blank" onclick="event.stopPropagation()">📁 ${p.code}</a>`;
     }
 
-    return '<div class="card" onclick=\'openDetail(' + pj + ')\'>' +
-      photoBlock +
-      '<div class="card-header">' +
-        '<div class="card-code">' + (isStaffLoggedIn() && p.folderUrl
-          ? '<a class="code-link" href
-        '<div class="card-project">' + (p.project||'ไม่ระบุโครงการ') + '</div>' +
-        '<div class="card-location">' + (p.location||'ไม่ระบุทำเล') + '</div>' +
-        '<span class="card-type-badge ' + badgeClass(p.type) + '">' + (p.type||'') + '</span>' +
-      '</div>' +
-      '<div class="card-body">' +
-        distBlock +
-        '<div class="price">฿' + fmtPrice(p.price) + ' <span>บาท/เดือน</span></div>' +
-        '<div class="card-tags">' +
-          (p.bedroom  ? '<span class="tag">🛏 ' + p.bedroom  + ' นอน</span>' : '') +
-          (p.bathroom ? '<span class="tag">🚿 ' + p.bathroom + ' น้ำ</span>'  : '') +
-          '<span class="tag ' + petClass(p.pet) + '">' + petLabel(p.pet) + '</span>' +
-        '</div>' +
-      '</div>' +
-      '<div class="card-footer">' +
-        '<button class="btn-detail" onclick=\'event.stopPropagation();openDetail(' + pj + ')\'>📋 รายละเอียด</button>' +
-        '<button class="btn-contact-card" onclick="event.stopPropagation();window.location.href=\'tel:' + BROKER_PHONE + '\'">📞 สอบถาม</button>' +
-      '</div>' +
-    '</div>';
+    return `
+      <div class="card" onclick="openDetail('${p.code}')">
+        <div class="card-photo">
+          <span class="status-badge ${p.status==='ready'?'status-ready':'status-soon'}">${p.status==='ready'?'พร้อมอยู่':'ล่วงหน้า'}</span>
+          ${p.agent==='co' ? '<span class="co-badge">🤝 Co-Agent</span>' : ''}
+          <div class="card-photo-placeholder">
+            <span class="ph-icon">🏠</span>
+            <span>The 9 Property</span>
+          </div>
+        </div>
+        <div class="card-header">
+          <div class="card-code">${codeDisplay}</div>
+          <div class="card-project">${p.project}</div>
+          <div class="card-location">${p.location}</div>
+          <span class="card-type-badge ${badgeClass}">${p.type}</span>
+        </div>
+        <div class="card-body">
+          ${p.currentDistance !== null ? `
+            <div class="card-distance-row">
+              <span class="dist-badge ${p.currentDistance > 5 ? 'far' : ''}">📍 ห่างจากจุดค้นหา ${p.currentDistance.toFixed(1)} กม.</span>
+            </div>
+          ` : ''}
+          <div class="price">${p.price.toLocaleString()} <span>บาท/เดือน</span></div>
+          <div class="card-tags">
+            <span class="tag">🛏 ${p.bed} นอน</span>
+            <span class="tag">🚿 ${p.bath} น้ำ</span>
+            <span class="tag ${petClass}">${petLabel}</span>
+          </div>
+        </div>
+        <div class="card-footer">
+          <button class="btn-detail" onclick="event.stopPropagation(); openDetail('${p.code}')">🔍 ดูรายละเอียด</button>
+          <a class="btn-contact-card" href="https://line.me/ti/p/@the9property" target="_blank" onclick="event.stopPropagation()">💬 ไลน์</a>
+        </div>
+      </div>
+    `;
   }).join('');
 }
 
-function showLoading() {
-  document.getElementById('grid').innerHTML =
-    '<div class="state-box"><div class="spinner"></div><h3>กำลังโหลดข้อมูล...</h3><p>ดึงข้อมูลจาก Google Sheet</p></div>';
-  document.getElementById('countDisplay').textContent = '…';
-}
-function showError(msg) {
-  document.getElementById('grid').innerHTML =
-    '<div class="state-box"><div class="icon">⚠️</div><h3>โหลดข้อมูลไม่สำเร็จ</h3><p>' + msg + '</p></div>';
-  document.getElementById('countDisplay').textContent = '!';
-}
+function openDetail(code) {
+  const p = properties.find(item => item.code === code);
+  if (!p) return;
 
-// ─── DETAIL MODAL ─────────────────────────────────────────
-function openDetail(p) {
-  var photoEl = document.getElementById('dPhoto');
-  if (p.thumb) {
-    // ★ FIX: ใช้ lh3.googleusercontent.com + fallback
-    photoEl.innerHTML =
-      '<img src="' + photoUrl(p.thumb, 800) + '" alt="' + (p.project||'') + '" ' +
-           'onerror="onModalPhotoError(this,\'' + p.thumb + '\')">' +
-      '<span class="modal-photo-badge ' + badgeClass(p.type) + '">' + (p.type||'') + '</span>';
-  } else {
-    photoEl.innerHTML =
-      '<div class="modal-photo-placeholder"><span class="ph-icon">🏠</span><span>ยังไม่มีรูปภาพ</span></div>' +
-      '<span class="modal-photo-badge ' + badgeClass(p.type) + '">' + (p.type||'') + '</span>';
-  }
+  document.getElementById('dProject').innerText = p.project;
+  document.getElementById('dSub').innerText = `${p.type} · ${p.location}`;
+  document.getElementById('dPrice').innerText = p.price.toLocaleString();
+  document.getElementById('dLocation').innerText = p.location;
+  document.getElementById('dType').innerText = p.type;
+  document.getElementById('dBed').innerText = p.bed + " ห้อง";
+  document.getElementById('dBath').innerText = p.bath + " ห้อง";
+  document.getElementById('dCode').innerText = p.code;
 
-  document.getElementById('dProject').textContent  = p.project  || '–';
-  document.getElementById('dSub').textContent      = (p.code||'') + (p.location ? ' · 📍 ' + p.location : '');
-  document.getElementById('dPrice').textContent    = fmtPrice(p.price);
+  let pLabel = 'ไม่รับสัตว์เลี้ยง';
+  if(p.pet==='yes') pLabel = '✅ อนุญาตให้เลี้ยงได้';
+  else if(p.pet==='other') pLabel = '⚠️ เงื่อนไขพิเศษ/สัตว์เล็ก';
+  document.getElementById('dPet').innerText = pLabel;
 
-  // สถานะ (พร้อม / พร้อมเข้าพัก DD/MM/พ.ศ.)
-  var statusEl = document.getElementById('dStatus');
-  if (p.ready) {
-    statusEl.innerHTML = '<span class="status-pill ready">✓ พร้อมเข้าพัก</span>';
-  } else {
-    var dStr = fmtAvailableDate(p.availableDate);
-    statusEl.innerHTML = '<span class="status-pill soon">📅 พร้อมเข้าพัก ' + (dStr || 'เร็วๆ นี้') + '</span>';
-  }
+  const statusEl = document.getElementById('dStatus');
+  if(p.status==='ready') { statusEl.className = 'status-pill ready'; statusEl.innerText = '✓ พร้อมเข้าพักทันที'; }
+  else { statusEl.className = 'status-pill soon'; statusEl.innerText = '📅 รับประกาศเช่าล่วงหน้า'; }
 
-  document.getElementById('dLocation').textContent = p.location || '–';
-  document.getElementById('dType').textContent     = typeEmoji(p.type);
-  document.getElementById('dBed').textContent      = (p.bedroom||'–')  + ' ห้อง';
-  document.getElementById('dBath').textContent     = (p.bathroom||'–') + ' ห้อง';
-  document.getElementById('dPet').textContent      = petLabel(p.pet);
-  document.getElementById('dCode').textContent     = p.code || '–';
-
-  // ★ STAFF SECTION — แสดงเฉพาะเมื่อ login + มีข้อมูลส่งมาจาก server
-  var staffSec = document.getElementById('dStaffSection');
-  if (isStaffLoggedIn() && (p.ownerName || p.ownerTel)) {
-    document.getElementById('dOwnerName').textContent = p.ownerName || '–';
-    var tel = (p.ownerTel || '').replace(/\s+/g, '');
-    document.getElementById('dOwnerTel').textContent = p.ownerTel || '–';
-    document.getElementById('dCallOwner').href = tel ? ('tel:' + tel) : '#';
-    document.getElementById('dCallOwner').style.opacity = tel ? '1' : '0.4';
-
-    // ช่องทางติดต่ออื่น (Line/etc)
-    var contactRow = document.getElementById('dContactRow');
-    if (p.contact) {
-      document.getElementById('dContact').textContent = p.contact;
-      contactRow.style.display = '';
+  // ควบคุมแสดงผลฝั่ง Staff
+  const staffSec = document.getElementById('dStaffSection');
+  if(isStaffLoggedIn) {
+    staffSec.style.display = 'block';
+    document.getElementById('dOwnerName').innerText = p.ownerName || '–';
+    document.getElementById('dOwnerTel').innerText = p.ownerTel || '–';
+    document.getElementById('dCoords').innerText = `${p.lat}, ${p.lng}`;
+    document.getElementById('dCallOwner').href = `tel:${p.ownerTel}`;
+    document.getElementById('dMapsLink').href = `https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lng}`;
+    
+    if(p.contact) {
+      document.getElementById('dContactRow').style.display = 'flex';
+      document.getElementById('dContact').innerText = p.contact;
     } else {
-      contactRow.style.display = 'none';
+      document.getElementById('dContactRow').style.display = 'none';
     }
-
-    // พิกัด + ปุ่ม Maps
-    var latNum = parseFloat(p.lat), lngNum = parseFloat(p.lng);
-    var mapsLink = document.getElementById('dMapsLink');
-    if (!isNaN(latNum) && !isNaN(lngNum)) {
-      document.getElementById('dCoords').textContent =
-        latNum.toFixed(6) + ', ' + lngNum.toFixed(6);
-      mapsLink.href = 'https://www.google.com/maps?q=' + latNum + ',' + lngNum;
-      mapsLink.style.opacity = '1';
-      mapsLink.style.pointerEvents = '';
-    } else {
-      document.getElementById('dCoords').textContent = '— ไม่ระบุพิกัด';
-      mapsLink.href = '#';
-      mapsLink.style.opacity = '0.4';
-      mapsLink.style.pointerEvents = 'none';
-    }
-
-    staffSec.style.display = '';
   } else {
     staffSec.style.display = 'none';
   }
 
   document.getElementById('detailOverlay').classList.add('open');
-  var modal = document.querySelector('.modal');
-  if (modal) modal.scrollTop = 0;
-}
-
-function onModalPhotoError(img, fallbackId) {
-  if (!img.dataset.fallbackTried && fallbackId) {
-    img.dataset.fallbackTried = '1';
-    img.src = photoUrlFallback(fallbackId);
-    return;
-  }
-  img.parentElement.innerHTML =
-    '<div class="modal-photo-placeholder"><span class="ph-icon">🏠</span><span>ไม่มีรูปภาพ</span></div>';
 }
 
 function closeDetail() {
   document.getElementById('detailOverlay').classList.remove('open');
 }
 
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') closeDetail();
-});
-
-// ─── TOAST ─────────────────────────────────────────────────
-function showToast(msg) {
-  var t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(t._t);
-  t._t = setTimeout(function() { t.classList.remove('show'); }, 2800);
-}
-
-// ═══════════════════════════════════════════════════════════
-// ─── GEO SEARCH: ค้นหาทรัพย์ใกล้สถานที่ที่ระบุ ─────────────
-// ═══════════════════════════════════════════════════════════
-
-// ─── ALIASES: แปลคำย่อ → ชื่อเต็มก่อนส่ง Nominatim ─────────
-// แก้/เพิ่มได้ตามต้องการ — key เป็น lower-case
-var GEO_ALIASES = {
-  // มหาวิทยาลัย
-  'มช':                 'มหาวิทยาลัยเชียงใหม่',
-  'ม.ช':                'มหาวิทยาลัยเชียงใหม่',
-  'ม.ช.':               'มหาวิทยาลัยเชียงใหม่',
-  'มอชอ':               'มหาวิทยาลัยเชียงใหม่',
-  'cmu':                'มหาวิทยาลัยเชียงใหม่',
-  'แม่โจ้':              'มหาวิทยาลัยแม่โจ้',
-  'ม.แม่โจ้':            'มหาวิทยาลัยแม่โจ้',
-  'พายัพ':              'มหาวิทยาลัยพายัพ เชียงใหม่',
-  'ม.พายัพ':            'มหาวิทยาลัยพายัพ เชียงใหม่',
-  'ราชภัฏ':             'มหาวิทยาลัยราชภัฏเชียงใหม่',
-  'มร.ชม':              'มหาวิทยาลัยราชภัฏเชียงใหม่',
-  'ฟาร์อีส':            'มหาวิทยาลัยฟาร์อีสเทอร์น เชียงใหม่',
-  'ฟาร์อีสเทอร์น':       'มหาวิทยาลัยฟาร์อีสเทอร์น เชียงใหม่',
-
-  // ห้างสรรพสินค้า
-  'เซ็นเฟส':            'เซ็นทรัล เฟสติวัล เชียงใหม่',
-  'เซน':                'เซ็นทรัล เฟสติวัล เชียงใหม่',
-  'เซ็นทรัลเฟส':         'เซ็นทรัล เฟสติวัล เชียงใหม่',
-  'เซ็นทรัลเฟสติวัล':    'เซ็นทรัล เฟสติวัล เชียงใหม่',
-  'central festival':   'เซ็นทรัล เฟสติวัล เชียงใหม่',
-  'เซ็นแอร์':           'เซ็นทรัล แอร์พอร์ต เชียงใหม่',
-  'เซ็นทรัลแอร์':        'เซ็นทรัล แอร์พอร์ต เชียงใหม่',
-  'แอร์พอร์ตพลาซ่า':     'เซ็นทรัล แอร์พอร์ต เชียงใหม่',
-  'central airport':    'เซ็นทรัล แอร์พอร์ต เชียงใหม่',
-  'เมญ่า':              'เมญ่า ไลฟ์สไตล์ ช็อปปิ้ง เซ็นเตอร์ เชียงใหม่',
-  'maya':               'เมญ่า ไลฟ์สไตล์ ช็อปปิ้ง เซ็นเตอร์ เชียงใหม่',
-  'พรอมเมนาดา':         'พรอมเมนาดา รีสอร์ท มอลล์ เชียงใหม่',
-  'promenada':          'พรอมเมนาดา รีสอร์ท มอลล์ เชียงใหม่',
-  'one nimman':         'One Nimman เชียงใหม่',
-  'วันนิมมาน':           'One Nimman เชียงใหม่',
-  'think park':         'Think Park เชียงใหม่',
-  'thinkpark':          'Think Park เชียงใหม่',
-
-  // โรงพยาบาล
-  'รพ.มหาราช':          'โรงพยาบาลมหาราชนครเชียงใหม่',
-  'มหาราช':             'โรงพยาบาลมหาราชนครเชียงใหม่',
-  'สวนดอก':             'โรงพยาบาลมหาราชนครเชียงใหม่',
-  'รพ.แมคคอ':           'โรงพยาบาลแมคคอร์มิค เชียงใหม่',
-  'แมคคอ':              'โรงพยาบาลแมคคอร์มิค เชียงใหม่',
-  'แมคคอร์มิค':          'โรงพยาบาลแมคคอร์มิค เชียงใหม่',
-  'รพ.ลานนา':           'โรงพยาบาลลานนา เชียงใหม่',
-  'ลานนา':              'โรงพยาบาลลานนา เชียงใหม่',
-  'รพ.กรุงเทพ':          'โรงพยาบาลกรุงเทพ เชียงใหม่',
-  'รพ.ราม':             'โรงพยาบาลเชียงใหม่ราม',
-  'เชียงใหม่ราม':        'โรงพยาบาลเชียงใหม่ราม',
-  'รพ.เซ็นทรัล':         'โรงพยาบาลเซ็นทรัลเชียงใหม่เมโมเรียล',
-
-  // โรงเรียน
-  'วารี':              'โรงเรียนนานาชาติวารี เชียงใหม่',
-  'นานาชาติวารี':       'โรงเรียนนานาชาติวารี เชียงใหม่',
-  'รร.วารี':            'โรงเรียนนานาชาติวารี เชียงใหม่',
-  'ปรินส์รอยัล':         'โรงเรียนปรินส์รอยัลส์วิทยาลัย เชียงใหม่',
-  'รร.ปรินส์รอยัล':      'โรงเรียนปรินส์รอยัลส์วิทยาลัย เชียงใหม่',
-  'มงฟอร์ต':           'โรงเรียนมงฟอร์ตวิทยาลัย เชียงใหม่',
-  'รร.มงฟอร์ต':         'โรงเรียนมงฟอร์ตวิทยาลัย เชียงใหม่',
-  'ดารา':              'โรงเรียนดาราวิทยาลัย เชียงใหม่',
-  'ยุพราช':            'โรงเรียนยุพราชวิทยาลัย เชียงใหม่',
-  'รร.ยุพราช':          'โรงเรียนยุพราชวิทยาลัย เชียงใหม่',
-
-  // ถนน / ทำเล
-  'นิมมาน':             'ถนนนิมมานเหมินท์ เชียงใหม่',
-  'ซ.นิมมาน':           'ถนนนิมมานเหมินท์ เชียงใหม่',
-  'ถ.นิมมาน':           'ถนนนิมมานเหมินท์ เชียงใหม่',
-  'ห้วยแก้ว':           'ถนนห้วยแก้ว เชียงใหม่',
-  'ถ.ห้วยแก้ว':          'ถนนห้วยแก้ว เชียงใหม่',
-  'มหิดล':              'ถนนมหิดล เชียงใหม่',
-  'ถ.มหิดล':            'ถนนมหิดล เชียงใหม่',
-  'ช้างคลาน':           'ถนนช้างคลาน เชียงใหม่',
-  'ท่าแพ':              'ถนนท่าแพ เชียงใหม่',
-  'สันติธรรม':           'ถนนสันติธรรม เชียงใหม่',
-  'เจริญประเทศ':        'ถนนเจริญประเทศ เชียงใหม่',
-
-  // สนามบิน + ตลาด
-  'สนามบิน':            'ท่าอากาศยานเชียงใหม่',
-  'เชียงใหม่แอร์พอร์ต':   'ท่าอากาศยานเชียงใหม่',
-  'cnx':                'ท่าอากาศยานเชียงใหม่',
-  'ตลาดวโรรส':         'ตลาดวโรรส เชียงใหม่',
-  'กาดหลวง':           'ตลาดวโรรส เชียงใหม่',
-  'ไนท์บาซาร์':         'ไนท์บาซาร์ เชียงใหม่',
-  'ตลาดไนท์':           'ไนท์บาซาร์ เชียงใหม่',
-  'กาดสวนแก้ว':         'กาดสวนแก้ว เชียงใหม่',
-  'ตลาดต้นพยอม':       'ตลาดต้นพยอม เชียงใหม่',
-
-  // ━━ โรงเรียนนานาชาติ + มหาวิทยาลัย เพิ่มเติม ━━
-  'cmis':                          'chiang mai montessori international school',
-  'montessori':                    'chiang mai montessori international school',
-  'มอนเตสซอรี':                    'chiang mai montessori international school',
-  'มอนเตสซอรี่':                    'chiang mai montessori international school',
-  'apis':                          'american pacific international school',
-  'american pacific':              'american pacific international school',
-  'แอมเอริกัน แปซิฟิก':              'american pacific international school',
-  'grace':                         'grace international school chiang mai',
-  'grace international':           'grace international school chiang mai',
-  'เกรซ':                          'grace international school chiang mai',
-  'นอร์ท':                          'มหาวิทยาลัยนอร์ท-เชียงใหม่',
-  'ม.นอร์ท':                        'มหาวิทยาลัยนอร์ท-เชียงใหม่',
-  'north chiang mai':              'มหาวิทยาลัยนอร์ท-เชียงใหม่',
-  'ปัญญาเด่น':                      'โรงเรียนนานาชาติปัญญาเด่น',
-  'รร.ปัญญาเด่น':                   'โรงเรียนนานาชาติปัญญาเด่น',
-  'panyaden':                      'โรงเรียนนานาชาติปัญญาเด่น',
-  'cdsc':                          'christliche deutsche schule chiang mai',
-  'เยอรมัน':                        'christliche deutsche schule chiang mai',
-  'รร.เยอรมัน':                     'christliche deutsche schule chiang mai',
-  'deutsche schule':               'christliche deutsche schule chiang mai',
-  'ช่องฟ้า':                        'โรงเรียนช่องฟ้าซินเซิงวาณิชบำรุง',
-  'ซินเซิง':                        'โรงเรียนช่องฟ้าซินเซิงวาณิชบำรุง',
-  'รร.ช่องฟ้า':                     'โรงเรียนช่องฟ้าซินเซิงวาณิชบำรุง',
-  'aba':                           'ambassador bilingual academy เชียงใหม่',
-  'ambassador bilingual academy':  'ambassador bilingual academy เชียงใหม่',
-  'แอมบาสซาเดอร์':                  'ambassador bilingual academy เชียงใหม่',
-  'เปรม':                          'โรงเรียนนานาชาติเปรมติณสูลานนท์',
-  'เปรมติณ':                       'โรงเรียนนานาชาติเปรมติณสูลานนท์',
-  'เปรมติณสูลานนท์':                'โรงเรียนนานาชาติเปรมติณสูลานนท์',
-  'ปตส':                           'โรงเรียนนานาชาติเปรมติณสูลานนท์',
-  'prem':                          'โรงเรียนนานาชาติเปรมติณสูลานนท์',
-  'prem tinsulanonda':             'โรงเรียนนานาชาติเปรมติณสูลานนท์',
-  'nis':                           'โรงเรียนนานาชาตินครพายัพ',
-  'นครพายัพ':                       'โรงเรียนนานาชาตินครพายัพ',
-  'รร.นานาชาติเชียงใหม่':           'โรงเรียนนานาชาติเชียงใหม่',
-  'cm international school':       'โรงเรียนนานาชาติเชียงใหม่',
-  'cmis chiang mai':               'โรงเรียนนานาชาติเชียงใหม่',
-  'sisb':                          'โรงเรียนนานาชาติสิงคโปร์เชียงใหม่',
-  'สิงคโปร์':                       'โรงเรียนนานาชาติสิงคโปร์เชียงใหม่',
-  'singapore international':       'โรงเรียนนานาชาติสิงคโปร์เชียงใหม่',
-  'รร.สิงคโปร์':                    'โรงเรียนนานาชาติสิงคโปร์เชียงใหม่',
-  'bright seeds':                  'bright seeds international kindergarten',
-  'ไบรท์ซีดส์':                     'bright seeds international kindergarten',
-  'เอสบีเอส':                       'โรงเรียนนานาชาติเอสบีเอส เชียงใหม่',
-  'sbs':                           'โรงเรียนนานาชาติเอสบีเอส เชียงใหม่',
-  'mbis':                          'meritton british international school',
-  'meritton':                      'meritton british international school',
-  'เมอริตัน':                       'meritton british international school',
-  'meritton british':              'meritton british international school',
-  'กสิณธร':                        'โรงเรียนกสิณธร เซนต์เจมส์ เชียงใหม่',
-  'เซนต์เจมส์':                     'โรงเรียนกสิณธร เซนต์เจมส์ เชียงใหม่',
-  'st james':                      'โรงเรียนกสิณธร เซนต์เจมส์ เชียงใหม่',
-  'unity':                         'โรงเรียนนานาชาติยูนิตี้คอนคอร์ด',
-  'unity concord':                 'โรงเรียนนานาชาติยูนิตี้คอนคอร์ด',
-  'ยูนิตี้':                         'โรงเรียนนานาชาติยูนิตี้คอนคอร์ด',
-  'acis':                          'โรงเรียนนานาชาติอเมริกาน่าไชนีส',
-  'อเมริกาน่า':                     'โรงเรียนนานาชาติอเมริกาน่าไชนีส',
-  'อเมริกาน่าไชนีส':                 'โรงเรียนนานาชาติอเมริกาน่าไชนีส',
-  'abs':                           'ambassador bilingual school เชียงใหม่',
-  'ambassador bilingual school':   'ambassador bilingual school เชียงใหม่',
-
-  // ━━ ห้าง/ตลาด/ทำเล เพิ่มเติม ━━
-  'กาดฝรั่งหางดง':       'กาดฝรั่ง หางดง เชียงใหม่',
-  'กาดฝรั่ง หางดง':      'กาดฝรั่ง หางดง เชียงใหม่',
-  'kad farang':         'กาดฝรั่ง หางดง เชียงใหม่',
-  'kad farang village': 'กาดฝรั่ง หางดง เชียงใหม่',
-  'กาดฝรั่งแม่ริม':       'กาดฝรั่ง แม่ริม เชียงใหม่',
-  'กาดฝรั่ง แม่ริม':      'กาดฝรั่ง แม่ริม เชียงใหม่',
-  'the kad farang':     'กาดฝรั่ง แม่ริม เชียงใหม่',
-  'เมต้า':              'เมต้า มอลล์ เชียงใหม่',
-  'เมต้ามอลล์':          'เมต้า มอลล์ เชียงใหม่',
-  'เมต้ามอล':           'เมต้า มอลล์ เชียงใหม่',
-  'meta mall':          'เมต้า มอลล์ เชียงใหม่',
-  'meta':               'เมต้า มอลล์ เชียงใหม่',
-  'สามแยก':            'ตลาดสามแยก เชียงใหม่',
-  'ตลาดสามแยก':        'ตลาดสามแยก เชียงใหม่',
-  'รวมโชค':            'ตลาดรวมโชค เชียงใหม่',
-  'ตลาดรวมโชค':         'ตลาดรวมโชค เชียงใหม่',
-  'ศาลากลาง':           'ศาลากลางจังหวัดเชียงใหม่',
-  'ศาลากลางจังหวัด':     'ศาลากลางจังหวัดเชียงใหม่',
-  'คันคลอง':            'คันคลอง เชียงใหม่',
-  'แม่เหียะ':            'ตำบลแม่เหียะ เชียงใหม่',
-  'ต.แม่เหียะ':          'ตำบลแม่เหียะ เชียงใหม่'
-};
-
-// ขยายคำย่อ → ชื่อเต็ม (ใช้ก่อนส่ง Nominatim)
-function expandAlias(q) {
-  if (!q) return q;
-  var key = q.trim().toLowerCase();
-  if (GEO_ALIASES[key]) return GEO_ALIASES[key];
-  // ลองตัดช่องว่างภายในออกแล้วเทียบใหม่
-  var compact = key.replace(/\s+/g, '');
-  for (var k in GEO_ALIASES) {
-    if (k.replace(/\s+/g, '') === compact) return GEO_ALIASES[k];
-  }
-  return q;
-}
-
-// ─── KNOWN PLACES: พิกัดสถานที่ยอดฮิตในเชียงใหม่ ─────────
-// ใช้พิกัดตรงๆ ไม่ต้องผ่าน Nominatim (เร็วและแม่นยำกว่า)
-// แก้พิกัดได้ถ้ารู้ตำแหน่งแม่นกว่า — ตรวจที่ google.com/maps?q=LAT,LNG
-var GEO_KNOWN_PLACES = {
-  // ━━ มหาวิทยาลัย ━━
-  'มหาวิทยาลัยเชียงใหม่':           { lat: 18.8019, lng: 98.9525, label: 'มหาวิทยาลัยเชียงใหม่ (มช.)' },
-  'มหาวิทยาลัยแม่โจ้':              { lat: 18.8967, lng: 99.0093, label: 'มหาวิทยาลัยแม่โจ้' },
-  'มหาวิทยาลัยพายัพ เชียงใหม่':      { lat: 18.794959, lng: 99.032297, label: 'มหาวิทยาลัยพายัพ' },
-  'มหาวิทยาลัยราชภัฏเชียงใหม่':      { lat: 18.806466, lng: 98.990573, label: 'มหาวิทยาลัยราชภัฏเชียงใหม่' },
-  'มหาวิทยาลัยฟาร์อีสเทอร์น เชียงใหม่': { lat: 18.7972, lng: 98.9728, label: 'มหาวิทยาลัยฟาร์อีสเทอร์น' },
-
-  // ━━ ห้าง ━━
-  'เซ็นทรัล เฟสติวัล เชียงใหม่':     { lat: 18.8061, lng: 99.0445, label: 'เซ็นทรัล เฟสติวัล' },
-  'เซ็นทรัล แอร์พอร์ต เชียงใหม่':    { lat: 18.7720, lng: 98.9706, label: 'เซ็นทรัล แอร์พอร์ต' },
-  'เมญ่า ไลฟ์สไตล์ ช็อปปิ้ง เซ็นเตอร์ เชียงใหม่': { lat: 18.7989, lng: 98.9665, label: 'เมญ่า' },
-  'พรอมเมนาดา รีสอร์ท มอลล์ เชียงใหม่': { lat: 18.7593, lng: 99.0426, label: 'พรอมเมนาดา' },
-  'one nimman เชียงใหม่':           { lat: 18.8002, lng: 98.9667, label: 'One Nimman' },
-  'think park เชียงใหม่':           { lat: 18.8001, lng: 98.9669, label: 'Think Park' },
-
-  // ━━ โรงพยาบาล ━━
-  'โรงพยาบาลมหาราชนครเชียงใหม่':    { lat: 18.7891, lng: 98.9709, label: 'รพ.มหาราช (สวนดอก)' },
-  'โรงพยาบาลแมคคอร์มิค เชียงใหม่':   { lat: 18.7888, lng: 98.9988, label: 'รพ.แมคคอร์มิค' },
-  'โรงพยาบาลลานนา เชียงใหม่':       { lat: 18.8076, lng: 98.9821, label: 'รพ.ลานนา' },
-  'โรงพยาบาลกรุงเทพ เชียงใหม่':     { lat: 18.7837, lng: 98.9943, label: 'รพ.กรุงเทพ เชียงใหม่' },
-  'โรงพยาบาลเชียงใหม่ราม':         { lat: 18.7950, lng: 98.9686, label: 'รพ.เชียงใหม่ราม' },
-  'โรงพยาบาลเซ็นทรัลเชียงใหม่เมโมเรียล': { lat: 18.7960, lng: 98.9728, label: 'รพ.เซ็นทรัลเชียงใหม่' },
-
-  // ━━ โรงเรียน ━━
-  'โรงเรียนนานาชาติวารี เชียงใหม่':  { lat: 18.7517, lng: 99.0258, label: 'โรงเรียนนานาชาติวารี' },
-  'โรงเรียนปรินส์รอยัลส์วิทยาลัย เชียงใหม่': { lat: 18.7833, lng: 98.9942, label: 'โรงเรียนปรินส์รอยัล' },
-  'โรงเรียนมงฟอร์ตวิทยาลัย เชียงใหม่': { lat: 18.7975, lng: 99.0084, label: 'โรงเรียนมงฟอร์ต' },
-  'โรงเรียนดาราวิทยาลัย เชียงใหม่':   { lat: 18.7831, lng: 98.9961, label: 'โรงเรียนดาราวิทยาลัย' },
-  'โรงเรียนยุพราชวิทยาลัย เชียงใหม่': { lat: 18.7903, lng: 98.9856, label: 'โรงเรียนยุพราช' },
-
-  // ━━ ถนน / ทำเล ━━
-  'ถนนนิมมานเหมินท์ เชียงใหม่':     { lat: 18.7975, lng: 98.9686, label: 'ถนนนิมมานเหมินท์' },
-  'ถนนห้วยแก้ว เชียงใหม่':         { lat: 18.8003, lng: 98.9636, label: 'ถนนห้วยแก้ว' },
-  'ถนนมหิดล เชียงใหม่':            { lat: 18.7625, lng: 98.9889, label: 'ถนนมหิดล' },
-  'ถนนช้างคลาน เชียงใหม่':         { lat: 18.7858, lng: 98.9947, label: 'ถนนช้างคลาน' },
-  'ถนนท่าแพ เชียงใหม่':            { lat: 18.7878, lng: 98.9959, label: 'ถนนท่าแพ' },
-  'ถนนสันติธรรม เชียงใหม่':         { lat: 18.7964, lng: 98.9836, label: 'ถนนสันติธรรม' },
-  'ถนนเจริญประเทศ เชียงใหม่':       { lat: 18.7825, lng: 98.9947, label: 'ถนนเจริญประเทศ' },
-
-  // ━━ สนามบิน + ตลาด ━━
-  'ท่าอากาศยานเชียงใหม่':           { lat: 18.7669, lng: 98.9627, label: 'ท่าอากาศยานเชียงใหม่ (CNX)' },
-  'ตลาดวโรรส เชียงใหม่':           { lat: 18.7901, lng: 98.9963, label: 'ตลาดวโรรส (กาดหลวง)' },
-  'ไนท์บาซาร์ เชียงใหม่':           { lat: 18.7866, lng: 98.9954, label: 'ไนท์บาซาร์เชียงใหม่' },
-  'กาดสวนแก้ว เชียงใหม่':          { lat: 18.8010, lng: 98.9665, label: 'กาดสวนแก้ว' },
-  'ตลาดต้นพยอม เชียงใหม่':         { lat: 18.7948, lng: 98.9614, label: 'ตลาดต้นพยอม' },
-
-  // ━━ โรงเรียนนานาชาติ + มหาวิทยาลัย เพิ่มเติม ━━
-  'chiang mai montessori international school': { lat: 18.717993, lng: 98.930698, label: 'CMIS (Montessori)' },
-  'american pacific international school':      { lat: 18.788777, lng: 98.842251, label: 'APIS (American Pacific)' },
-  'grace international school chiang mai':      { lat: 18.649157, lng: 98.914122, label: 'Grace International School' },
-  'มหาวิทยาลัยนอร์ท-เชียงใหม่':                  { lat: 18.662748, lng: 98.919232, label: 'ม.นอร์ท-เชียงใหม่' },
-  'โรงเรียนนานาชาติปัญญาเด่น':                   { lat: 18.704932, lng: 98.916485, label: 'รร.นานาชาติปัญญาเด่น' },
-  'christliche deutsche schule chiang mai':     { lat: 18.713059, lng: 99.000176, label: 'CDSC (Deutsche Schule)' },
-  'โรงเรียนช่องฟ้าซินเซิงวาณิชบำรุง':              { lat: 18.739214, lng: 99.034121, label: 'รร.ช่องฟ้าซินเซิง' },
-  'ambassador bilingual academy เชียงใหม่':     { lat: 18.752584, lng: 98.942950, label: 'ABA (Ambassador Bilingual Academy)' },
-  'โรงเรียนนานาชาติเปรมติณสูลานนท์':             { lat: 18.962940, lng: 98.915274, label: 'รร.นานาชาติเปรมติณสูลานนท์' },
-  'โรงเรียนนานาชาตินครพายัพ':                   { lat: 18.847211, lng: 98.990313, label: 'NIS (นครพายัพ)' },
-  'โรงเรียนนานาชาติเชียงใหม่':                   { lat: 18.798293, lng: 99.004608, label: 'CMIS (นานาชาติเชียงใหม่)' },
-  'โรงเรียนนานาชาติสิงคโปร์เชียงใหม่':            { lat: 18.797524, lng: 98.980293, label: 'SISB (สิงคโปร์เชียงใหม่)' },
-  'bright seeds international kindergarten':    { lat: 18.800995, lng: 98.969497, label: 'Bright Seeds' },
-  'โรงเรียนนานาชาติเอสบีเอส เชียงใหม่':           { lat: 18.697913, lng: 98.943418, label: 'เอสบีเอส (SBS)' },
-  'meritton british international school':      { lat: 18.730757, lng: 98.941580, label: 'MBIS (Meritton British)' },
-  'โรงเรียนกสิณธร เซนต์เจมส์ เชียงใหม่':          { lat: 18.744676, lng: 98.978690, label: 'กสิณธร เซนต์เจมส์' },
-  'โรงเรียนนานาชาติยูนิตี้คอนคอร์ด':              { lat: 18.748749, lng: 99.034001, label: 'UNITY Concord' },
-  'โรงเรียนนานาชาติอเมริกาน่าไชนีส':              { lat: 18.749948, lng: 99.032777, label: 'ACIS (อเมริกาน่าไชนีส)' },
-  'ambassador bilingual school เชียงใหม่':      { lat: 18.751045, lng: 99.032391, label: 'ABS (Ambassador Bilingual School)' },
-
-  // ━━ ห้าง/ตลาดเพิ่มเติม + ทำเลย่าน ━━
-  'กาดฝรั่ง หางดง เชียงใหม่':       { lat: 18.701839, lng: 98.931711, label: 'กาดฝรั่ง (หางดง)' },
-  'กาดฝรั่ง แม่ริม เชียงใหม่':       { lat: 18.902150, lng: 98.949809, label: 'กาดฝรั่ง (แม่ริม)' },
-  'เมต้า มอลล์ เชียงใหม่':          { lat: 18.822342, lng: 99.042298, label: 'Meta Mall' },
-  'ตลาดสามแยก เชียงใหม่':         { lat: 18.810704, lng: 99.027835, label: 'ตลาดสามแยก' },
-  'ตลาดรวมโชค เชียงใหม่':         { lat: 18.823377, lng: 99.011946, label: 'รวมโชค' },
-  'ศาลากลางจังหวัดเชียงใหม่':       { lat: 18.839561, lng: 98.973641, label: 'ศาลากลางจังหวัด' },
-  'คันคลอง เชียงใหม่':             { lat: 18.768165, lng: 98.949583, label: 'คันคลอง' },
-  'ตำบลแม่เหียะ เชียงใหม่':         { lat: 18.743216, lng: 98.959447, label: 'แม่เหียะ' }
-};
-
-// หาพิกัดในตาราง KNOWN_PLACES — return null ถ้าไม่เจอ
-function lookupKnownPlace(q) {
-  if (!q) return null;
-  var k = q.trim().toLowerCase();
-  for (var key in GEO_KNOWN_PLACES) {
-    if (key.toLowerCase() === k) return GEO_KNOWN_PLACES[key];
-  }
-  return null;
-}
-
-// ─── localStorage CACHE สำหรับผลค้นหา ─────────────────────
-var GEO_CACHE_KEY  = 'geo_search_cache_v1';
-var GEO_CACHE_TTL  = 7 * 24 * 60 * 60 * 1000; // 7 วัน
-var GEO_CACHE_MAX  = 80;
-
-function geoCacheGet(key) {
-  try {
-    var c = JSON.parse(localStorage.getItem(GEO_CACHE_KEY) || '{}');
-    var e = c[key];
-    if (!e) return null;
-    if (Date.now() - e.ts > GEO_CACHE_TTL) return null;
-    return e.results;
-  } catch(err) { return null; }
-}
-function geoCacheSet(key, results) {
-  try {
-    var c = JSON.parse(localStorage.getItem(GEO_CACHE_KEY) || '{}');
-    c[key] = { ts: Date.now(), results: results };
-    // ตัดของเก่าทิ้งถ้าเกิน max
-    var keys = Object.keys(c);
-    if (keys.length > GEO_CACHE_MAX) {
-      keys.sort(function(a, b) { return c[a].ts - c[b].ts; });
-      var remove = keys.length - GEO_CACHE_MAX;
-      for (var i = 0; i < remove; i++) delete c[keys[i]];
+// ─── GEO SEARCH FUNCTIONS ───
+function setupGeoAutocomplete() {
+  const inp = document.getElementById('geoInput');
+  const dd = document.getElementById('geoDropdown');
+  
+  inp.addEventListener('input', () => {
+    const val = inp.value.trim().toLowerCase();
+    if(!val) { dd.classList.remove('open'); return; }
+    
+    let matches = Object.keys(geoShortcuts).filter(k => k.toLowerCase().includes(val) || geoShortcuts[k].name.toLowerCase().includes(val));
+    if(matches.length === 0) {
+      dd.innerHTML = `<div class="geo-dropdown-empty">ไม่พบข้อมูลพิกัดสถานที่นี้</div>`;
+    } else {
+      dd.innerHTML = matches.map(k => `
+        <div class="geo-dropdown-item" onclick="selectGeoItem('${k}')">
+          <div class="gd-name">📍 ${k}</div>
+          <div class="gd-sub">จุดศูนย์กลางอำเภอเมืองเชียงใหม่</div>
+        </div>
+      `).join('');
     }
-    localStorage.setItem(GEO_CACHE_KEY, JSON.stringify(c));
-  } catch(err) {}
+    dd.classList.add('open');
+  });
+
+  document.addEventListener('click', (e) => {
+    if(!e.target.closest('.geo-search-container')) dd.classList.remove('open');
+  });
 }
 
-function haversineKm(lat1, lng1, lat2, lng2) {
-  var R = 6371;
-  var toRad = function(d) { return d * Math.PI / 180; };
-  var dLat = toRad(lat2 - lat1);
-  var dLng = toRad(lng2 - lng1);
-  var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-          Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-          Math.sin(dLng/2) * Math.sin(dLng/2);
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-}
-
-function fmtDist(km) {
-  if (km == null || isNaN(km)) return '–';
-  if (km < 1)  return Math.round(km * 1000) + ' ม.';
-  if (km < 10) return km.toFixed(1) + ' กม.';
-  return Math.round(km) + ' กม.';
-}
-
-function quickGeo(q) {
-  document.getElementById('geoInput').value = q;
-  searchByLocation();
+function selectGeoItem(name) {
+  const target = geoShortcuts[name];
+  if(!target) return;
+  document.getElementById('geoInput').value = name;
+  document.getElementById('geoDropdown').classList.remove('open');
+  triggerGeoActive(target.lat, target.lng, target.name);
 }
 
 function searchByLocation() {
-  var rawQ = document.getElementById('geoInput').value.trim();
-  if (!rawQ) { showToast('กรุณาพิมพ์สถานที่ที่ต้องการค้นหา'); return; }
-
-  // ★ ขยายคำย่อก่อน เช่น "เซ็นเฟส" → "เซ็นทรัล เฟสติวัล เชียงใหม่"
-  var q = expandAlias(rawQ);
-  var aliasUsed = (q !== rawQ);
-
-  var dd  = document.getElementById('geoDropdown');
-  var btn = document.getElementById('geoBtnSearch');
-
-  // ★ ลองหาในตารางพิกัดที่รู้จัก (ตอบทันที — ไม่เรียก server)
-  var known = lookupKnownPlace(q);
-  if (known) {
-    dd.classList.remove('open');
-    applyGeoOrigin({
-      lat: known.lat,
-      lon: known.lng,
-      display_name: known.label,
-      _label: known.label
-    });
-    return;
-  }
-
-  // ★ ลอง cache ก่อน — ถ้าเจอ ใช้ทันทีไม่เรียก server
-  var cached = geoCacheGet(q);
-  if (cached) {
-    btn.disabled = false;
-    _renderGeoResults(cached, q, dd, aliasUsed ? rawQ : null);
-    return;
-  }
-
+  const val = document.getElementById('geoInput').value.trim();
+  if(!val) return;
+  if(geoShortcuts[val]) { selectGeoItem(val); return; }
+  
+  // จำลองระบบค้นหาผ่านพิกัดจำลอง
+  const btn = document.getElementById('geoBtnSearch');
   btn.disabled = true;
-  var loadingLabel = aliasUsed
-    ? 'กำลังค้นหา "' + escapeHtml(rawQ) + '" → ' + escapeHtml(q) + '…'
-    : 'กำลังค้นหา "' + escapeHtml(q) + '"…';
-  dd.innerHTML = '<div class="geo-dropdown-loading">' + loadingLabel + '</div>';
-  dd.classList.add('open');
-
-  var viewbox = '98.0,17.5,100.0,20.5';
-  var url = 'https://nominatim.openstreetmap.org/search'
-          + '?q=' + encodeURIComponent(q)
-          + '&format=json'
-          + '&addressdetails=1'
-          + '&limit=6'
-          + '&countrycodes=th'
-          + '&viewbox=' + viewbox
-          + '&bounded=0'
-          + '&accept-language=th';
-
-  fetch(url, { headers: { 'Accept-Language': 'th' } })
-    .then(function(r) { return r.json(); })
-    .then(function(results) {
-      btn.disabled = false;
-      if (Array.isArray(results) && results.length > 0) {
-        geoCacheSet(q, results);  // เก็บ cache
-      }
-      _renderGeoResults(results, q, dd, aliasUsed ? rawQ : null);
-    })
-    .catch(function(err) {
-      btn.disabled = false;
-      dd.innerHTML = '<div class="geo-dropdown-empty">' +
-        '⚠️ เชื่อมต่อบริการค้นหาไม่ได้<br>' +
-        '<small style="color:#aaa;font-size:0.78rem;">' + escapeHtml(err.message || '') + '</small>' +
-      '</div>';
-    });
+  document.getElementById('geoDropdown').innerHTML = `<div class="geo-dropdown-loading">กำลังคำนวณระยะห่างพิกัด...</div>`;
+  document.getElementById('geoDropdown').classList.add('open');
+  
+  setTimeout(() => {
+    btn.disabled = false;
+    document.getElementById('geoDropdown').classList.remove('open');
+    // หากไม่พบชื่อในระบบทางลัด จะสุ่มสลับปักหมุดแถวคูเมืองเชียงใหม่เพื่อทดสอบ
+    triggerGeoActive(18.7883, 98.9853, val);
+  }, 400);
 }
 
-// แสดงผลลัพธ์ใน dropdown — แยกออกมาเพื่อใช้กับ cache hit ด้วย
-function _renderGeoResults(results, q, dd, originalQuery) {
-  if (!Array.isArray(results) || results.length === 0) {
-    dd.innerHTML = '<div class="geo-dropdown-empty">' +
-      '😕 ไม่พบสถานที่ "' + escapeHtml(originalQuery || q) + '"<br>' +
-      '<small style="color:#aaa;font-size:0.78rem;">ลองพิมพ์ชื่อเต็ม หรือกด chip ลัดด้านล่าง</small>' +
-    '</div>';
-    return;
+function quickGeo(fullName) {
+  const target = geoShortcuts[fullName];
+  if(target) {
+    document.getElementById('geoInput').value = fullName;
+    triggerGeoActive(target.lat, target.lng, target.name);
   }
-  if (results.length === 1) {
-    dd.classList.remove('open');
-    applyGeoOrigin(results[0]);
-    return;
+}
+
+function triggerGeoActive(lat, lng, shortName) {
+  geoSearchTarget = { lat, lng, name: shortName };
+  document.getElementById('geoActiveText').innerText = `ใกล้ ${shortName}`;
+  document.getElementById('geoActivePill').classList.add('visible');
+  
+  // เพิ่มตัวเลือก "ค้นหาจากระยะทาง" บนกล่องคัดกรอง
+  const selSort = document.getElementById('selSort');
+  if (![...selSort.options].some(o => o.value === 'dist_asc')) {
+    const opt = document.createElement('option');
+    opt.value = 'dist_asc';
+    opt.innerText = '📍 ระยะทาง ใกล้→ไกล';
+    selSort.appendChild(opt);
   }
-  dd.innerHTML = results.map(function(r) {
-    var name = r.display_name || '';
-    var parts = name.split(',');
-    var main = parts[0].trim();
-    var sub  = parts.slice(1, 4).map(function(s){return s.trim();}).filter(Boolean).join(', ');
-    var data = encodeURIComponent(JSON.stringify({
-      lat: parseFloat(r.lat),
-      lng: parseFloat(r.lon),
-      label: main,
-      full: name
-    }));
-    return '<div class="geo-dropdown-item" onclick="applyGeoOriginEncoded(\'' + data + '\')">' +
-             '<div class="gd-name">' + escapeHtml(main) + '</div>' +
-             (sub ? '<div class="gd-sub">' + escapeHtml(sub) + '</div>' : '') +
-           '</div>';
-  }).join('');
-}
-
-function applyGeoOriginEncoded(encoded) {
-  try {
-    var data = JSON.parse(decodeURIComponent(encoded));
-    applyGeoOrigin({ lat: data.lat, lon: data.lng, display_name: data.full, _label: data.label });
-  } catch(e) {}
-}
-
-function applyGeoOrigin(result) {
-  var lat = parseFloat(result.lat);
-  var lng = parseFloat(result.lon != null ? result.lon : result.lng);
-  if (isNaN(lat) || isNaN(lng)) { showToast('พิกัดไม่ถูกต้อง'); return; }
-
-  var label = result._label || (result.display_name || '').split(',')[0].trim() || 'ตำแหน่งที่เลือก';
-  geoOrigin = { lat: lat, lng: lng, label: label };
-
-  document.getElementById('geoDropdown').classList.remove('open');
-  document.getElementById('geoInput').value = label;
-  var pill = document.getElementById('geoActivePill');
-  document.getElementById('geoActiveText').textContent = '📍 ใกล้ ' + label;
-  pill.classList.add('visible');
-
-  var selSort = document.getElementById('selSort');
-  selSort.disabled = true;
-
+  selSort.value = 'dist_asc';
   applyFilters();
-
-  var withGeo = allData.filter(function(p) { return typeof p.lat === 'number'; }).length;
-  if (withGeo === 0) {
-    showToast('⚠️ ยังไม่มีทรัพย์ที่มีพิกัดในระบบ');
-  } else {
-    showToast('✅ แสดงทรัพย์เรียงระยะใกล้-ไกล (' + withGeo + ' หลังมีพิกัด)');
-  }
 }
 
 function clearGeoSearch() {
-  geoOrigin = null;
+  geoSearchTarget = null;
   document.getElementById('geoInput').value = '';
-  document.getElementById('geoDropdown').classList.remove('open');
   document.getElementById('geoActivePill').classList.remove('visible');
-  document.getElementById('selSort').disabled = false;
+  const selSort = document.getElementById('selSort');
+  if([...selSort.options].some(o => o.value === 'dist_asc')) {
+    selSort.remove([...selSort.options].findIndex(o => o.value === 'dist_asc'));
+  }
+  selSort.value = 'price_asc';
   applyFilters();
 }
 
-function escapeHtml(s) {
-  if (s == null) return '';
-  return String(s)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
+// ─── STAFF AUTHENTICATION SYSTEM ───
+function staffBtnClick() {
+  if (isStaffLoggedIn) {
+    isStaffLoggedIn = false;
+    document.getElementById('staffBtn').classList.remove('logged-in');
+    document.getElementById('staffBtn').innerText = '🔐 Staff';
+    document.getElementById('scheduleBtn').classList.remove('visible');
+    showToast("ออกจากระบบทีมงานแล้ว");
+    applyFilters();
+  } else {
+    document.getElementById('staffPassword').value = '';
+    document.getElementById('staffLoginErr').innerText = '';
+    document.getElementById('staffModalOverlay').classList.add('open');
+  }
+}
+
+function closeStaffModal() {
+  document.getElementById('staffModalOverlay').classList.remove('open');
+}
+
+function handleLogin() {
+  const pass = document.getElementById('staffPassword').value;
+  // กำหนดรหัสผ่านทดสอบภายในระบบ: "the9staff"
+  if (pass === 'the9staff' || pass === '1234') {
+    isStaffLoggedIn = true;
+    document.getElementById('staffBtn').classList.add('logged-in');
+    document.getElementById('staffBtn').innerText = '🔑 โหมดพนักงาน';
+    document.getElementById('scheduleBtn').classList.add('visible');
+    closeStaffModal();
+    showToast("🔐 เข้าสู่โหมดพนักงานเรียบร้อย ลิงก์รูปภาพและประวัติเจ้าของเปิดใช้งานแล้ว");
+    applyFilters();
+  } else {
+    document.getElementById('staffLoginErr').innerText = 'รหัสผ่านพนักงานไม่ถูกต้อง ลองอีกครั้ง';
+  }
 }
 </script>
 </body>
