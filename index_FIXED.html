@@ -80,6 +80,15 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
   max-width: 115px;
 }
 .filter-select option { color: #333; background: white; }
+.filter-clear-btn {
+  padding: 4px 11px; border-radius: 50px; flex-shrink: 0;
+  border: 1.5px solid rgba(255,180,0,0.7);
+  background: rgba(255,180,0,0.15); color: rgba(255,220,80,0.95);
+  font-size: 0.73rem; cursor: pointer; transition: all 0.2s; font-family: inherit;
+  display: none;
+}
+.filter-clear-btn:hover { background: rgba(255,180,0,0.35); border-color: rgba(255,220,80,0.9); }
+.filter-clear-btn.visible { display: inline-flex; align-items: center; gap: 3px; }
 /* ─── STATS BAR ─── */
 .stats-bar {
   background: white; padding: 8px 16px;
@@ -566,6 +575,8 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
       <option value="ready">✓ พร้อมเข้าพัก</option>
       <option value="soon">📅 ประกาศล่วงหน้า</option>
     </select>
+    <div class="filter-sep"></div>
+    <button class="filter-clear-btn" id="btnClearFilters" onclick="clearAllFilters()">✕ ล้างตัวกรอง</button>
   </div>
   <!-- GEO ROW: ค้นหาตำแหน่งใกล้เคียง -->
   <div class="geo-row">
@@ -807,6 +818,32 @@ function loadData(manual) {
     });
 }
 // ─── FILTER & SORT ─────────────────────────────────────────
+function clearAllFilters() {
+  // Reset type → ทั้งหมด
+  activeType = 'all';
+  var row2 = document.querySelector('.header-row2');
+  row2.querySelectorAll('.filter-btn').forEach(function(b) {
+    if (!b.id) b.classList.remove('active');
+  });
+  // ทำให้ปุ่ม "ทั้งหมด" active (ปุ่มแรกที่ไม่มี id)
+  var firstTypeBtn = Array.from(row2.querySelectorAll('.filter-btn')).find(function(b){ return !b.id; });
+  if (firstTypeBtn) firstTypeBtn.classList.add('active');
+  // Reset agent
+  activeAgent = 'all';
+  var btnD = document.getElementById('btnAgentDirect');
+  var btnC = document.getElementById('btnAgentCo');
+  if (btnD) btnD.classList.remove('active');
+  if (btnC) btnC.classList.remove('active');
+  // Reset selects
+  document.getElementById('selPet').value    = 'all';
+  document.getElementById('selMin').value    = '0';
+  document.getElementById('selMax').value    = '9999999';
+  document.getElementById('selBed').value    = 'all';
+  document.getElementById('selStatus').value = 'all';
+  // Clear search
+  document.getElementById('searchInput').value = '';
+  applyFilters();
+}
 // ปุ่ม "ทั้งหมด/บ้านเดี่ยว/ทาวน์/คอนโด/พูลวิลล่า/บ้าน" — เฉพาะ type group
 function setType(val, btn) {
   activeType = val;
@@ -894,6 +931,17 @@ function applyFilters() {
   }
   showGrid(filtered);
   document.getElementById('countDisplay').textContent = filtered.length;
+  // แสดงปุ่มล้างตัวกรองเมื่อมีการกรองอยู่
+  var hasFilter = activeType !== 'all'
+    || activeAgent !== 'all'
+    || document.getElementById('selPet').value !== 'all'
+    || document.getElementById('selMin').value !== '0'
+    || document.getElementById('selMax').value !== '9999999'
+    || document.getElementById('selBed').value !== 'all'
+    || document.getElementById('selStatus').value !== 'all'
+    || document.getElementById('searchInput').value.trim() !== '';
+  var btnClear = document.getElementById('btnClearFilters');
+  if (btnClear) btnClear.classList.toggle('visible', hasFilter);
 }
 // ─── HELPERS ───────────────────────────────────────────────
 function badgeClass(t) {
