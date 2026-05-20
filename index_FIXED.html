@@ -438,6 +438,15 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
 
 /* Wrapper ที่ทำให้ Staff button + Schedule button stack แนวตั้ง */
 .staff-controls { display: flex; flex-direction: column; gap: 6px; align-items: stretch; flex-shrink: 0; }
+.sale-link-btn {
+  background: linear-gradient(135deg, #c0392b, #962d22);
+  color: white; border: 1.5px solid rgba(255,255,255,0.3);
+  padding: 4px 11px; border-radius: 50px; font-size: 0.73rem;
+  cursor: pointer; font-family: inherit; text-decoration: none;
+  display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+  white-space: nowrap; font-weight: 600;
+}
+.sale-link-btn:hover { filter: brightness(1.18); }
 
 /* ปุ่มลิงก์ไปหน้า "ตารางโพสทรัพย์" — แสดงเฉพาะตอน login */
 .schedule-btn {
@@ -526,6 +535,7 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
     </div>
     <div class="staff-controls">
       <button class="staff-btn" id="staffBtn" onclick="staffBtnClick()">🔐 Staff</button>
+      <a class="sale-link-btn" href="https://the9property-blip.github.io/sale-house/" target="_blank" rel="noopener" title="ไปยังเว็บทรัพย์ขาย">🏷️ ทรัพย์ขาย</a>
       <a class="schedule-btn" id="scheduleBtn"
          href="https://the9property-blip.github.io/property-posting-schedule/"
          target="_blank" rel="noopener">📋 ตารางโพสทรัพย์</a>
@@ -1554,63 +1564,4 @@ function _renderGeoResults(results, q, dd, originalQuery) {
     var name = r.display_name || '';
     var parts = name.split(',');
     var main = parts[0].trim();
-    var sub  = parts.slice(1, 4).map(function(s){return s.trim();}).filter(Boolean).join(', ');
-    var data = encodeURIComponent(JSON.stringify({
-      lat: parseFloat(r.lat),
-      lng: parseFloat(r.lon),
-      label: main,
-      full: name
-    }));
-    return '<div class="geo-dropdown-item" onclick="applyGeoOriginEncoded(\'' + data + '\')">' +
-             '<div class="gd-name">' + escapeHtml(main) + '</div>' +
-             (sub ? '<div class="gd-sub">' + escapeHtml(sub) + '</div>' : '') +
-           '</div>';
-  }).join('');
-}
-function applyGeoOriginEncoded(encoded) {
-  try {
-    var data = JSON.parse(decodeURIComponent(encoded));
-    applyGeoOrigin({ lat: data.lat, lon: data.lng, display_name: data.full, _label: data.label });
-  } catch(e) {}
-}
-function applyGeoOrigin(result) {
-  var lat = parseFloat(result.lat);
-  var lng = parseFloat(result.lon != null ? result.lon : result.lng);
-  if (isNaN(lat) || isNaN(lng)) { showToast('พิกัดไม่ถูกต้อง'); return; }
-  var label = result._label || (result.display_name || '').split(',')[0].trim() || 'ตำแหน่งที่เลือก';
-  geoOrigin = { lat: lat, lng: lng, label: label };
-  document.getElementById('geoDropdown').classList.remove('open');
-  document.getElementById('geoInput').value = label;
-  var pill = document.getElementById('geoActivePill');
-  document.getElementById('geoActiveText').textContent = '📍 ใกล้ ' + label;
-  pill.classList.add('visible');
-  var selSort = document.getElementById('selSort');
-  selSort.disabled = true;
-  applyFilters();
-  var withGeo = allData.filter(function(p) { return typeof p.lat === 'number'; }).length;
-  if (withGeo === 0) {
-    showToast('⚠️ ยังไม่มีทรัพย์ที่มีพิกัดในระบบ');
-  } else {
-    showToast('✅ แสดงทรัพย์เรียงระยะใกล้-ไกล (' + withGeo + ' หลังมีพิกัด)');
-  }
-}
-function clearGeoSearch() {
-  geoOrigin = null;
-  document.getElementById('geoInput').value = '';
-  document.getElementById('geoDropdown').classList.remove('open');
-  document.getElementById('geoActivePill').classList.remove('visible');
-  document.getElementById('selSort').disabled = false;
-  applyFilters();
-}
-function escapeHtml(s) {
-  if (s == null) return '';
-  return String(s)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
-</script>
-</body>
-</html>
+    var sub  = parts.slice(1, 4).map(function(s){return s.trim();}).
