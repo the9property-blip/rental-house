@@ -1564,4 +1564,56 @@ function _renderGeoResults(results, q, dd, originalQuery) {
     var name = r.display_name || '';
     var parts = name.split(',');
     var main = parts[0].trim();
-    var sub  = parts.slice(1, 4).map(function(s){return s.trim();}).
+    var sub  = parts.slice(1, 4).map(function(s){return s.trim();}).join(', ');
+    return '<div class="geo-dropdown-item" onclick=\'applyGeoOrigin(' + JSON.stringify(r).replace(/"/g, "&quot;") + ')\'>' +
+      '<div class="gd-name">' + escapeHtml(main) + '</div>' +
+      (sub ? '<div class="gd-sub">' + escapeHtml(sub) + '</div>' : '') +
+    '</div>';
+  }).join('');
+  dd.classList.add('open');
+}
+
+// ใช้ผลลัพธ์ Nominatim → ตั้ง geoOrigin → re-render พร้อมระยะทาง
+function applyGeoOrigin(r) {
+  var lat = parseFloat(r.lat || (r.geometry && r.geometry.coordinates && r.geometry.coordinates[1]));
+  var lng = parseFloat(r.lon || r.lng || (r.geometry && r.geometry.coordinates && r.geometry.coordinates[0]));
+  if (isNaN(lat) || isNaN(lng)) { showToast('⚠️ ไม่พบพิกัด'); return; }
+  var label = r._label || r.display_name || (lat.toFixed(4) + ',' + lng.toFixed(4));
+  geoOrigin = { lat: lat, lng: lng, label: label };
+  // disable sort dropdown ระหว่างใช้ geo
+  var sortSel = document.getElementById('selSort');
+  if (sortSel) sortSel.disabled = true;
+  // แสดง pill
+  var pill = document.getElementById('geoActivePill');
+  var pillText = document.getElementById('geoActiveText');
+  if (pillText) pillText.textContent = '📍 ใกล้ ' + label;
+  if (pill) pill.classList.add('visible');
+  // ปิด dropdown
+  var dd = document.getElementById('geoDropdown');
+  if (dd) dd.classList.remove('open');
+  applyFilters();
+  showToast('✅ เรียงตามระยะใกล้ ' + label);
+}
+
+// ล้าง geo search → กลับไป sort ปกติ
+function clearGeoSearch() {
+  geoOrigin = null;
+  var pill = document.getElementById('geoActivePill');
+  if (pill) pill.classList.remove('visible');
+  var sortSel = document.getElementById('selSort');
+  if (sortSel) sortSel.disabled = false;
+  var geoInput = document.getElementById('geoInput');
+  if (geoInput) geoInput.value = '';
+  applyFilters();
+}
+
+// HTML escape ขั้นพื้นฐาน
+function escapeHtml(s) {
+  if (s == null) return '';
+  return String(s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+</script>
+</body>
+</html>
