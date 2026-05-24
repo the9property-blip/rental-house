@@ -1022,7 +1022,7 @@ function showGrid(data) {
   }
   if (data.length === 0) { g.innerHTML = ''; return; }
   g.innerHTML = data.map(function(p) {
-    var pj = JSON.stringify(p).replace(/"/g, '&quot;');
+    var pj = JSON.stringify(p).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
     // ★ NEW: รูปบนการ์ด + status badge (ซ้ายบน) + Co badge (ขวาบน)
     var sBadge  = statusBadgeHtml(p);
     var coBadge = p.coAgent ? '<span class="co-badge">Co</span>' : '';
