@@ -567,7 +567,24 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
       <option value="1">1 นอน</option>
       <option value="2">2 นอน</option>
       <option value="3">3 นอน</option>
-      <option value="4">4+ นอน</option>
+      <option value="4">4 นอน</option>
+      <option value="5">5 นอน</option>
+      <option value="6">6 นอน</option>
+      <option value="7">7 นอน</option>
+      <option value="8">8 นอน</option>
+      <option value="9">9+ นอน</option>
+    </select>
+    <select class="filter-select" id="selBath" onchange="applyFilters()">
+      <option value="all">🚿 ทุกห้องน้ำ</option>
+      <option value="1">1 น้ำ</option>
+      <option value="2">2 น้ำ</option>
+      <option value="3">3 น้ำ</option>
+      <option value="4">4 น้ำ</option>
+      <option value="5">5 น้ำ</option>
+      <option value="6">6 น้ำ</option>
+      <option value="7">7 น้ำ</option>
+      <option value="8">8 น้ำ</option>
+      <option value="9">9+ น้ำ</option>
     </select>
     <select class="filter-select" id="selStatus" onchange="applyFilters()">
       <option value="all">📋 ทุกสถานะ</option>
@@ -832,6 +849,7 @@ function clearAllFilters() {
   document.getElementById('selMin').value    = '';
   document.getElementById('selMax').value    = '';
   document.getElementById('selBed').value    = 'all';
+  document.getElementById('selBath').value   = 'all';
   document.getElementById('selStatus').value = 'all';
   // Clear search
   document.getElementById('searchInput').value = '';
@@ -877,6 +895,7 @@ function applyFilters() {
   var priceMax = parseFloat(document.getElementById('selMax').value);
   if (isNaN(priceMax)) priceMax = Infinity;
   var bed      = document.getElementById('selBed').value;
+  var bath     = document.getElementById('selBath').value;
   var sort     = document.getElementById('selSort').value;
   var statusF  = (document.getElementById('selStatus') || {}).value || 'all';
   var filtered = allData.filter(function(p) {
@@ -886,8 +905,13 @@ function applyFilters() {
     if (pet === 'no'  && !(p.pet||'').includes('ไม่'))  return false;
     if (bed !== 'all') {
       var br = parseInt(p.bedroom) || 0;
-      if (bed === '4' && br < 4) return false;
-      if (bed !== '4' && br !== parseInt(bed)) return false;
+      if (bed === '9' && br < 9) return false;
+      if (bed !== '9' && br !== parseInt(bed)) return false;
+    }
+    if (bath !== 'all') {
+      var ba = parseInt(p.bathroom) || 0;
+      if (bath === '9' && ba < 9) return false;
+      if (bath !== '9' && ba !== parseInt(bath)) return false;
     }
     if (statusF === 'ready' && !p.ready) return false;
     if (statusF === 'soon'  &&  p.ready) return false;
@@ -939,6 +963,7 @@ function applyFilters() {
     || document.getElementById('selMin').value.trim() !== ''
     || document.getElementById('selMax').value.trim() !== ''
     || document.getElementById('selBed').value !== 'all'
+    || document.getElementById('selBath').value !== 'all'
     || document.getElementById('selStatus').value !== 'all'
     || document.getElementById('searchInput').value.trim() !== '';
   var btnClear = document.getElementById('btnClearFilters');
