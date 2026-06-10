@@ -80,6 +80,10 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
   max-width: 115px;
 }
 .filter-select option { color: #333; background: white; }
+.filter-num { width: 108px; cursor: text; -moz-appearance: textfield; }
+.filter-num::-webkit-outer-spin-button,
+.filter-num::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.filter-num::placeholder { color: rgba(255,255,255,0.6); }
 .filter-clear-btn {
   padding: 4px 11px; border-radius: 50px; flex-shrink: 0;
   border: 1.5px solid rgba(255,180,0,0.7);
@@ -189,6 +193,16 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
   box-shadow: 0 2px 8px rgba(0,0,0,0.2);
   text-shadow: 0 1px 0 rgba(255,255,255,0.3);
 }
+/* ─── SURVEY BADGE (มุมขวาบน เหมือน Co) ─── */
+.survey-badge {
+  position: absolute; top: 10px; right: 10px;
+  font-size: 0.72rem; font-weight: 900; letter-spacing: 0.5px;
+  padding: 4px 11px; border-radius: 50px;
+  background: linear-gradient(135deg, #a78bfa, #7c3aed);
+  color: #fff; border: 1px solid rgba(255,255,255,0.5);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+.survey-badge.below { top: 46px; }  /* ถ้ามีป้าย Co อยู่แล้ว ให้ Survey ลงมาด้านล่าง */
 /* status row ใน modal */
 .status-pill {
   display: inline-block; padding: 3px 11px; border-radius: 50px;
@@ -362,6 +376,15 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
   font-family: inherit; white-space: nowrap;
 }
 .geo-chip:hover { background: rgba(255,255,255,0.18); }
+.geo-map-btn {
+  flex-shrink: 0; padding: 6px 14px; border-radius: 50px;
+  background: linear-gradient(135deg, #2563eb, #0f3460);
+  color: white; border: 1.5px solid rgba(255,255,255,0.35);
+  font-size: 0.76rem; font-weight: 700; cursor: pointer; font-family: inherit;
+  text-decoration: none; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap;
+  box-shadow: 0 2px 9px rgba(37,99,235,0.45);
+}
+.geo-map-btn:hover { filter: brightness(1.13); }
 .geo-chip-label {
   flex-shrink: 0; font-size: 0.7rem; color: rgba(255,255,255,0.55);
   white-space: nowrap; padding-right: 2px;
@@ -542,43 +565,46 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
     </div>
   </div>
   <div class="header-row2">
-    <button class="filter-btn active" onclick="setType('all',this)">ทั้งหมด</button>
-    <button class="filter-btn" onclick="setType('บ้านเดี่ยว',this)">🏡 บ้านเดี่ยว</button>
-    <button class="filter-btn" onclick="setType('ทาวน์เฮ้าส์',this)">🏘 ทาวน์</button>
-    <button class="filter-btn" onclick="setType('คอนโด',this)">🏢 คอนโด</button>
-    <button class="filter-btn" onclick="setType('พูลวิลล่า',this)">🏊 พูลวิลล่า</button>
-    <button class="filter-btn" onclick="setType('บ้าน',this)">🏠 บ้าน</button>
+    <button class="filter-btn type-btn active" data-type="all" onclick="setType('all')">ทั้งหมด</button>
+    <button class="filter-btn type-btn" data-type="บ้านเดี่ยว" onclick="setType('บ้านเดี่ยว')">🏡 บ้านเดี่ยว</button>
+    <button class="filter-btn type-btn" data-type="ทาวน์เฮ้าส์" onclick="setType('ทาวน์เฮ้าส์')">🏘 ทาวน์</button>
+    <button class="filter-btn type-btn" data-type="คอนโด" onclick="setType('คอนโด')">🏢 คอนโด</button>
+    <button class="filter-btn type-btn" data-type="พูลวิลล่า" onclick="setType('พูลวิลล่า')">🏊 พูลวิลล่า</button>
     <div class="filter-sep"></div>
     <button class="filter-btn" id="btnAgentDirect" onclick="setAgent('direct',this)">📌 ติดทรัพย์</button>
     <button class="filter-btn" id="btnAgentCo" onclick="setAgent('co',this)">🤝 Co</button>
+    <button class="filter-btn" id="btnAgentSurvey" onclick="setAgent('survey',this)">📋 Survey</button>
     <div class="filter-sep"></div>
     <select class="filter-select" id="selPet" onchange="applyFilters()">
       <option value="all">🐾 สัตว์เลี้ยง</option>
       <option value="yes">✅ รับได้</option>
       <option value="no">❌ ไม่รับ</option>
     </select>
-    <select class="filter-select" id="selMin" onchange="applyFilters()">
-      <option value="0">ราคาต่ำสุด</option>
-      <option value="10000">฿10,000+</option>
-      <option value="15000">฿15,000+</option>
-      <option value="20000">฿20,000+</option>
-      <option value="30000">฿30,000+</option>
-      <option value="50000">฿50,000+</option>
-    </select>
-    <select class="filter-select" id="selMax" onchange="applyFilters()">
-      <option value="9999999">ราคาสูงสุด</option>
-      <option value="15000">≤฿15,000</option>
-      <option value="20000">≤฿20,000</option>
-      <option value="30000">≤฿30,000</option>
-      <option value="40000">≤฿40,000</option>
-      <option value="50000">≤฿50,000</option>
-    </select>
+    <input type="number" class="filter-select filter-num" id="selMin" placeholder="ราคาต่ำสุด" min="0" step="1000" inputmode="numeric" oninput="applyFilters()">
+    <input type="number" class="filter-select filter-num" id="selMax" placeholder="ราคาสูงสุด" min="0" step="1000" inputmode="numeric" oninput="applyFilters()">
     <select class="filter-select" id="selBed" onchange="applyFilters()">
       <option value="all">🛏 ทุกขนาด</option>
       <option value="1">1 นอน</option>
       <option value="2">2 นอน</option>
       <option value="3">3 นอน</option>
-      <option value="4">4+ นอน</option>
+      <option value="4">4 นอน</option>
+      <option value="5">5 นอน</option>
+      <option value="6">6 นอน</option>
+      <option value="7">7 นอน</option>
+      <option value="8">8 นอน</option>
+      <option value="9">9+ นอน</option>
+    </select>
+    <select class="filter-select" id="selBath" onchange="applyFilters()">
+      <option value="all">🚿 ทุกห้องน้ำ</option>
+      <option value="1">1 น้ำ</option>
+      <option value="2">2 น้ำ</option>
+      <option value="3">3 น้ำ</option>
+      <option value="4">4 น้ำ</option>
+      <option value="5">5 น้ำ</option>
+      <option value="6">6 น้ำ</option>
+      <option value="7">7 น้ำ</option>
+      <option value="8">8 น้ำ</option>
+      <option value="9">9+ น้ำ</option>
     </select>
     <select class="filter-select" id="selStatus" onchange="applyFilters()">
       <option value="all">📋 ทุกสถานะ</option>
@@ -590,6 +616,7 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
   </div>
   <!-- GEO ROW: ค้นหาตำแหน่งใกล้เคียง -->
   <div class="geo-row">
+    <a class="geo-map-btn" href="map.html" title="ดูบ้านทั้งหมดบนแผนที่">🗺️ ดูแผนที่</a>
     <div class="geo-search-container">
       <div class="geo-input-wrap">
         <input type="text" id="geoInput" placeholder="📍 ค้นหาใกล้... เช่น วารีเชียงใหม่, มช., เซ็นทรัล"
@@ -669,6 +696,7 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
       <div class="modal-row"><span class="lbl">เจ้าของ</span> <span class="val" id="dOwnerName">–</span></div>
       <div class="modal-row"><span class="lbl">เบอร์โทร</span> <span class="val" id="dOwnerTel">–</span></div>
       <div class="modal-row" id="dContactRow" style="display:none;"><span class="lbl">ติดต่ออื่น</span> <span class="val" id="dContact">–</span></div>
+      <div class="modal-row" id="dFacebookRow" style="display:none;"><span class="lbl">โพส FB</span> <span class="val" id="dFacebookVal">–</span></div>
       <div class="modal-row"><span class="lbl">พิกัด</span> <span class="val" id="dCoords">–</span></div>
       <div class="staff-actions">
         <a id="dCallOwner" href="#">📞 โทรเจ้าของ</a>
@@ -708,8 +736,16 @@ function photoUrl(id, size) {
 function photoUrlFallback(id) {
   return 'https://drive.usercontent.google.com/download?id=' + id + '&export=view';
 }
+// ★ SURVEY: ทรัพย์ที่ยังไม่ได้โพส — "URI ของโพส" จะเขียนว่า Survey
+//   อ่านจากฟิลด์ลิงก์โพสที่ backend ส่งมา (รองรับชื่อฟิลด์ที่เป็นไปได้หลายแบบ)
+//   ★ ถ้า backend ใช้ชื่อฟิลด์อื่น แก้รายการในบรรทัด var s ด้านล่างจุดเดียวจบ
+function isSurvey(p) {
+  if (!p) return false;
+  var s = String(p.postUrl || p.post || p.facebook || p.fbUrl || p.link || p.url || '');
+  return /survey/i.test(s);
+}
 var allData     = [];
-var activeType  = 'all';
+var activeTypes = [];      // ประเภทที่เลือก (ว่าง = ทั้งหมด) — เลือกได้หลายอันพร้อมกัน
 var activeAgent = 'all';   // 'all' | 'direct' | 'co'
 // ─── GEO STATE ───────────────────────────────────────────
 var geoOrigin = null;  // { lat, lng, label } เมื่อค้นหาตามตำแหน่ง
@@ -830,42 +866,46 @@ function loadData(manual) {
 // ─── FILTER & SORT ─────────────────────────────────────────
 function clearAllFilters() {
   // Reset type → ทั้งหมด
-  activeType = 'all';
-  var row2 = document.querySelector('.header-row2');
-  row2.querySelectorAll('.filter-btn').forEach(function(b) {
-    if (!b.id) b.classList.remove('active');
-  });
-  // ทำให้ปุ่ม "ทั้งหมด" active (ปุ่มแรกที่ไม่มี id)
-  var firstTypeBtn = Array.from(row2.querySelectorAll('.filter-btn')).find(function(b){ return !b.id; });
-  if (firstTypeBtn) firstTypeBtn.classList.add('active');
+  activeTypes = [];
+  refreshTypeButtons();
   // Reset agent
   activeAgent = 'all';
   var btnD = document.getElementById('btnAgentDirect');
   var btnC = document.getElementById('btnAgentCo');
   if (btnD) btnD.classList.remove('active');
   if (btnC) btnC.classList.remove('active');
+  var btnS = document.getElementById('btnAgentSurvey');
+  if (btnS) btnS.classList.remove('active');
   // Reset selects
   document.getElementById('selPet').value    = 'all';
-  document.getElementById('selMin').value    = '0';
-  document.getElementById('selMax').value    = '9999999';
+  document.getElementById('selMin').value    = '';
+  document.getElementById('selMax').value    = '';
   document.getElementById('selBed').value    = 'all';
+  document.getElementById('selBath').value   = 'all';
   document.getElementById('selStatus').value = 'all';
   // Clear search
   document.getElementById('searchInput').value = '';
   applyFilters();
 }
-// ปุ่ม "ทั้งหมด/บ้านเดี่ยว/ทาวน์/คอนโด/พูลวิลล่า/บ้าน" — เฉพาะ type group
-function setType(val, btn) {
-  activeType = val;
-  // active เฉพาะกลุ่ม type — ไม่แตะปุ่ม Co/ติดทรัพย์
-  var typeBtns = btn.parentElement.querySelectorAll('.filter-btn');
-  // จัดการเฉพาะ 6 ปุ่มแรก (type group) — กันไม่ให้ปุ่ม Co/ติดทรัพย์ถูกล้าง
-  // ใช้วิธี: ลบ active ออกจากปุ่มที่ไม่มี id (type group ทั้งหมดไม่มี id)
-  typeBtns.forEach(function(b) {
-    if (!b.id) b.classList.remove('active');
-  });
-  btn.classList.add('active');
+// ปุ่มประเภท — เลือกพร้อมกันได้หลายอัน; "ทั้งหมด" = ล้างการเลือก
+function setType(val) {
+  if (val === 'all') {
+    activeTypes = [];
+  } else {
+    var i = activeTypes.indexOf(val);
+    if (i === -1) activeTypes.push(val);   // ยังไม่เลือก → เพิ่ม
+    else           activeTypes.splice(i, 1); // เลือกอยู่แล้ว → เอาออก
+  }
+  refreshTypeButtons();
   applyFilters();
+}
+// อัปเดตไฮไลต์ปุ่มประเภทให้ตรงกับ activeTypes
+function refreshTypeButtons() {
+  document.querySelectorAll('.type-btn').forEach(function(b) {
+    var t = b.getAttribute('data-type');
+    var on = (t === 'all') ? (activeTypes.length === 0) : (activeTypes.indexOf(t) !== -1);
+    b.classList.toggle('active', on);
+  });
 }
 // ปุ่ม "ติดทรัพย์ / Co" — toggle: คลิกซ้ำ = ปิด กลับไป 'all'
 function setAgent(val, btn) {
@@ -876,6 +916,7 @@ function setAgent(val, btn) {
     activeAgent = val;
     document.getElementById('btnAgentDirect').classList.remove('active');
     document.getElementById('btnAgentCo').classList.remove('active');
+    var bSurv = document.getElementById('btnAgentSurvey'); if (bSurv) bSurv.classList.remove('active');
     btn.classList.add('active');
   }
   applyFilters();
@@ -883,25 +924,33 @@ function setAgent(val, btn) {
 function applyFilters() {
   var search   = document.getElementById('searchInput').value.toLowerCase().trim();
   var pet      = document.getElementById('selPet').value;
-  var priceMin = parseInt(document.getElementById('selMin').value);
-  var priceMax = parseInt(document.getElementById('selMax').value);
+  var priceMin = parseFloat(document.getElementById('selMin').value) || 0;
+  var priceMax = parseFloat(document.getElementById('selMax').value);
+  if (isNaN(priceMax)) priceMax = Infinity;
   var bed      = document.getElementById('selBed').value;
+  var bath     = document.getElementById('selBath').value;
   var sort     = document.getElementById('selSort').value;
   var statusF  = (document.getElementById('selStatus') || {}).value || 'all';
   var filtered = allData.filter(function(p) {
-    if (activeType !== 'all' && p.type !== activeType) return false;
+    if (activeTypes.length && activeTypes.indexOf(p.type) === -1) return false;
     if (p.price > 0 && (p.price < priceMin || p.price > priceMax)) return false;
     if (pet === 'yes' && !(p.pet||'').includes('รับ'))  return false;
     if (pet === 'no'  && !(p.pet||'').includes('ไม่'))  return false;
     if (bed !== 'all') {
       var br = parseInt(p.bedroom) || 0;
-      if (bed === '4' && br < 4) return false;
-      if (bed !== '4' && br !== parseInt(bed)) return false;
+      if (bed === '9' && br < 9) return false;
+      if (bed !== '9' && br !== parseInt(bed)) return false;
+    }
+    if (bath !== 'all') {
+      var ba = parseInt(p.bathroom) || 0;
+      if (bath === '9' && ba < 9) return false;
+      if (bath !== '9' && ba !== parseInt(bath)) return false;
     }
     if (statusF === 'ready' && !p.ready) return false;
     if (statusF === 'soon'  &&  p.ready) return false;
     if (activeAgent === 'co'     && !p.coAgent) return false;
     if (activeAgent === 'direct' &&  p.coAgent) return false;
+    if (activeAgent === 'survey' && !isSurvey(p)) return false;
     if (search) {
       var hay = ((p.code||'') + ' ' + (p.project||'') + ' ' + (p.location||'') + ' ' + (p.type||'')).toLowerCase();
       if (hay.indexOf(search) === -1) return false;
@@ -942,12 +991,13 @@ function applyFilters() {
   showGrid(filtered);
   document.getElementById('countDisplay').textContent = filtered.length;
   // แสดงปุ่มล้างตัวกรองเมื่อมีการกรองอยู่
-  var hasFilter = activeType !== 'all'
+  var hasFilter = activeTypes.length > 0
     || activeAgent !== 'all'
     || document.getElementById('selPet').value !== 'all'
-    || document.getElementById('selMin').value !== '0'
-    || document.getElementById('selMax').value !== '9999999'
+    || document.getElementById('selMin').value.trim() !== ''
+    || document.getElementById('selMax').value.trim() !== ''
     || document.getElementById('selBed').value !== 'all'
+    || document.getElementById('selBath').value !== 'all'
     || document.getElementById('selStatus').value !== 'all'
     || document.getElementById('searchInput').value.trim() !== '';
   var btnClear = document.getElementById('btnClearFilters');
@@ -1022,13 +1072,14 @@ function showGrid(data) {
   }
   if (data.length === 0) { g.innerHTML = ''; return; }
   g.innerHTML = data.map(function(p) {
-    var pj = JSON.stringify(p).replace(/"/g, '&quot;');
+    var pj = JSON.stringify(p).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
     // ★ NEW: รูปบนการ์ด + status badge (ซ้ายบน) + Co badge (ขวาบน)
     var sBadge  = statusBadgeHtml(p);
     var coBadge = p.coAgent ? '<span class="co-badge">Co</span>' : '';
+    var surveyBadge = isSurvey(p) ? '<span class="survey-badge' + (p.coAgent ? ' below' : '') + '">Survey</span>' : '';
     var photoBlock = p.thumb
-      ? '<div class="card-photo"><img src="' + photoUrl(p.thumb, 400) + '" loading="lazy" alt="' + (p.project||'') + '" onerror="onPhotoError(this,\'' + p.thumb + '\')">' + sBadge + coBadge + '</div>'
-      : '<div class="card-photo"><div class="card-photo-placeholder"><span class="ph-icon">🏠</span><span>ยังไม่มีรูป</span></div>' + sBadge + coBadge + '</div>';
+      ? '<div class="card-photo"><img src="' + photoUrl(p.thumb, 400) + '" loading="lazy" alt="' + (p.project||'') + '" onerror="onPhotoError(this,\'' + p.thumb + '\')">' + sBadge + coBadge + surveyBadge + '</div>'
+      : '<div class="card-photo"><div class="card-photo-placeholder"><span class="ph-icon">🏠</span><span>ยังไม่มีรูป</span></div>' + sBadge + coBadge + surveyBadge + '</div>';
     // ★ GEO: badge ระยะทางเมื่อกำลังค้นหาตามตำแหน่ง
     var distBlock = '';
     if (geoOrigin) {
@@ -1116,7 +1167,7 @@ function openDetail(p) {
   }
   // ★ STAFF SECTION — แสดงเฉพาะเมื่อ login + มีข้อมูลส่งมาจาก server
   var staffSec = document.getElementById('dStaffSection');
-  if (isStaffLoggedIn() && (p.ownerName || p.ownerTel)) {
+  if (isStaffLoggedIn() && (p.ownerName || p.ownerTel || p.facebook)) {
     document.getElementById('dOwnerName').textContent = p.ownerName || '–';
     var tel = (p.ownerTel || '').replace(/\s+/g, '');
     document.getElementById('dOwnerTel').textContent = p.ownerTel || '–';
@@ -1129,6 +1180,22 @@ function openDetail(p) {
       contactRow.style.display = '';
     } else {
       contactRow.style.display = 'none';
+    }
+    // โพส Facebook (staff) — ถ้าเป็น URL ทำเป็นลิงก์, ถ้าเป็นข้อความ (เช่น "Survey") แสดงเป็นข้อความ
+    var fbRow = document.getElementById('dFacebookRow');
+    var fbVal = document.getElementById('dFacebookVal');
+    var fb = (p.facebook || '').trim();
+    if (fb) {
+      if (/^https?:\/\//i.test(fb)) {
+        var fa = document.createElement('a');
+        fa.href = fb; fa.target = '_blank'; fa.rel = 'noopener'; fa.textContent = 'เปิดโพสต์ ↗';
+        fbVal.textContent = ''; fbVal.appendChild(fa);
+      } else {
+        fbVal.textContent = fb;
+      }
+      fbRow.style.display = '';
+    } else {
+      fbRow.style.display = 'none';
     }
     // พิกัด + ปุ่ม Maps
     var latNum = parseFloat(p.lat), lngNum = parseFloat(p.lng);
@@ -1367,16 +1434,16 @@ var GEO_KNOWN_PLACES = {
   'มหาวิทยาลัยราชภัฏเชียงใหม่':      { lat: 18.806466, lng: 98.990573, label: 'มหาวิทยาลัยราชภัฏเชียงใหม่' },
   'มหาวิทยาลัยฟาร์อีสเทอร์น เชียงใหม่': { lat: 18.7972, lng: 98.9728, label: 'มหาวิทยาลัยฟาร์อีสเทอร์น' },
   // ━━ ห้าง ━━
-  'เซ็นทรัล เฟสติวัล เชียงใหม่':     { lat: 18.8061, lng: 99.0445, label: 'เซ็นทรัล เฟสติวัล' },
+  'เซ็นทรัล เฟสติวัล เชียงใหม่':     { lat: 18.8064231, lng: 99.0178958, label: 'เซ็นทรัล เฟสติวัล' },
   'เซ็นทรัล แอร์พอร์ต เชียงใหม่':    { lat: 18.7720, lng: 98.9706, label: 'เซ็นทรัล แอร์พอร์ต' },
-  'เมญ่า ไลฟ์สไตล์ ช็อปปิ้ง เซ็นเตอร์ เชียงใหม่': { lat: 18.7989, lng: 98.9665, label: 'เมญ่า' },
+  'เมญ่า ไลฟ์สไตล์ ช็อปปิ้ง เซ็นเตอร์ เชียงใหม่': { lat: 18.8020204, lng: 98.9676745, label: 'เมญ่า' },
   'พรอมเมนาดา รีสอร์ท มอลล์ เชียงใหม่': { lat: 18.7593, lng: 99.0426, label: 'พรอมเมนาดา' },
   'one nimman เชียงใหม่':           { lat: 18.8002, lng: 98.9667, label: 'One Nimman' },
   'think park เชียงใหม่':           { lat: 18.8001, lng: 98.9669, label: 'Think Park' },
   // ━━ โรงพยาบาล ━━
   'โรงพยาบาลมหาราชนครเชียงใหม่':    { lat: 18.7891, lng: 98.9709, label: 'รพ.มหาราช (สวนดอก)' },
   'โรงพยาบาลแมคคอร์มิค เชียงใหม่':   { lat: 18.7888, lng: 98.9988, label: 'รพ.แมคคอร์มิค' },
-  'โรงพยาบาลลานนา เชียงใหม่':       { lat: 18.8076, lng: 98.9821, label: 'รพ.ลานนา' },
+  'โรงพยาบาลลานนา เชียงใหม่':       { lat: 18.8126417, lng: 98.9909685, label: 'รพ.ลานนา' },
   'โรงพยาบาลกรุงเทพ เชียงใหม่':     { lat: 18.7837, lng: 98.9943, label: 'รพ.กรุงเทพ เชียงใหม่' },
   'โรงพยาบาลเชียงใหม่ราม':         { lat: 18.7950, lng: 98.9686, label: 'รพ.เชียงใหม่ราม' },
   'โรงพยาบาลเซ็นทรัลเชียงใหม่เมโมเรียล': { lat: 18.7960, lng: 98.9728, label: 'รพ.เซ็นทรัลเชียงใหม่' },
