@@ -1595,14 +1595,33 @@ var GEO_KNOWN_PLACES = {
   'แยกแม่กวง เชียงใหม่': { lat: 18.8269961, lng: 99.0476252, label: 'แยกแม่กวง' },
   'แยกหนองจ๊อม เชียงใหม่': { lat: 18.8477919, lng: 99.0137256, label: 'แยกหนองจ๊อม (ลิขิตชีวัน)' }
 };
-// หาพิกัดในตาราง KNOWN_PLACES — return null ถ้าไม่เจอ
+// ตัดคำที่แทบทุกที่มี ("เชียงใหม่") ออก เพื่อให้เทียบเฉพาะส่วนที่แยกแยะได้
+function geoNorm_(s) {
+  return normSearch(s).replace(/เชียงใหม่|เชียง ใหม่|chiang ?mai|cnx/g, ' ').replace(/\s+/g, ' ').trim();
+}
+// หาพิกัดในตาราง KNOWN_PLACES — รองรับพิมพ์ "ใกล้เคียง" (บางส่วน/พิมพ์ผิด) ไม่ต้องตรงเป๊ะ
 function lookupKnownPlace(q) {
   if (!q) return null;
-  var k = q.trim().toLowerCase();
+  var raw = q.trim().toLowerCase();
+  // 1) ตรงเป๊ะ (เร็วสุด)
   for (var key in GEO_KNOWN_PLACES) {
-    if (key.toLowerCase() === k) return GEO_KNOWN_PLACES[key];
+    if (key.toLowerCase() === raw) return GEO_KNOWN_PLACES[key];
   }
-  return null;
+  // 2) ใกล้เคียง: เลือกที่ error น้อยสุด (เป็นส่วนหนึ่งของชื่อ = 0, พิมพ์ผิดยอมตามความยาวคำ)
+  var nq = geoNorm_(q);
+  if (nq.length < 2) return null;
+  var maxErr = nq.length <= 4 ? 1 : Math.floor(nq.length * 0.3);
+  var best = null, bestErr = Infinity, bestLen = Infinity;
+  for (var k2 in GEO_KNOWN_PLACES) {
+    var pl  = GEO_KNOWN_PLACES[k2];
+    var hay = geoNorm_(k2 + ' ' + (pl.label || ''));
+    if (!hay) continue;
+    var err = fuzzySubErr(hay, nq);
+    if (err < bestErr || (err === bestErr && hay.length < bestLen)) {
+      bestErr = err; bestLen = hay.length; best = pl;
+    }
+  }
+  return (best && bestErr <= maxErr) ? best : null;
 }
 // ─── localStorage CACHE สำหรับผลค้นหา ─────────────────────
 var GEO_CACHE_KEY  = 'geo_search_cache_v1';
