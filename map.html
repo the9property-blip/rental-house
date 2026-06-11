@@ -67,6 +67,14 @@ body {
   border: 1.5px solid rgba(255,255,255,0.35); background: rgba(255,255,255,0.08); color: white;
   font-size: 0.72rem; font-family: inherit; outline: none; -moz-appearance: textfield;
 }
+.filter-select {
+  flex-shrink: 0; padding: 4px 8px; border-radius: 50px;
+  border: 1.5px solid rgba(255,255,255,0.35);
+  background: rgba(255,255,255,0.08); color: white;
+  font-size: 0.71rem; cursor: pointer; font-family: inherit; outline: none;
+  max-width: 115px;
+}
+.filter-select option { color: #333; background: white; }
 .filter-num::-webkit-outer-spin-button, .filter-num::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 .filter-num::placeholder { color: rgba(255,255,255,0.6); }
 .filter-clear-btn {
@@ -487,8 +495,46 @@ body {
     <button class="filter-btn type-btn" data-type="คอนโด" onclick="setType('คอนโด')">🏢 คอนโด</button>
     <button class="filter-btn type-btn" data-type="พูลวิลล่า" onclick="setType('พูลวิลล่า')">🏊 พูลวิลล่า</button>
     <div class="filter-sep"></div>
+    <button class="filter-btn" id="btnAgentDirect" onclick="setAgent('direct',this)">📌 ติดทรัพย์</button>
+    <button class="filter-btn" id="btnAgentCo" onclick="setAgent('co',this)">🤝 Co</button>
+    <button class="filter-btn" id="btnAgentSurvey" onclick="setAgent('survey',this)">📋 Survey</button>
+    <div class="filter-sep"></div>
+    <select class="filter-select" id="selPet" onchange="applyFilters()">
+      <option value="all">🐾 สัตว์เลี้ยง</option>
+      <option value="yes">✅ รับได้</option>
+      <option value="no">❌ ไม่รับ</option>
+    </select>
     <input type="number" class="filter-num" id="selMin" placeholder="ราคาต่ำสุด" min="0" step="1000" inputmode="numeric" oninput="applyFilters()">
     <input type="number" class="filter-num" id="selMax" placeholder="ราคาสูงสุด" min="0" step="1000" inputmode="numeric" oninput="applyFilters()">
+    <select class="filter-select" id="selBed" onchange="applyFilters()">
+      <option value="all">🛏 ทุกขนาด</option>
+      <option value="1">1 นอน</option>
+      <option value="2">2 นอน</option>
+      <option value="3">3 นอน</option>
+      <option value="4">4 นอน</option>
+      <option value="5">5 นอน</option>
+      <option value="6">6 นอน</option>
+      <option value="7">7 นอน</option>
+      <option value="8">8 นอน</option>
+      <option value="9">9+ นอน</option>
+    </select>
+    <select class="filter-select" id="selBath" onchange="applyFilters()">
+      <option value="all">🚿 ทุกห้องน้ำ</option>
+      <option value="1">1 น้ำ</option>
+      <option value="2">2 น้ำ</option>
+      <option value="3">3 น้ำ</option>
+      <option value="4">4 น้ำ</option>
+      <option value="5">5 น้ำ</option>
+      <option value="6">6 น้ำ</option>
+      <option value="7">7 น้ำ</option>
+      <option value="8">8 น้ำ</option>
+      <option value="9">9+ น้ำ</option>
+    </select>
+    <select class="filter-select" id="selStatus" onchange="applyFilters()">
+      <option value="all">📋 ทุกสถานะ</option>
+      <option value="ready">✓ พร้อมเข้าพัก</option>
+      <option value="soon">📅 ประกาศล่วงหน้า</option>
+    </select>
     <div class="filter-sep"></div>
     <button class="filter-clear-btn" id="btnClearFilters" onclick="clearAllFilters()">✕ ล้างตัวกรอง</button>
   </div>
@@ -755,7 +801,27 @@ var entries = [];        // { p, latShown, lngShown, marker, visible }
 var byCode = {};         // code -> entry
 var noCoordCount = 0;
 var activeTypes = [];
+var activeAgent = 'all';   // 'all' | 'direct' | 'co' | 'survey'
 var selectedCode = null;
+
+function isSurvey(p) {
+  if (!p) return false;
+  var s = String(p.postUrl || p.post || p.facebook || p.fbUrl || p.link || p.url || '');
+  return /survey/i.test(s);
+}
+function setAgent(val, btn) {
+  if (activeAgent === val) {
+    activeAgent = 'all';
+    if (btn) btn.classList.remove('active');
+  } else {
+    activeAgent = val;
+    ['btnAgentDirect','btnAgentCo','btnAgentSurvey'].forEach(function(id) {
+      var b = document.getElementById(id); if (b) b.classList.remove('active');
+    });
+    if (btn) btn.classList.add('active');
+  }
+  applyFilters();
+}
 var landmarksOn = true;
 var geoPlace = null;     // { lat, lng, label } เมื่อค้นหาสถานที่
 var placeMarker = null;  // หมุดสถานที่ที่ค้นหา
@@ -947,21 +1013,50 @@ function setType(val) {
 }
 function clearAllFilters() {
   activeTypes = [];
+  activeAgent = 'all';
   document.querySelectorAll('.type-btn').forEach(function(b) {
     b.classList.toggle('active', b.getAttribute('data-type') === 'all');
   });
+  ['btnAgentDirect','btnAgentCo','btnAgentSurvey'].forEach(function(id) {
+    var b = document.getElementById(id); if (b) b.classList.remove('active');
+  });
+  document.getElementById('selPet').value = 'all';
   document.getElementById('selMin').value = '';
   document.getElementById('selMax').value = '';
+  document.getElementById('selBed').value = 'all';
+  document.getElementById('selBath').value = 'all';
+  document.getElementById('selStatus').value = 'all';
   document.getElementById('searchInput').value = '';
   applyFilters();
 }
 function passFilter(p) {
   var search = document.getElementById('searchInput').value.toLowerCase().trim();
-  var pMin = parseFloat(document.getElementById('selMin').value) || 0;
-  var pMax = parseFloat(document.getElementById('selMax').value);
+  var pet    = document.getElementById('selPet').value;
+  var pMin   = parseFloat(document.getElementById('selMin').value) || 0;
+  var pMax   = parseFloat(document.getElementById('selMax').value);
   if (isNaN(pMax)) pMax = Infinity;
+  var bed    = document.getElementById('selBed').value;
+  var bath   = document.getElementById('selBath').value;
+  var statusF= document.getElementById('selStatus').value;
   if (activeTypes.length && activeTypes.indexOf(p.type) === -1) return false;
   if (p.price > 0 && (p.price < pMin || p.price > pMax)) return false;
+  if (pet === 'yes' && !(p.pet||'').includes('รับ')) return false;
+  if (pet === 'no'  && !(p.pet||'').includes('ไม่')) return false;
+  if (bed !== 'all') {
+    var br = parseInt(p.bedroom) || 0;
+    if (bed === '9' && br < 9) return false;
+    if (bed !== '9' && br !== parseInt(bed)) return false;
+  }
+  if (bath !== 'all') {
+    var ba = parseInt(p.bathroom) || 0;
+    if (bath === '9' && ba < 9) return false;
+    if (bath !== '9' && ba !== parseInt(bath)) return false;
+  }
+  if (statusF === 'ready' && !p.ready) return false;
+  if (statusF === 'soon'  &&  p.ready) return false;
+  if (activeAgent === 'co'     && !p.coAgent) return false;
+  if (activeAgent === 'direct' &&  p.coAgent) return false;
+  if (activeAgent === 'survey' && !isSurvey(p)) return false;
   if (search) {
     var hay = ((p.code || '') + ' ' + (p.project || '') + ' ' + (p.location || '') + ' ' + (p.type || '')).toLowerCase();
     if (hay.indexOf(search) === -1) return false;
@@ -998,8 +1093,13 @@ function applyFilters() {
   cp.innerHTML = '🏠 ' + shown.length + ' หลังบนแผนที่' + extra;
   // clear filter button
   var hasFilter = activeTypes.length > 0 ||
+    activeAgent !== 'all' ||
+    document.getElementById('selPet').value !== 'all' ||
     document.getElementById('selMin').value.trim() !== '' ||
     document.getElementById('selMax').value.trim() !== '' ||
+    document.getElementById('selBed').value !== 'all' ||
+    document.getElementById('selBath').value !== 'all' ||
+    document.getElementById('selStatus').value !== 'all' ||
     document.getElementById('searchInput').value.trim() !== '';
   document.getElementById('btnClearFilters').classList.toggle('visible', hasFilter);
 }
