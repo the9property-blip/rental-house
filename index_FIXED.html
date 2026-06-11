@@ -744,6 +744,83 @@ function isSurvey(p) {
   var s = String(p.postUrl || p.post || p.facebook || p.fbUrl || p.link || p.url || '');
   return /survey/i.test(s);
 }
+// ═══ SMART SEARCH — ค้นแบบใกล้เคียง: พิมพ์ผิดเล็กน้อยได้ + ข้ามไทย/อังกฤษ ═══
+// กลุ่มคำที่ถือว่า "ใกล้เคียงกัน" ข้ามภาษา/สะกดต่าง — ★ เพิ่มได้ตามชื่อโครงการที่มี
+var SEARCH_ALIASES = [
+  ['ปาล์ม','palm'],
+  ['วิลล์','วิลล่า','วิลลา','villa','ville'],
+  ['วิว','view'],
+  ['พาร์ค','พาร์ก','park'],
+  ['การ์เด้น','การ์เดน','garden'],
+  ['โฮม','home'],
+  ['เพลส','place'],
+  ['ทาวน์','town'],
+  ['ซิตี้','ซิตี','city'],
+  ['ฮิลล์','ฮิล','hill'],
+  ['เลค','lake'],
+  ['ริเวอร์','river'],
+  ['กรีน','green'],
+  ['แกรนด์','grand'],
+  ['เรสซิเดนซ์','เรสซิเดนท์','residence']
+];
+// ปรับข้อความให้เทียบกันง่าย: ตัดคำกว้างๆ + เครื่องหมาย + ช่องว่างซ้ำ + ตัวพิมพ์เล็ก
+function normSearch(s) {
+  return String(s || '').toLowerCase()
+    .replace(/หมู่บ้าน|โครงการ|เดอะ|\bthe\b/g, ' ')
+    .replace(/[()\[\]{}.,\/\\\-_"'“”‘’|]+/g, ' ')
+    .replace(/\s+/g, ' ').trim();
+}
+// edit distance ของ pattern ในฐานะ "substring" ของ text (เริ่มตำแหน่งใดก็ได้) → จำนวน error น้อยสุด
+function fuzzySubErr(text, pattern) {
+  var n = text.length, m = pattern.length;
+  if (m === 0) return 0;
+  if (n === 0) return m;
+  var prev = new Array(n + 1), cur = new Array(n + 1), j;
+  for (j = 0; j <= n; j++) prev[j] = 0;   // แถวแรก = 0 → เริ่มแมตช์ตำแหน่งใดก็ได้
+  for (var i = 1; i <= m; i++) {
+    cur[0] = i;
+    var pc = pattern.charAt(i - 1);
+    for (j = 1; j <= n; j++) {
+      var cost = (pc === text.charAt(j - 1)) ? 0 : 1;
+      var v = prev[j - 1] + cost;
+      if (prev[j] + 1 < v) v = prev[j] + 1;
+      if (cur[j - 1] + 1 < v) v = cur[j - 1] + 1;
+      cur[j] = v;
+    }
+    var tmp = prev; prev = cur; cur = tmp;
+  }
+  var best = Infinity;
+  for (j = 0; j <= n; j++) if (prev[j] < best) best = prev[j];
+  return best;
+}
+// ขยาย token ด้วยกลุ่มคำใกล้เคียง (ถ้ามี)
+function expandAliases(tok) {
+  for (var i = 0; i < SEARCH_ALIASES.length; i++) {
+    if (SEARCH_ALIASES[i].indexOf(tok) !== -1) return SEARCH_ALIASES[i];
+  }
+  return [tok];
+}
+function tokenMatches(hay, tok) {
+  if (!tok) return true;
+  var forms = expandAliases(tok);
+  for (var i = 0; i < forms.length; i++) {
+    var f = forms[i];
+    if (!f) continue;
+    if (hay.indexOf(f) !== -1) return true;                          // ตรง/บางส่วน
+    var maxErr = f.length <= 3 ? 0 : (f.length <= 5 ? 1 : Math.floor(f.length * 0.34));
+    if (maxErr > 0 && fuzzySubErr(hay, f) <= maxErr) return true;    // ใกล้เคียง (พิมพ์ผิด)
+  }
+  return false;
+}
+// true ถ้าทุก token ของคำค้น แมตช์ haystack (อย่างใดอย่างหนึ่งในกลุ่มคำใกล้เคียง)
+function searchMatch(hay, query) {
+  var h = normSearch(hay);
+  var toks = normSearch(query).split(' ').filter(Boolean);
+  for (var i = 0; i < toks.length; i++) {
+    if (!tokenMatches(h, toks[i])) return false;
+  }
+  return true;
+}
 var allData     = [];
 var activeTypes = [];      // ประเภทที่เลือก (ว่าง = ทั้งหมด) — เลือกได้หลายอันพร้อมกัน
 var activeAgent = 'all';   // 'all' | 'direct' | 'co'
@@ -952,8 +1029,8 @@ function applyFilters() {
     if (activeAgent === 'direct' &&  p.coAgent) return false;
     if (activeAgent === 'survey' && !isSurvey(p)) return false;
     if (search) {
-      var hay = ((p.code||'') + ' ' + (p.project||'') + ' ' + (p.location||'') + ' ' + (p.type||'')).toLowerCase();
-      if (hay.indexOf(search) === -1) return false;
+      var hay = (p.code||'') + ' ' + (p.project||'') + ' ' + (p.location||'') + ' ' + (p.type||'');
+      if (!searchMatch(hay, search)) return false;
     }
     return true;
   });
