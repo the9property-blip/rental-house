@@ -261,6 +261,12 @@ body {
 }
 .pp-statusbadge.ready { background: linear-gradient(135deg,#2ecc71,#27ae60); }
 .pp-statusbadge.soon  { background: linear-gradient(135deg,#ff9f43,#ee5a24); }
+.pp-cobadge {
+  position: absolute; top: 34px; right: 8px; font-size: 0.62rem; font-weight: 900;
+  letter-spacing: 0.5px; padding: 3px 9px; border-radius: 50px;
+  background: linear-gradient(135deg,#f1c40f,#d4a017); color: #4a2c00;
+  border: 1px solid rgba(255,255,255,0.5); box-shadow: 0 1px 5px rgba(0,0,0,0.2);
+}
 .pp-body { padding: 9px 11px 11px; }
 .pp-price { font-size: 1.12rem; font-weight: 800; color: #e74c3c; line-height: 1; }
 .pp-price small { font-size: 0.64rem; color: #aaa; font-weight: 400; }
@@ -312,6 +318,12 @@ body {
 }
 .mc-status.ready { background: rgba(39,174,96,0.92); }
 .mc-status.soon  { background: rgba(238,90,36,0.92); }
+.mc-cobadge {
+  position: absolute; top: 5px; right: 5px; font-size: 0.55rem; font-weight: 900;
+  letter-spacing: 0.5px; padding: 2px 6px; border-radius: 50px;
+  background: linear-gradient(135deg,#f1c40f,#d4a017); color: #4a2c00;
+  border: 1px solid rgba(255,255,255,0.5); box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
 .mc-info { flex: 1; min-width: 0; padding: 8px 9px 7px; display: flex; flex-direction: column; }
 .mc-price { font-size: 0.98rem; font-weight: 800; color: #e74c3c; line-height: 1; }
 .mc-price small { font-size: 0.6rem; color: #bbb; font-weight: 400; }
@@ -873,12 +885,14 @@ function buildPopup(p) {
   var statusBadge = p.ready
     ? '<span class="pp-statusbadge ready">✓ พร้อม</span>'
     : '<span class="pp-statusbadge soon">📅 ' + (fmtAvailableDate(p.availableDate) || 'เร็วๆ นี้') + '</span>';
+  var coBadge = p.coAgent ? '<span class="pp-cobadge">Co</span>' : '';
   var mapsHref = 'https://www.google.com/maps?q=' + p.lat + ',' + p.lng;
   return '' +
     '<div class="pp-photo" onclick="openDetailByCode(\'' + p.code + '\')">' +
       photoBlockHtml(p, 'pp', true) +
       '<span class="pp-typebadge">' + escapeHtml(p.type || '') + '</span>' +
       statusBadge +
+      coBadge +
     '</div>' +
     '<div class="pp-body">' +
       '<div class="pp-price">฿' + fmtPrice(p.price) + ' <small>/ เดือน</small></div>' +
@@ -898,11 +912,12 @@ function miniCardHtml(p) {
   var status = p.ready
     ? '<span class="mc-status ready">✓ พร้อม</span>'
     : '<span class="mc-status soon">📅 ' + (fmtAvailableDate(p.availableDate) || 'เร็วๆ') + '</span>';
+  var coBadge = p.coAgent ? '<span class="mc-cobadge">Co</span>' : '';
   var dist = (p._dist != null)
     ? '<div class="mc-dist' + (p._dist > 5 ? ' far' : '') + '">📍 ' + fmtDist(p._dist) + '</div>'
     : '';
   return '<div class="mini-card" data-code="' + p.code + '" title="แตะเพื่อดูตำแหน่งบนแผนที่" onclick="focusMarker(\'' + p.code + '\')">' +
-    '<div class="mc-photo">' + photo + status + '</div>' +
+    '<div class="mc-photo">' + photo + status + coBadge + '</div>' +
     '<div class="mc-info">' +
       dist +
       '<div class="mc-price">฿' + fmtPrice(p.price) + ' <small>/ด.</small></div>' +
