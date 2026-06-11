@@ -1029,6 +1029,85 @@ function clearAllFilters() {
   document.getElementById('searchInput').value = '';
   applyFilters();
 }
+// ════════════════════════════════════════════════════════════
+//  SMART SEARCH — ค้นหา "ใกล้เคียง" (บางส่วน/พิมพ์ผิด/ไทย-อังกฤษ)
+//  (พอร์ตจากหน้า catalog ให้ช่องค้นหาบนแผนที่ทำงานเหมือนกัน)
+// ════════════════════════════════════════════════════════════
+var SEARCH_ALIASES = [
+  ['ปาล์ม','palm'],
+  ['วิลล์','วิลล่า','วิลลา','villa','ville'],
+  ['วิว','view'],
+  ['พาร์ค','พาร์ก','park'],
+  ['การ์เด้น','การ์เดน','garden'],
+  ['โฮม','home'],
+  ['เพลส','place'],
+  ['ทาวน์','town'],
+  ['ซิตี้','ซิตี','city'],
+  ['ฮิลล์','ฮิล','hill'],
+  ['เลค','lake'],
+  ['ริเวอร์','river'],
+  ['กรีน','green'],
+  ['แกรนด์','grand'],
+  ['เรสซิเดนซ์','เรสซิเดนท์','residence']
+];
+// ปรับข้อความให้เทียบกันง่าย: ตัดคำกว้างๆ + เครื่องหมาย + ช่องว่างซ้ำ + ตัวพิมพ์เล็ก
+function normSearch(s) {
+  return String(s || '').toLowerCase()
+    .replace(/หมู่บ้าน|โครงการ|เดอะ|\bthe\b/g, ' ')
+    .replace(/[()\[\]{}.,\/\\\-_"'“”‘’|]+/g, ' ')
+    .replace(/\s+/g, ' ').trim();
+}
+// edit distance ของ pattern ในฐานะ "substring" ของ text (เริ่มตำแหน่งใดก็ได้) → จำนวน error น้อยสุด
+function fuzzySubErr(text, pattern) {
+  var n = text.length, m = pattern.length;
+  if (m === 0) return 0;
+  if (n === 0) return m;
+  var prev = new Array(n + 1), cur = new Array(n + 1), j;
+  for (j = 0; j <= n; j++) prev[j] = 0;   // แถวแรก = 0 → เริ่มแมตช์ตำแหน่งใดก็ได้
+  for (var i = 1; i <= m; i++) {
+    cur[0] = i;
+    var pc = pattern.charAt(i - 1);
+    for (j = 1; j <= n; j++) {
+      var cost = (pc === text.charAt(j - 1)) ? 0 : 1;
+      var v = prev[j - 1] + cost;
+      if (prev[j] + 1 < v) v = prev[j] + 1;
+      if (cur[j - 1] + 1 < v) v = cur[j - 1] + 1;
+      cur[j] = v;
+    }
+    var tmp = prev; prev = cur; cur = tmp;
+  }
+  var best = Infinity;
+  for (j = 0; j <= n; j++) if (prev[j] < best) best = prev[j];
+  return best;
+}
+// ขยาย token ด้วยกลุ่มคำใกล้เคียง (ถ้ามี)
+function expandAliases(tok) {
+  for (var i = 0; i < SEARCH_ALIASES.length; i++) {
+    if (SEARCH_ALIASES[i].indexOf(tok) !== -1) return SEARCH_ALIASES[i];
+  }
+  return [tok];
+}
+function tokenMatches(hay, tok) {
+  if (!tok) return true;
+  var forms = expandAliases(tok);
+  for (var i = 0; i < forms.length; i++) {
+    var f = forms[i];
+    if (!f) continue;
+    if (hay.indexOf(f) !== -1) return true;                          // ตรง/บางส่วน
+    var maxErr = f.length <= 3 ? 0 : (f.length <= 5 ? 1 : Math.floor(f.length * 0.34));
+    if (maxErr > 0 && fuzzySubErr(hay, f) <= maxErr) return true;    // ใกล้เคียง (พิมพ์ผิด)
+  }
+  return false;
+}
+// true ถ้าทุก token ของคำค้น แมตช์ haystack (อย่างใดอย่างหนึ่งในกลุ่มคำใกล้เคียง)
+function searchMatch(hay, query) {
+  var h = normSearch(hay);
+  var toks = normSearch(query).split(' ').filter(Boolean);
+  for (var i = 0; i < toks.length; i++) {
+    if (!tokenMatches(h, toks[i])) return false;
+  }
+  return true;
+}
 function passFilter(p) {
   var search = document.getElementById('searchInput').value.toLowerCase().trim();
   var pet    = document.getElementById('selPet').value;
@@ -1058,8 +1137,8 @@ function passFilter(p) {
   if (activeAgent === 'direct' &&  p.coAgent) return false;
   if (activeAgent === 'survey' && !isSurvey(p)) return false;
   if (search) {
-    var hay = ((p.code || '') + ' ' + (p.project || '') + ' ' + (p.location || '') + ' ' + (p.type || '')).toLowerCase();
-    if (hay.indexOf(search) === -1) return false;
+    var hay = (p.code || '') + ' ' + (p.project || '') + ' ' + (p.location || '') + ' ' + (p.type || '');
+    if (!searchMatch(hay, search)) return false;
   }
   return true;
 }
@@ -1338,11 +1417,33 @@ function expandAlias(q) {
   for (var k in GEO_ALIASES) { if (k.replace(/\s+/g, '') === compact) return GEO_ALIASES[k]; }
   return q;
 }
+// ตัด "เชียงใหม่" ที่ทุกที่มีออกก่อนเทียบ (ไม่ช่วยแยกแยะ)
+function geoNorm_(s) {
+  return normSearch(s).replace(/เชียงใหม่|เชียง ใหม่|chiang ?mai|cnx/g, ' ').replace(/\s+/g, ' ').trim();
+}
+// หาพิกัดในตาราง KNOWN_PLACES — รองรับพิมพ์ "ใกล้เคียง" (บางส่วน/พิมพ์ผิด) ไม่ต้องตรงเป๊ะ
 function lookupKnownPlace(q) {
   if (!q) return null;
-  var k = q.trim().toLowerCase();
-  for (var key in GEO_KNOWN_PLACES) { if (key.toLowerCase() === k) return GEO_KNOWN_PLACES[key]; }
-  return null;
+  var raw = q.trim().toLowerCase();
+  // 1) ตรงเป๊ะ (เร็วสุด)
+  for (var key in GEO_KNOWN_PLACES) {
+    if (key.toLowerCase() === raw) return GEO_KNOWN_PLACES[key];
+  }
+  // 2) ใกล้เคียง: เลือกที่ error น้อยสุด (เป็นส่วนหนึ่งของชื่อ = 0, พิมพ์ผิดยอมตามความยาวคำ)
+  var nq = geoNorm_(q);
+  if (nq.length < 2) return null;
+  var maxErr = nq.length <= 4 ? 1 : Math.floor(nq.length * 0.3);
+  var best = null, bestErr = Infinity, bestLen = Infinity;
+  for (var k2 in GEO_KNOWN_PLACES) {
+    var pl  = GEO_KNOWN_PLACES[k2];
+    var hay = geoNorm_(k2 + ' ' + (pl.label || ''));
+    if (!hay) continue;
+    var err = fuzzySubErr(hay, nq);
+    if (err < bestErr || (err === bestErr && hay.length < bestLen)) {
+      bestErr = err; bestLen = hay.length; best = pl;
+    }
+  }
+  return (best && bestErr <= maxErr) ? best : null;
 }
 // localStorage cache สำหรับผล Nominatim
 var GEO_CACHE_KEY = 'map_geo_cache_v1', GEO_CACHE_TTL = 7 * 24 * 3600 * 1000, GEO_CACHE_MAX = 80;
