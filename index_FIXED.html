@@ -736,13 +736,10 @@ function photoUrl(id, size) {
 function photoUrlFallback(id) {
   return 'https://drive.usercontent.google.com/download?id=' + id + '&export=view';
 }
-// ★ SURVEY: ทรัพย์ที่ยังไม่ได้โพส — "URI ของโพส" จะเขียนว่า Survey
-//   อ่านจากฟิลด์ลิงก์โพสที่ backend ส่งมา (รองรับชื่อฟิลด์ที่เป็นไปได้หลายแบบ)
-//   ★ ถ้า backend ใช้ชื่อฟิลด์อื่น แก้รายการในบรรทัด var s ด้านล่างจุดเดียวจบ
+// ★ SURVEY: ทรัพย์สำรวจ — เขียนคำว่า "survey" ในคอลัมน์ A ของชีต (ที่เดียวกับ "co") → backend ส่ง p.survey
 function isSurvey(p) {
-  if (!p) return false;
-  var s = String(p.postUrl || p.post || p.facebook || p.fbUrl || p.link || p.url || '');
-  return /survey/i.test(s);
+  // ★ อ่านจาก Google Sheet คอลัมน์ A (ค่า "survey") — backend ส่งมาเป็น field p.survey (สาธารณะ เหมือน coAgent)
+  return !!(p && p.survey);
 }
 // ═══ SMART SEARCH — ค้นแบบใกล้เคียง: พิมพ์ผิดเล็กน้อยได้ + ข้ามไทย/อังกฤษ ═══
 // กลุ่มคำที่ถือว่า "ใกล้เคียงกัน" ข้ามภาษา/สะกดต่าง — ★ เพิ่มได้ตามชื่อโครงการที่มี
