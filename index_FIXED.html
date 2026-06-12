@@ -804,6 +804,7 @@ function tokenMatches(hay, tok) {
     var f = forms[i];
     if (!f) continue;
     if (hay.indexOf(f) !== -1) return true;                          // ตรง/บางส่วน
+    if (/\d/.test(f)) continue;                                      // ★ มีตัวเลข (เช่น รหัส RSK0940) → ต้องตรง/บางส่วน ไม่ fuzzy
     var maxErr = f.length <= 3 ? 0 : (f.length <= 5 ? 1 : Math.floor(f.length * 0.34));
     if (maxErr > 0 && fuzzySubErr(hay, f) <= maxErr) return true;    // ใกล้เคียง (พิมพ์ผิด)
   }
@@ -1323,6 +1324,9 @@ function showToast(msg) {
 // ─── ALIASES: แปลคำย่อ → ชื่อเต็มก่อนส่ง Nominatim ─────────
 // แก้/เพิ่มได้ตามต้องการ — key เป็น lower-case
 var GEO_ALIASES = {
+  // ── โรงเรียนนานาชาติ เพิ่มเติม (มิ.ย. 2026) ──
+  'lanna international': 'lanna international school', 'ลานนาอินเตอร์': 'lanna international school', 'โรงเรียนนานาชาติลานนา': 'lanna international school', 'รร.นานาชาติลานนา': 'lanna international school',
+  'british concordance': 'british concordance international school', 'bcis': 'british concordance international school', 'concordance': 'british concordance international school', 'บริติช คอนคอร์แดนซ์': 'british concordance international school', 'คอนคอร์แดนซ์': 'british concordance international school',
   // มหาวิทยาลัย
   'มช':                 'มหาวิทยาลัยเชียงใหม่',
   'ม.ช':                'มหาวิทยาลัยเชียงใหม่',
@@ -1590,7 +1594,10 @@ var GEO_KNOWN_PLACES = {
   'สวนเฉลิมพระเกียรติ อบจ.เชียงใหม่': { lat: 18.8390910, lng: 98.9646198, label: 'สวนเฉลิมพระเกียรติฯ อบจ.' },
   'สนามกีฬาสมโภชเชียงใหม่ 700 ปี': { lat: 18.8423403, lng: 98.9596416, label: 'สนามกีฬา 700 ปี' },
   'แยกแม่กวง เชียงใหม่': { lat: 18.8269961, lng: 99.0476252, label: 'แยกแม่กวง' },
-  'แยกหนองจ๊อม เชียงใหม่': { lat: 18.8477919, lng: 99.0137256, label: 'แยกหนองจ๊อม (ลิขิตชีวัน)' }
+  'แยกหนองจ๊อม เชียงใหม่': { lat: 18.8477919, lng: 99.0137256, label: 'แยกหนองจ๊อม (ลิขิตชีวัน)' },
+  // ── โรงเรียนนานาชาติ เพิ่มเติม (มิ.ย. 2026) ──
+  'lanna international school': { lat: 18.6972916, lng: 98.9651003, label: 'Lanna International School' },
+  'british concordance international school': { lat: 18.7358159, lng: 98.9310956, label: 'British Concordance (BCIS)' }
 };
 // ตัดคำที่แทบทุกที่มี ("เชียงใหม่") ออก เพื่อให้เทียบเฉพาะส่วนที่แยกแยะได้
 function geoNorm_(s) {
