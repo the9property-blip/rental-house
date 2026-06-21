@@ -886,7 +886,7 @@ function initMap() {
 // ════════════════════════════════════════════════════════════
 function loadData() {
   var token = getStaffToken();
-  var url = SCRIPT_URL + (token ? '?token=' + encodeURIComponent(token) : '');
+  var url = SCRIPT_URL + '?_t=' + Date.now() + (token ? '&token=' + encodeURIComponent(token) : '');
   fetch(url)
     .then(function(r) { return r.json(); })
     .then(function(json) {

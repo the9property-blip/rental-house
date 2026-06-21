@@ -970,7 +970,8 @@ function loadData(manual) {
   if (manual) params.push('refresh=1');
   var token = getStaffToken();
   if (token) params.push('token=' + encodeURIComponent(token));
-  var url = SCRIPT_URL + (params.length ? '?' + params.join('&') : '');
+  params.push('_t=' + Date.now());  // cache-buster: กัน Google dispatch-cache คืนการ์ดค้าง
+  var url = SCRIPT_URL + '?' + params.join('&');
   fetch(url)
     .then(function(r) { return r.json(); })
     .then(function(json) {
