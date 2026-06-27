@@ -600,6 +600,12 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
     </select>
     <input type="number" class="filter-select filter-num" id="selMin" placeholder="ราคาต่ำสุด" min="0" step="1000" inputmode="numeric" oninput="applyFilters()">
     <input type="number" class="filter-select filter-num" id="selMax" placeholder="ราคาสูงสุด" min="0" step="1000" inputmode="numeric" oninput="applyFilters()">
+    <input type="number" class="filter-select filter-num" id="floorMin" placeholder="ชั้นต่ำสุด" min="0" step="1" inputmode="numeric" title="ชั้นต่ำสุด" oninput="applyFilters()">
+    <input type="number" class="filter-select filter-num" id="floorMax" placeholder="ชั้นสูงสุด" min="0" step="1" inputmode="numeric" title="ชั้นสูงสุด" oninput="applyFilters()">
+    <input type="number" class="filter-select filter-num" id="landMin" placeholder="ที่ดินต่ำ(ตรว.)" min="0" step="1" inputmode="decimal" title="ขนาดที่ดินต่ำสุด (ตร.ว.)" oninput="applyFilters()">
+    <input type="number" class="filter-select filter-num" id="landMax" placeholder="ที่ดินสูง(ตรว.)" min="0" step="1" inputmode="decimal" title="ขนาดที่ดินสูงสุด (ตร.ว.)" oninput="applyFilters()">
+    <input type="number" class="filter-select filter-num" id="usableMin" placeholder="ใช้สอยต่ำ(ตรม.)" min="0" step="1" inputmode="decimal" title="พื้นที่ใช้สอยต่ำสุด (ตร.ม.)" oninput="applyFilters()">
+    <input type="number" class="filter-select filter-num" id="usableMax" placeholder="ใช้สอยสูง(ตรม.)" min="0" step="1" inputmode="decimal" title="พื้นที่ใช้สอยสูงสุด (ตร.ม.)" oninput="applyFilters()">
     <select class="filter-select" id="selBed" onchange="applyFilters()">
       <option value="all">🛏 ทุกขนาด</option>
       <option value="1">1 นอน</option>
@@ -1014,6 +1020,12 @@ function clearAllFilters() {
   document.getElementById('selPet').value    = 'all';
   document.getElementById('selMin').value    = '';
   document.getElementById('selMax').value    = '';
+  document.getElementById('floorMin').value  = '';
+  document.getElementById('floorMax').value  = '';
+  document.getElementById('landMin').value   = '';
+  document.getElementById('landMax').value   = '';
+  document.getElementById('usableMin').value = '';
+  document.getElementById('usableMax').value = '';
   document.getElementById('selBed').value    = 'all';
   document.getElementById('selBath').value   = 'all';
   document.getElementById('selStatus').value = 'all';
@@ -1061,6 +1073,12 @@ function applyFilters() {
   var priceMin = parseFloat(document.getElementById('selMin').value) || 0;
   var priceMax = parseFloat(document.getElementById('selMax').value);
   if (isNaN(priceMax)) priceMax = Infinity;
+  var floorMin = parseFloat(document.getElementById('floorMin').value) || 0;
+  var floorMax = parseFloat(document.getElementById('floorMax').value); if (isNaN(floorMax)) floorMax = Infinity;
+  var landMin  = parseFloat(document.getElementById('landMin').value) || 0;
+  var landMax  = parseFloat(document.getElementById('landMax').value); if (isNaN(landMax)) landMax = Infinity;
+  var usableMin = parseFloat(document.getElementById('usableMin').value) || 0;
+  var usableMax = parseFloat(document.getElementById('usableMax').value); if (isNaN(usableMax)) usableMax = Infinity;
   var bed      = document.getElementById('selBed').value;
   var bath     = document.getElementById('selBath').value;
   var sort     = document.getElementById('selSort').value;
@@ -1068,6 +1086,12 @@ function applyFilters() {
   var filtered = allData.filter(function(p) {
     if (activeTypes.length && activeTypes.indexOf(p.type) === -1) return false;
     if (p.price > 0 && (p.price < priceMin || p.price > priceMax)) return false;
+    var flV = parseFloat(String(p.floor||'').replace(/[^0-9.]/g,'')) || 0;
+    if (flV > 0 && (flV < floorMin || flV > floorMax)) return false;
+    var ldV = parseFloat(String(p.land||'').replace(/[^0-9.]/g,'')) || 0;
+    if (ldV > 0 && (ldV < landMin || ldV > landMax)) return false;
+    var usV = parseFloat(String(p.usable||'').replace(/[^0-9.]/g,'')) || 0;
+    if (usV > 0 && (usV < usableMin || usV > usableMax)) return false;
     if (pet === 'yes' && !(p.pet||'').includes('รับ'))  return false;
     if (pet === 'no'  && !(p.pet||'').includes('ไม่'))  return false;
     if (bed !== 'all') {
@@ -1130,6 +1154,12 @@ function applyFilters() {
     || document.getElementById('selPet').value !== 'all'
     || document.getElementById('selMin').value.trim() !== ''
     || document.getElementById('selMax').value.trim() !== ''
+    || document.getElementById('floorMin').value.trim() !== ''
+    || document.getElementById('floorMax').value.trim() !== ''
+    || document.getElementById('landMin').value.trim() !== ''
+    || document.getElementById('landMax').value.trim() !== ''
+    || document.getElementById('usableMin').value.trim() !== ''
+    || document.getElementById('usableMax').value.trim() !== ''
     || document.getElementById('selBed').value !== 'all'
     || document.getElementById('selBath').value !== 'all'
     || document.getElementById('selStatus').value !== 'all'
