@@ -601,11 +601,9 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
     <input type="number" class="filter-select filter-num" id="selMin" placeholder="ราคาต่ำสุด" min="0" step="1000" inputmode="numeric" oninput="applyFilters()">
     <input type="number" class="filter-select filter-num" id="selMax" placeholder="ราคาสูงสุด" min="0" step="1000" inputmode="numeric" oninput="applyFilters()">
     <input type="number" class="filter-select filter-num" id="floorMin" placeholder="ชั้นต่ำสุด" min="0" step="1" inputmode="numeric" title="ชั้นต่ำสุด" oninput="applyFilters()">
-    <input type="number" class="filter-select filter-num" id="floorMax" placeholder="ชั้นสูงสุด" min="0" step="1" inputmode="numeric" title="ชั้นสูงสุด" oninput="applyFilters()">
-    <input type="number" class="filter-select filter-num" id="landMin" placeholder="ที่ดินต่ำ(ตรว.)" min="0" step="1" inputmode="decimal" title="ขนาดที่ดินต่ำสุด (ตร.ว.)" oninput="applyFilters()">
-    <input type="number" class="filter-select filter-num" id="landMax" placeholder="ที่ดินสูง(ตรว.)" min="0" step="1" inputmode="decimal" title="ขนาดที่ดินสูงสุด (ตร.ว.)" oninput="applyFilters()">
-    <input type="number" class="filter-select filter-num" id="usableMin" placeholder="ใช้สอยต่ำ(ตรม.)" min="0" step="1" inputmode="decimal" title="พื้นที่ใช้สอยต่ำสุด (ตร.ม.)" oninput="applyFilters()">
-    <input type="number" class="filter-select filter-num" id="usableMax" placeholder="ใช้สอยสูง(ตรม.)" min="0" step="1" inputmode="decimal" title="พื้นที่ใช้สอยสูงสุด (ตร.ม.)" oninput="applyFilters()">
+    <input type="number" class="filter-select filter-num" id="landMin" placeholder="ที่ดิน(ตรว.)" min="0" step="1" inputmode="decimal" title="ขนาดที่ดินต่ำสุด (ตร.ว.)" oninput="applyFilters()">
+    <input type="number" class="filter-select filter-num" id="usableMin" placeholder="ใช้สอย(ตรม.)" min="0" step="1" inputmode="decimal" title="พื้นที่ใช้สอยต่ำสุด (ตร.ม.)" oninput="applyFilters()">
+   
     <select class="filter-select" id="selBed" onchange="applyFilters()">
       <option value="all">🛏 ทุกขนาด</option>
       <option value="1">1 นอน</option>
