@@ -1079,6 +1079,9 @@ function applyFilters() {
   var landMax  = parseFloat(document.getElementById('landMax').value); if (isNaN(landMax)) landMax = Infinity;
   var usableMin = parseFloat(document.getElementById('usableMin').value) || 0;
   var usableMax = parseFloat(document.getElementById('usableMax').value); if (isNaN(usableMax)) usableMax = Infinity;
+  var floorOn  = floorMin > 0  || floorMax  !== Infinity;
+  var landOn   = landMin > 0   || landMax   !== Infinity;
+  var usableOn = usableMin > 0 || usableMax !== Infinity;
   var bed      = document.getElementById('selBed').value;
   var bath     = document.getElementById('selBath').value;
   var sort     = document.getElementById('selSort').value;
@@ -1086,12 +1089,9 @@ function applyFilters() {
   var filtered = allData.filter(function(p) {
     if (activeTypes.length && activeTypes.indexOf(p.type) === -1) return false;
     if (p.price > 0 && (p.price < priceMin || p.price > priceMax)) return false;
-    var flV = parseFloat(String(p.floor||'').replace(/[^0-9.]/g,'')) || 0;
-    if (flV > 0 && (flV < floorMin || flV > floorMax)) return false;
-    var ldV = parseFloat(String(p.land||'').replace(/[^0-9.]/g,'')) || 0;
-    if (ldV > 0 && (ldV < landMin || ldV > landMax)) return false;
-    var usV = parseFloat(String(p.usable||'').replace(/[^0-9.]/g,'')) || 0;
-    if (usV > 0 && (usV < usableMin || usV > usableMax)) return false;
+    if (floorOn)  { var flV = parseFloat(String(p.floor||'').replace(/[^0-9.]/g,''));  if (isNaN(flV) || flV < floorMin || flV > floorMax) return false; }
+    if (landOn)   { var ldV = parseFloat(String(p.land||'').replace(/[^0-9.]/g,''));   if (isNaN(ldV) || ldV < landMin || ldV > landMax) return false; }
+    if (usableOn) { var usV = parseFloat(String(p.usable||'').replace(/[^0-9.]/g,'')); if (isNaN(usV) || usV < usableMin || usV > usableMax) return false; }
     if (pet === 'yes' && !(p.pet||'').includes('รับ'))  return false;
     if (pet === 'no'  && !(p.pet||'').includes('ไม่'))  return false;
     if (bed !== 'all') {
