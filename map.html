@@ -878,10 +878,10 @@ var placeMarker = null;  // หมุดสถานที่ที่ค้น�
 function initMap() {
   map = L.map('map', { zoomControl: true, attributionControl: true, tap: true }).setView(CM_CENTER, 12);
   // CARTO Voyager — โทนสว่างคล้าย Google Maps
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-    subdomains: 'abcd', maxZoom: 20,
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
-  }).addTo(map);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+  subdomains: 'abcd', maxZoom: 20,
+  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+}).addTo(map);
   map.zoomControl.setPosition('topright');
   propLayer = L.layerGroup().addTo(map);
   lmLayer = L.layerGroup().addTo(map);
