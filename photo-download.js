@@ -1,8 +1,17 @@
-/* Shared by the catalog and map. The server rechecks the staff token for every ZIP. */
+/* Shared by the catalog and map. The server authenticates both original images and ZIPs. */
 window.PropertyPhotos = (function () {
   'use strict';
   var config, pendingCode = null, activeCode = null, controller = null;
   var generation = 0, objectUrl = null, panel = null;
+  var readyImages = null;
+
+  function isMobile() {
+    // Include iPads requesting desktop sites; do not classify touch Windows PCs as phones.
+    var ua = navigator.userAgent || '';
+    return !!(navigator.userAgentData && navigator.userAgentData.mobile) ||
+      /Android|iPhone|iPad|iPod/i.test(ua) ||
+      (/Macintosh|MacIntel/i.test(ua + ' ' + (navigator.platform || '')) && navigator.maxTouchPoints > 1);
+  }
 
   function escapeAttr(value) {
     return String(value || '').replace(/[&<>"']/g, function (c) {
@@ -10,6 +19,7 @@ window.PropertyPhotos = (function () {
     });
   }
   function label() {
+    if (isMobile()) return config && config.getToken() ? '📲 บันทึกรูปทั้งหมด' : '🔒 บันทึกรูป (ล็อกอิน)';
     return config && config.getToken() ? '⬇ ดาวน์โหลดรูปทั้งหมด (ZIP)' : '🔒 ดาวน์โหลดรูป (ล็อกอิน)';
   }
   function buttonHtml(code) {
@@ -23,6 +33,7 @@ window.PropertyPhotos = (function () {
     });
   }
   function cleanup() {
+    readyImages = null;
     if (objectUrl) URL.revokeObjectURL(objectUrl);
     objectUrl = null;
     if (panel) panel.remove();
@@ -56,7 +67,7 @@ window.PropertyPhotos = (function () {
     document.body.appendChild(panel);
     return status;
   }
-  function decodeZip(base64) {
+  function decodeBytes(base64) {
     var chunks = [];
     // Decode aligned chunks to avoid a second full-size binary string on mobile.
     for (var offset = 0; offset < base64.length; offset += 32768) {
@@ -65,10 +76,67 @@ window.PropertyPhotos = (function () {
       for (var i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
       chunks.push(bytes);
     }
+    return chunks;
+  }
+  function decodeZip(base64) {
+    var chunks = decodeBytes(base64);
     if (!chunks.length || chunks[0][0] !== 80 || chunks[0][1] !== 75 || chunks[0][2] !== 3 || chunks[0][3] !== 4) {
       throw new Error('invalid_archive');
     }
     return new Blob(chunks, { type: 'application/zip' });
+  }
+  function zipFallback(code) {
+    var zip = document.createElement('button');
+    zip.type = 'button';
+    zip.className = 'photo-download-save';
+    zip.textContent = 'ดาวน์โหลด ZIP แทน';
+    zip.onclick = function () { download(code, true); };
+    panel.appendChild(zip);
+  }
+  function showUnsupported(code) {
+    showPanel('เครื่องหรือเบราว์เซอร์นี้ไม่รองรับการบันทึกรูปทั้งหมดพร้อมกัน ลองเปิดใน Safari หรือ Chrome หรือใช้ ZIP แทน');
+    zipFallback(code);
+  }
+  function showImages(result, code, token) {
+    if (result.format !== 'images' || !Array.isArray(result.images) || !result.count || result.images.length !== result.count) {
+      throw new Error('invalid_images');
+    }
+    var files;
+    try {
+      files = result.images.map(function (item) {
+        if (!/^image\//i.test(item.mimeType) || typeof item.base64 !== 'string' || !item.base64 || !item.name) throw new Error();
+        var file = new File(decodeBytes(item.base64), item.name, { type: item.mimeType });
+        if (!file.size) throw new Error();
+        return file;
+      });
+    } catch (_) { throw new Error('invalid_images'); }
+    var supported = false;
+    try { supported = navigator.canShare({ files: files }); } catch (_) {}
+    if (!supported) { showUnsupported(code); return; }
+    var status = showPanel('เตรียมครบ ' + files.length + ' รูปแล้ว แตะ “บันทึกรูปทั้งหมด” แล้วเลือกบันทึกหรือแอปปลายทางในเมนูของเครื่อง');
+    var share = document.createElement('button');
+    share.type = 'button';
+    share.className = 'photo-download-save';
+    share.textContent = '📲 บันทึกรูปทั้งหมด';
+    var state = { code: code, token: token, busy: false, share: async function () {
+      if (readyImages !== state || state.busy) return;
+      if (config.getToken() !== token) { reset(); download(code); return; }
+      state.busy = true;
+      share.disabled = true;
+      try {
+        // Call directly in the tap handler: fetching first would lose user activation.
+        await navigator.share({ files: files, title: 'รูปทรัพย์ ' + code });
+        if (readyImages === state) status.textContent = 'ส่งรูปให้เมนูของเครื่องแล้ว หากต้องการบันทึกอีกครั้ง ให้แตะปุ่มด้านล่าง';
+      } catch (err) {
+        if (readyImages === state) status.textContent = err.name === 'AbortError' ?
+          'ปิดเมนูแล้ว สามารถแตะ “บันทึกรูปทั้งหมด” เพื่อลองอีกครั้งได้' :
+          'เครื่องไม่สามารถบันทึกรูปชุดนี้ได้ ลองอีกครั้งหรือดาวน์โหลด ZIP แทน';
+      } finally { state.busy = false; share.disabled = false; }
+    } };
+    readyImages = state;
+    share.onclick = state.share;
+    panel.appendChild(share);
+    zipFallback(code);
   }
   function showReady(blob, filename, count) {
     var status = showPanel('รวมรูปครบ ' + count + ' รูปแล้ว กำลังเริ่มดาวน์โหลด หากไฟล์ไม่เริ่มโหลด ให้แตะ “บันทึก ZIP”');
@@ -98,7 +166,7 @@ window.PropertyPhotos = (function () {
     } catch (_) { /* File sharing is optional; the download link remains available. */ }
     save.click();
   }
-  async function download(code) {
+  async function download(code, zipOnly) {
     if (!config || activeCode) return;
     code = String(code || '').trim().toUpperCase();
     if (!/^(?:R[A-Z]{2}|CO[A-Z]*)\d+$/.test(code)) {
@@ -107,8 +175,17 @@ window.PropertyPhotos = (function () {
     }
     var token = config.getToken();
     if (!token) {
-      pendingCode = code;
+      cleanup();
+      pendingCode = { code: code, zipOnly: !!zipOnly };
       config.requestLogin();
+      return;
+    }
+    var mobileImages = isMobile() && !zipOnly;
+    if (mobileImages && readyImages && readyImages.code === code && readyImages.token === token) {
+      return readyImages.share();
+    }
+    if (mobileImages && (!navigator.share || !navigator.canShare || typeof File === 'undefined')) {
+      showUnsupported(code);
       return;
     }
     pendingCode = null;
@@ -119,14 +196,15 @@ window.PropertyPhotos = (function () {
     var signal = controller.signal;
     var timedOut = false;
     var timeout = setTimeout(function () { timedOut = true; requestController.abort(); }, 180000);
-    showPanel('กำลังรวมรูปทั้งหมดของ ' + code + ' เป็น ZIP กรุณารอสักครู่…');
+    showPanel(mobileImages ? 'กำลังเตรียมรูปทั้งหมดของ ' + code + ' เมื่อพร้อมแล้วให้แตะบันทึกอีกครั้ง…' :
+      'กำลังรวมรูปทั้งหมดของ ' + code + ' เป็น ZIP กรุณารอสักครู่…');
     refreshButtons();
     try {
       // text/plain keeps this a CORS simple request supported by Apps Script.
       // Never put the download credential in the URL or persist the generated ZIP.
       var response = await fetch(config.endpoint, {
         method: 'POST', headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
-        body: JSON.stringify({ action: 'downloadPhotos', code: code, token: token }),
+        body: JSON.stringify({ action: 'downloadPhotos', code: code, token: token, format: mobileImages ? 'images' : 'zip' }),
         credentials: 'omit', cache: 'no-store', redirect: 'follow', signal: signal
       });
       if (!response.ok) throw new Error('network');
@@ -135,7 +213,7 @@ window.PropertyPhotos = (function () {
       if (config.getToken() !== token) { cleanup(); return; }
       if (result.error === 'unauthorized') {
         config.onUnauthorized();
-        pendingCode = code;
+        pendingCode = { code: code, zipOnly: !!zipOnly };
         cleanup();
         config.requestLogin();
         return;
@@ -144,12 +222,13 @@ window.PropertyPhotos = (function () {
         var messages = {
           no_folder: 'ยังไม่พบโฟลเดอร์รูปของทรัพย์นี้',
           no_photos: 'ยังไม่มีรูปภาพในโฟลเดอร์ทรัพย์นี้',
-          too_large: 'รูปทั้งหมดเกินขีดจำกัด 25 MB หรือ 200 รูป จึงยังสร้าง ZIP ไม่ได้ กรุณาติดต่อผู้ดูแล',
+          too_large: 'รูปทั้งหมดเกินขีดจำกัด 25 MB หรือ 200 รูป จึงยังเตรียมไฟล์ไม่ได้ กรุณาติดต่อผู้ดูแล',
           invalid_code: 'รหัสทรัพย์ไม่ถูกต้อง',
           archive_failed: 'รวมรูปไม่สำเร็จ กรุณาลองอีกครั้ง'
         };
         throw new Error(messages[result.error] || 'ระบบดาวน์โหลดยังไม่พร้อม กรุณาติดต่อผู้ดูแลให้อัปเดตระบบ');
       }
+      if (mobileImages) { showImages(result, code, token); return; }
       if (result.mimeType !== 'application/zip' || typeof result.base64 !== 'string' || !result.count) {
         throw new Error('invalid_archive');
       }
@@ -159,8 +238,10 @@ window.PropertyPhotos = (function () {
       var message = timedOut ? 'ใช้เวลารวมรูปนานเกินไป กรุณาลองอีกครั้ง' :
         (err instanceof TypeError || err instanceof SyntaxError || err.message === 'network' ?
           'เชื่อมต่อระบบดาวน์โหลดไม่ได้ กรุณาลองอีกครั้ง หากยังไม่ได้ ให้เปิดเว็บใน Safari หรือ Chrome' :
+          err.message === 'invalid_images' ? 'ได้รับรูปไม่ครบหรือระบบยังไม่รองรับ กรุณาลองอีกครั้งหรือติดต่อผู้ดูแลให้อัปเดตระบบ' :
           err.message === 'invalid_archive' ? 'ไฟล์ ZIP ไม่สมบูรณ์ กรุณาลองอีกครั้ง' : err.message);
       showPanel(message, true);
+      if (mobileImages && err.message === 'invalid_images') zipFallback(code);
     } finally {
       clearTimeout(timeout);
       if (current === generation) {
@@ -183,7 +264,7 @@ window.PropertyPhotos = (function () {
       var code = pendingCode;
       pendingCode = null;
       refreshButtons();
-      if (code) download(code);
+      if (code) download(code.code, code.zipOnly);
     },
     cancelLogin: function () { pendingCode = null; },
     reset: reset

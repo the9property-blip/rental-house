@@ -654,13 +654,13 @@ body {
         <a id="dStaffMaps" class="maps" href="#" target="_blank" rel="noopener">🗺 ดูใน Maps</a>
         <a id="dDriveLink" class="drive" href="#" target="_blank" rel="noopener" style="display:none;">📁 Drive</a>
       </div>
+      <div id="dPhotoDownload"></div>
       <div class="caption-block" id="dCaptionBlock" style="display:none;">
         <div class="caption-head"><span class="lbl">ข้อความประกาศ</span>
           <button type="button" class="btn-caption-copy" onclick="copyCaption()">📋 คัดลอกทั้งหมด</button></div>
         <pre class="caption-text" id="dCaptionText"></pre>
       </div>
     </div>
-    <div id="dPhotoDownload"></div>
     <div class="modal-actions">
       <button class="btn-call" onclick="window.location.href='tel:0809945497'">📞 โทรสอบถาม</button>
       <button class="btn-line" onclick="alert('Line ID: @the9property หรือโทร 0809945497')">💬 Line</button>
@@ -1391,7 +1391,7 @@ function openDetail(p) {
   }
   // STAFF SECTION
   var staffSec = document.getElementById('dStaffSection');
-  if (isStaffLoggedIn() && (p.ownerName || p.ownerTel || p.facebook || p.folderUrl || validCoord(p))) {
+  if (isStaffLoggedIn()) {
     document.getElementById('dOwnerName').textContent = p.ownerName || '–';
     var tel = (p.ownerTel || '').toString().replace(/[^0-9+]/g, '');
     document.getElementById('dOwnerTel').textContent = p.ownerTel || '–';
