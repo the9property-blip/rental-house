@@ -4,6 +4,7 @@ window.PropertyPhotos = (function () {
   var config, pendingCode = null, activeCode = null, controller = null;
   var generation = 0, objectUrl = null, panel = null;
   var readyImages = null;
+  var detailCode = null;
 
   function isMobile() {
     // Include iPads requesting desktop sites; do not classify touch Windows PCs as phones.
@@ -64,7 +65,8 @@ window.PropertyPhotos = (function () {
     status.textContent = message;
     panel.appendChild(close);
     panel.appendChild(status);
-    document.body.appendChild(panel);
+    document.getElementById('dStaffSection').appendChild(panel);
+    if (panel.scrollIntoView) panel.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     return status;
   }
   function decodeBytes(base64) {
@@ -222,7 +224,7 @@ window.PropertyPhotos = (function () {
         var messages = {
           no_folder: 'ยังไม่พบโฟลเดอร์รูปของทรัพย์นี้',
           no_photos: 'ยังไม่มีรูปภาพในโฟลเดอร์ทรัพย์นี้',
-          too_large: 'รูปทั้งหมดเกินขีดจำกัด 25 MB หรือ 200 รูป จึงยังเตรียมไฟล์ไม่ได้ กรุณาติดต่อผู้ดูแล',
+          too_large: 'รูปทั้งหมดเกินขีดจำกัด ' + (Number(result.maxMB) || 50) + ' MB หรือ ' + (Number(result.maxFiles) || 200) + ' รูป จึงยังเตรียมไฟล์ไม่ได้ กรุณาติดต่อผู้ดูแล',
           invalid_code: 'รหัสทรัพย์ไม่ถูกต้อง',
           archive_failed: 'รวมรูปไม่สำเร็จ กรุณาลองอีกครั้ง'
         };
@@ -255,6 +257,8 @@ window.PropertyPhotos = (function () {
     configure: function (options) { config = options; },
     buttonHtml: buttonHtml,
     setDetail: function (code) {
+      if (detailCode && detailCode !== code) reset();
+      detailCode = code;
       var slot = document.getElementById('dPhotoDownload');
       if (slot) slot.innerHTML = buttonHtml(code);
       refreshButtons();

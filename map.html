@@ -1025,7 +1025,6 @@ function buildPopup(p) {
       '<div class="pp-loc">📍 ' + escapeHtml(p.location || 'ไม่ระบุทำเล') + '</div>' +
       '<div class="pp-tags">' + tagsHtml(p, 'pp') + '</div>' +
       '<div class="pp-actions">' +
-        PropertyPhotos.buttonHtml(p.code) +
         '<button class="pp-btn detail" onclick="openDetailByCode(\'' + p.code + '\')">📋 รายละเอียด</button>' +
         '<a class="pp-btn maps" href="' + mapsHref + '" target="_blank" rel="noopener" title="Google Maps">🗺️</a>' +
       '</div>' +
