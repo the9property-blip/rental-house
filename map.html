@@ -505,6 +505,8 @@ body {
 .btn-caption-copy:active{transform:scale(0.96)}
 .caption-text{max-height:120px;overflow:auto;font-size:11px;line-height:1.5;white-space:pre-wrap;word-break:break-word;background:#fffdf5;border:1px solid #eadba0;border-radius:8px;padding:8px;margin:0;color:#333;font-family:inherit}
 </style>
+<link rel="stylesheet" href="photo-download.css">
+<script src="photo-download.js"></script>
 </head>
 <body>
 <!-- HEADER -->
@@ -534,7 +536,14 @@ body {
       <option value="yes">✅ รับได้</option>
       <option value="no">❌ ไม่รับ</option>
     </select>
-    
+    <input type="number" class="filter-num" id="selMin" placeholder="ราคาต่ำสุด" min="0" step="1000" inputmode="numeric" oninput="applyFilters()">
+    <input type="number" class="filter-num" id="selMax" placeholder="ราคาสูงสุด" min="0" step="1000" inputmode="numeric" oninput="applyFilters()">
+    <input type="number" class="filter-num" id="floorMin" placeholder="ชั้นต่ำสุด" min="0" step="1" inputmode="numeric" title="ชั้นต่ำสุด" oninput="applyFilters()">
+    <input type="number" class="filter-num" id="floorMax" placeholder="ชั้นสูงสุด" min="0" step="1" inputmode="numeric" title="ชั้นสูงสุด" oninput="applyFilters()">
+    <input type="number" class="filter-num" id="landMin" placeholder="ที่ดินต่ำ(ตรว.)" min="0" step="1" inputmode="decimal" title="ขนาดที่ดินต่ำสุด (ตร.ว.)" oninput="applyFilters()">
+    <input type="number" class="filter-num" id="landMax" placeholder="ที่ดินสูง(ตรว.)" min="0" step="1" inputmode="decimal" title="ขนาดที่ดินสูงสุด (ตร.ว.)" oninput="applyFilters()">
+    <input type="number" class="filter-num" id="usableMin" placeholder="ใช้สอยต่ำ(ตรม.)" min="0" step="1" inputmode="decimal" title="พื้นที่ใช้สอยต่ำสุด (ตร.ม.)" oninput="applyFilters()">
+    <input type="number" class="filter-num" id="usableMax" placeholder="ใช้สอยสูง(ตรม.)" min="0" step="1" inputmode="decimal" title="พื้นที่ใช้สอยสูงสุด (ตร.ม.)" oninput="applyFilters()">
     <select class="filter-select" id="selBed" onchange="applyFilters()">
       <option value="all">🛏 ทุกขนาด</option>
       <option value="1">1 นอน</option>
@@ -581,14 +590,15 @@ body {
       </div>
       <div class="geo-dropdown" id="geoDropdown"></div>
     </div>
-    <input type="number" class="filter-num" id="selMin" placeholder="ราคาต่ำสุด" min="0" step="1000" inputmode="numeric" oninput="applyFilters()">
-    <input type="number" class="filter-num" id="selMax" placeholder="ราคาสูงสุด" min="0" step="1000" inputmode="numeric" oninput="applyFilters()">
-    <input type="number" class="filter-num" id="floorMin" placeholder="ชั้นต่ำสุด" min="0" step="1" inputmode="numeric" title="ชั้นต่ำสุด" oninput="applyFilters()">
-    <input type="number" class="filter-num" id="floorMax" placeholder="ชั้นสูงสุด" min="0" step="1" inputmode="numeric" title="ชั้นสูงสุด" oninput="applyFilters()">
-    <input type="number" class="filter-num" id="landMin" placeholder="ที่ดินต่ำ(ตรว.)" min="0" step="1" inputmode="decimal" title="ขนาดที่ดินต่ำสุด (ตร.ว.)" oninput="applyFilters()">
-    <input type="number" class="filter-num" id="landMax" placeholder="ที่ดินสูง(ตรว.)" min="0" step="1" inputmode="decimal" title="ขนาดที่ดินสูงสุด (ตร.ว.)" oninput="applyFilters()">
-    <input type="number" class="filter-num" id="usableMin" placeholder="ใช้สอยต่ำ(ตรม.)" min="0" step="1" inputmode="decimal" title="พื้นที่ใช้สอยต่ำสุด (ตร.ม.)" oninput="applyFilters()">
-    <input type="number" class="filter-num" id="usableMax" placeholder="ใช้สอยสูง(ตรม.)" min="0" step="1" inputmode="decimal" title="พื้นที่ใช้สอยสูงสุด (ตร.ม.)" oninput="applyFilters()">
+    <span class="geo-chip-label">ลัด:</span>
+    <button class="geo-chip" onclick="quickGeo('มหาวิทยาลัยเชียงใหม่')">มช.</button>
+    <button class="geo-chip" onclick="quickGeo('เซ็นทรัล เฟสติวัล เชียงใหม่')">เซ็นทรัลเฟสติวัล</button>
+    <button class="geo-chip" onclick="quickGeo('เซ็นทรัล แอร์พอร์ต เชียงใหม่')">เซ็นทรัลแอร์พอร์ต</button>
+    <button class="geo-chip" onclick="quickGeo('ท่าอากาศยานเชียงใหม่')">สนามบิน</button>
+    <button class="geo-chip" onclick="quickGeo('ถนนนิมมานเหมินท์ เชียงใหม่')">นิมมาน</button>
+    <button class="geo-chip" onclick="quickGeo('โรงพยาบาลมหาราชนครเชียงใหม่')">รพ.มหาราช</button>
+    <button class="geo-chip" onclick="quickGeo('โรงเรียนนานาชาติวารี เชียงใหม่')">วารีเชียงใหม่</button>
+    <button class="geo-chip" onclick="quickGeo('เมญ่า ไลฟ์สไตล์ ช็อปปิ้ง เซ็นเตอร์ เชียงใหม่')">เมญ่า</button>
   </div>
 </div>
 <!-- MAP -->
@@ -650,6 +660,7 @@ body {
         <pre class="caption-text" id="dCaptionText"></pre>
       </div>
     </div>
+    <div id="dPhotoDownload"></div>
     <div class="modal-actions">
       <button class="btn-call" onclick="window.location.href='tel:0809945497'">📞 โทรสอบถาม</button>
       <button class="btn-line" onclick="alert('Line ID: @the9property หรือโทร 0809945497')">💬 Line</button>
@@ -713,7 +724,7 @@ var GEO_KNOWN_PLACES = {
   'โรงพยาบาลเซ็นทรัลเชียงใหม่เมโมเรียล': { lat: 18.7960, lng: 98.9728, label: 'รพ.เซ็นทรัลเชียงใหม่' },
   'โรงพยาบาลเทพปัญญา เชียงใหม่':    { lat: 18.8104198, lng: 99.0113788, label: 'รพ.เทพปัญญา' },
   // โรงเรียน
-  'โรงเรียนนานาชาติวารี เชียงใหม่':  { lat: 18.758599404565434, lng: 99.01533543460081, label: 'โรงเรียนนานาชาติวารี' },
+  'โรงเรียนนานาชาติวารี เชียงใหม่':  { lat: 18.7517, lng: 99.0258, label: 'โรงเรียนนานาชาติวารี' },
   'โรงเรียนปรินส์รอยัลส์วิทยาลัย เชียงใหม่': { lat: 18.7833, lng: 98.9942, label: 'โรงเรียนปรินส์รอยัล' },
   'โรงเรียนมงฟอร์ตวิทยาลัย เชียงใหม่': { lat: 18.7975, lng: 99.0084, label: 'โรงเรียนมงฟอร์ต' },
   'โรงเรียนดาราวิทยาลัย เชียงใหม่':   { lat: 18.7831, lng: 98.9961, label: 'โรงเรียนดาราวิทยาลัย' },
@@ -1014,6 +1025,7 @@ function buildPopup(p) {
       '<div class="pp-loc">📍 ' + escapeHtml(p.location || 'ไม่ระบุทำเล') + '</div>' +
       '<div class="pp-tags">' + tagsHtml(p, 'pp') + '</div>' +
       '<div class="pp-actions">' +
+        PropertyPhotos.buttonHtml(p.code) +
         '<button class="pp-btn detail" onclick="openDetailByCode(\'' + p.code + '\')">📋 รายละเอียด</button>' +
         '<a class="pp-btn maps" href="' + mapsHref + '" target="_blank" rel="noopener" title="Google Maps">🗺️</a>' +
       '</div>' +
@@ -1344,6 +1356,7 @@ function openDetailByCode(code) {
   openDetail(p);
 }
 function openDetail(p) {
+  PropertyPhotos.setDetail(p.code);
   var photoEl = document.getElementById('dPhoto');
   if (p.thumb) {
     photoEl.innerHTML = '<img src="' + photoUrl(p.thumb, 800) + '" alt="' + escapeHtml(p.project || '') + '" onerror="onModalPhotoError(this,\'' + p.thumb + '\')">' +
@@ -1788,6 +1801,7 @@ function staffBtnClick() {
   if (isStaffLoggedIn()) {
     if (confirm('ออกจากระบบทีมงาน?')) {
       try { sessionStorage.removeItem('staff_token'); } catch(e) {}
+      PropertyPhotos.reset();
       updateStaffBtn();
       loadData();
       showToast('👋 ออกจากระบบแล้ว');
@@ -1802,7 +1816,8 @@ function openStaffModal() {
   document.getElementById('staffLoginModal').classList.add('open');
   setTimeout(function() { document.getElementById('staffPasswordInput').focus(); }, 50);
 }
-function closeStaffModal() {
+function closeStaffModal(keepDownload) {
+  if (!keepDownload) PropertyPhotos.cancelLogin();
   document.getElementById('staffLoginModal').classList.remove('open');
 }
 function doStaffLogin() {
@@ -1814,12 +1829,13 @@ function doStaffLogin() {
     .then(function(r) { return r.json(); })
     .then(function(json) {
       if (json.staff === true) {
-        closeStaffModal();
+        closeStaffModal(true);
         updateStaffBtn();
         allData = json.data || [];
         buildEntries(allData);
         applyFilters();
         showToast('✅ เข้าสู่ระบบสำเร็จ');
+        PropertyPhotos.onLogin();
       } else {
         try { sessionStorage.removeItem('staff_token'); } catch(e) {}
         document.getElementById('staffLoginErr').textContent = '❌ รหัสผ่านไม่ถูกต้อง';
@@ -1843,6 +1859,16 @@ window.addEventListener('load', function() {
   loadData();
 });
 window.addEventListener('resize', function() { if (map) map.invalidateSize(); });
+</script>
+<script>
+PropertyPhotos.configure({
+  endpoint: SCRIPT_URL, getToken: getStaffToken, requestLogin: openStaffModal,
+  onUnauthorized: function() {
+    try { sessionStorage.removeItem('staff_token'); } catch(e) {}
+    updateStaffBtn();
+    loadData();
+  }
+});
 </script>
 </body>
 </html>

@@ -561,6 +561,8 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
 .btn-caption-copy:active{transform:scale(0.96)}
 .caption-text{max-height:120px;overflow:auto;font-size:11px;line-height:1.5;white-space:pre-wrap;word-break:break-word;background:#fffdf5;border:1px solid #eadba0;border-radius:8px;padding:8px;margin:0;color:#333;font-family:inherit}
 </style>
+<link rel="stylesheet" href="photo-download.css">
+<script src="photo-download.js"></script>
 </head>
 <body>
 <!-- HEADER -->
@@ -598,7 +600,14 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
       <option value="yes">✅ รับได้</option>
       <option value="no">❌ ไม่รับ</option>
     </select>
-    
+    <input type="number" class="filter-select filter-num" id="selMin" placeholder="ราคาต่ำสุด" min="0" step="1000" inputmode="numeric" oninput="applyFilters()">
+    <input type="number" class="filter-select filter-num" id="selMax" placeholder="ราคาสูงสุด" min="0" step="1000" inputmode="numeric" oninput="applyFilters()">
+    <input type="number" class="filter-select filter-num" id="floorMin" placeholder="ชั้นต่ำสุด" min="0" step="1" inputmode="numeric" title="ชั้นต่ำสุด" oninput="applyFilters()">
+    <input type="number" class="filter-select filter-num" id="floorMax" placeholder="ชั้นสูงสุด" min="0" step="1" inputmode="numeric" title="ชั้นสูงสุด" oninput="applyFilters()">
+    <input type="number" class="filter-select filter-num" id="landMin" placeholder="ที่ดินต่ำ(ตรว.)" min="0" step="1" inputmode="decimal" title="ขนาดที่ดินต่ำสุด (ตร.ว.)" oninput="applyFilters()">
+    <input type="number" class="filter-select filter-num" id="landMax" placeholder="ที่ดินสูง(ตรว.)" min="0" step="1" inputmode="decimal" title="ขนาดที่ดินสูงสุด (ตร.ว.)" oninput="applyFilters()">
+    <input type="number" class="filter-select filter-num" id="usableMin" placeholder="ใช้สอยต่ำ(ตรม.)" min="0" step="1" inputmode="decimal" title="พื้นที่ใช้สอยต่ำสุด (ตร.ม.)" oninput="applyFilters()">
+    <input type="number" class="filter-select filter-num" id="usableMax" placeholder="ใช้สอยสูง(ตรม.)" min="0" step="1" inputmode="decimal" title="พื้นที่ใช้สอยสูงสุด (ตร.ม.)" oninput="applyFilters()">
     <select class="filter-select" id="selBed" onchange="applyFilters()">
       <option value="all">🛏 ทุกขนาด</option>
       <option value="1">1 นอน</option>
@@ -643,14 +652,14 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
       <div class="geo-dropdown" id="geoDropdown"></div>
     </div>
     <span class="geo-chip-label">ลัด:</span>
-    <input type="number" class="filter-select filter-num" id="selMin" placeholder="ราคาต่ำสุด" min="0" step="1000" inputmode="numeric" oninput="applyFilters()">
-    <input type="number" class="filter-select filter-num" id="selMax" placeholder="ราคาสูงสุด" min="0" step="1000" inputmode="numeric" oninput="applyFilters()">
-    <input type="number" class="filter-select filter-num" id="floorMin" placeholder="ชั้นต่ำสุด" min="0" step="1" inputmode="numeric" title="ชั้นต่ำสุด" oninput="applyFilters()">
-    <input type="number" class="filter-select filter-num" id="floorMax" placeholder="ชั้นสูงสุด" min="0" step="1" inputmode="numeric" title="ชั้นสูงสุด" oninput="applyFilters()">
-    <input type="number" class="filter-select filter-num" id="landMin" placeholder="ที่ดินต่ำ(ตรว.)" min="0" step="1" inputmode="decimal" title="ขนาดที่ดินต่ำสุด (ตร.ว.)" oninput="applyFilters()">
-    <input type="number" class="filter-select filter-num" id="landMax" placeholder="ที่ดินสูง(ตรว.)" min="0" step="1" inputmode="decimal" title="ขนาดที่ดินสูงสุด (ตร.ว.)" oninput="applyFilters()">
-    <input type="number" class="filter-select filter-num" id="usableMin" placeholder="ใช้สอยต่ำ(ตรม.)" min="0" step="1" inputmode="decimal" title="พื้นที่ใช้สอยต่ำสุด (ตร.ม.)" oninput="applyFilters()">
-    <input type="number" class="filter-select filter-num" id="usableMax" placeholder="ใช้สอยสูง(ตรม.)" min="0" step="1" inputmode="decimal" title="พื้นที่ใช้สอยสูงสุด (ตร.ม.)" oninput="applyFilters()">
+    <button class="geo-chip" onclick="quickGeo('มหาวิทยาลัยเชียงใหม่')">มช.</button>
+    <button class="geo-chip" onclick="quickGeo('เซ็นทรัล เฟสติวัล เชียงใหม่')">เซ็นทรัลเฟสติวัล</button>
+    <button class="geo-chip" onclick="quickGeo('เซ็นทรัล แอร์พอร์ต เชียงใหม่')">เซ็นทรัลแอร์พอร์ต</button>
+    <button class="geo-chip" onclick="quickGeo('ท่าอากาศยานเชียงใหม่')">สนามบิน</button>
+    <button class="geo-chip" onclick="quickGeo('ถนนนิมมานเหมินท์ เชียงใหม่')">นิมมาน</button>
+    <button class="geo-chip" onclick="quickGeo('โรงพยาบาลมหาราชนครเชียงใหม่')">รพ.มหาราช</button>
+    <button class="geo-chip" onclick="quickGeo('โรงเรียนนานาชาติวารี เชียงใหม่')">วารีเชียงใหม่</button>
+    <button class="geo-chip" onclick="quickGeo('ถนนมหิดล เชียงใหม่')">ถ.มหิดล</button>
   </div>
 </div>
 <!-- STATS BAR -->
@@ -727,6 +736,7 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
         <pre class="caption-text" id="dCaptionText"></pre>
       </div>
     </div>
+    <div id="dPhotoDownload"></div>
     <div class="modal-actions">
       <button class="btn-call" onclick="window.location.href='tel:0809945497'">📞 โทรสอบถาม</button>
       <button class="btn-line" onclick="alert('Line ID: @the9property หรือโทร 0809945497')">💬 Line</button>
@@ -874,6 +884,7 @@ function staffBtnClick() {
   if (isStaffLoggedIn()) {
     if (confirm('ออกจากระบบทีมงาน?')) {
       try { sessionStorage.removeItem('staff_token'); } catch(e) {}
+      PropertyPhotos.reset();
       updateStaffBtn();
       loadData(true);
       showToast('👋 ออกจากระบบแล้ว');
@@ -888,7 +899,8 @@ function openStaffModal() {
   document.getElementById('staffLoginModal').classList.add('open');
   setTimeout(function() { document.getElementById('staffPasswordInput').focus(); }, 50);
 }
-function closeStaffModal() {
+function closeStaffModal(keepDownload) {
+  if (!keepDownload) PropertyPhotos.cancelLogin();
   document.getElementById('staffLoginModal').classList.remove('open');
 }
 function doStaffLogin() {
@@ -901,11 +913,12 @@ function doStaffLogin() {
     .then(function(r) { return r.json(); })
     .then(function(json) {
       if (json.staff === true) {
-        closeStaffModal();
+        closeStaffModal(true);
         updateStaffBtn();
         allData = json.data || [];
         applyFilters();
         showToast('✅ เข้าสู่ระบบสำเร็จ');
+        PropertyPhotos.onLogin();
       } else {
         try { sessionStorage.removeItem('staff_token'); } catch(e) {}
         document.getElementById('staffLoginErr').textContent = '❌ รหัสผ่านไม่ถูกต้อง';
@@ -1269,6 +1282,7 @@ function showGrid(data) {
         '</div>' +
       '</div>' +
       '<div class="card-footer">' +
+        PropertyPhotos.buttonHtml(p.code) +
         '<button class="btn-detail" onclick=\'event.stopPropagation();openDetail(' + pj + ')\'>📋 รายละเอียด</button>' +
         '<button class="btn-contact-card" onclick="event.stopPropagation();window.location.href=\'tel:' + BROKER_PHONE + '\'">📞 สอบถาม</button>' +
       '</div>' +
@@ -1287,6 +1301,7 @@ function showError(msg) {
 }
 // ─── DETAIL MODAL ─────────────────────────────────────────
 function openDetail(p) {
+  PropertyPhotos.setDetail(p.code);
   var photoEl = document.getElementById('dPhoto');
   if (p.thumb) {
     // ★ FIX: ใช้ lh3.googleusercontent.com + fallback
@@ -1888,6 +1903,16 @@ function escapeHtml(s) {
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
+</script>
+<script>
+PropertyPhotos.configure({
+  endpoint: SCRIPT_URL, getToken: getStaffToken, requestLogin: openStaffModal,
+  onUnauthorized: function() {
+    try { sessionStorage.removeItem('staff_token'); } catch(e) {}
+    updateStaffBtn();
+    loadData(false);
+  }
+});
 </script>
 </body>
 </html>
