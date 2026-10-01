@@ -368,14 +368,6 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
   display: flex; align-items: center; justify-content: center;
 }
 .geo-btn-search:disabled { opacity: 0.5; cursor: wait; }
-.geo-chip {
-  flex-shrink: 0; padding: 4px 11px; border-radius: 50px;
-  border: 1.5px solid rgba(255,255,255,0.35);
-  background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.9);
-  font-size: 0.72rem; cursor: pointer; transition: all 0.2s;
-  font-family: inherit; white-space: nowrap;
-}
-.geo-chip:hover { background: rgba(255,255,255,0.18); }
 .geo-map-btn {
   flex-shrink: 0; padding: 6px 14px; border-radius: 50px;
   background: linear-gradient(135deg, #2563eb, #0f3460);
@@ -385,10 +377,6 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
   box-shadow: 0 2px 9px rgba(37,99,235,0.45);
 }
 .geo-map-btn:hover { filter: brightness(1.13); }
-.geo-chip-label {
-  flex-shrink: 0; font-size: 0.7rem; color: rgba(255,255,255,0.55);
-  white-space: nowrap; padding-right: 2px;
-}
 .geo-dropdown {
   position: absolute; top: 100%; left: 0; min-width: 280px;
   background: white; border-radius: 12px;
@@ -560,6 +548,25 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
 .btn-caption-copy{font-size:0.72rem;font-weight:700;padding:4px 10px;border:none;border-radius:7px;background:#0f3460;color:#fff;cursor:pointer;font-family:inherit;flex:none}
 .btn-caption-copy:active{transform:scale(0.96)}
 .caption-text{max-height:120px;overflow:auto;font-size:11px;line-height:1.5;white-space:pre-wrap;word-break:break-word;background:#fffdf5;border:1px solid #eadba0;border-radius:8px;padding:8px;margin:0;color:#333;font-family:inherit}
+
+/* Keep every search/filter control within the header width. */
+.header-row2 { flex-wrap: wrap; overflow: visible; gap: 7px; }
+.header-row2 .filter-sep { display: none; }
+.geo-search-container { flex: 1 1 260px; min-width: 0; max-width: 460px; }
+.geo-input-wrap { width: 100%; min-width: 0; }
+.geo-input-wrap input { min-width: 0; width: 100%; }
+.geo-dropdown { width: 100%; min-width: 0; }
+.filter-clear-btn { min-height: 32px; font-weight: 700; }
+@media (max-width: 600px) {
+  .header { position: relative; top: auto; }
+  .header-row1 { flex-wrap: wrap; }
+  .header-row1 .search-wrap { order: 3; flex: 1 0 100%; min-width: 0; }
+  .header-row2 .filter-num { flex: 1 1 100px; max-width: none; min-width: 0; }
+  .header-row2 .filter-select:not(.filter-num) { flex: 1 1 100px; max-width: none; min-width: 0; }
+  .header-row2 .filter-btn, .header-row2 .filter-select, .header-row2 .filter-num { min-height: 32px; }
+  .header-row2 .geo-search-container { flex: 1 1 100%; max-width: none; }
+  .header-row2 .filter-clear-btn { width: 100%; justify-content: center; }
+}
 </style>
 <link rel="stylesheet" href="photo-download.css">
 <script src="photo-download.js"></script>
@@ -638,28 +645,17 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
       <option value="soon">📅 ประกาศล่วงหน้า</option>
     </select>
     <div class="filter-sep"></div>
-    <button class="filter-clear-btn" id="btnClearFilters" onclick="clearAllFilters()">✕ ล้างตัวกรอง</button>
-  </div>
-  <!-- GEO ROW: ค้นหาตำแหน่งใกล้เคียง -->
-  <div class="geo-row">
+    <!-- Location search shares the filter area. -->
     <a class="geo-map-btn" href="map.html" title="ดูบ้านทั้งหมดบนแผนที่">🗺️ ดูแผนที่</a>
     <div class="geo-search-container">
       <div class="geo-input-wrap">
         <input type="text" id="geoInput" placeholder="📍 ค้นหาใกล้... เช่น วารีเชียงใหม่, มช., เซ็นทรัล"
-               onkeydown="if(event.key==='Enter') searchByLocation()">
+               oninput="onGeoInput()" onkeydown="if(event.key==='Enter') searchByLocation()">
         <button class="geo-btn-search" id="geoBtnSearch" onclick="searchByLocation()" title="ค้นหา">🔍</button>
       </div>
       <div class="geo-dropdown" id="geoDropdown"></div>
     </div>
-    <span class="geo-chip-label">ลัด:</span>
-    <button class="geo-chip" onclick="quickGeo('มหาวิทยาลัยเชียงใหม่')">มช.</button>
-    <button class="geo-chip" onclick="quickGeo('เซ็นทรัล เฟสติวัล เชียงใหม่')">เซ็นทรัลเฟสติวัล</button>
-    <button class="geo-chip" onclick="quickGeo('เซ็นทรัล แอร์พอร์ต เชียงใหม่')">เซ็นทรัลแอร์พอร์ต</button>
-    <button class="geo-chip" onclick="quickGeo('ท่าอากาศยานเชียงใหม่')">สนามบิน</button>
-    <button class="geo-chip" onclick="quickGeo('ถนนนิมมานเหมินท์ เชียงใหม่')">นิมมาน</button>
-    <button class="geo-chip" onclick="quickGeo('โรงพยาบาลมหาราชนครเชียงใหม่')">รพ.มหาราช</button>
-    <button class="geo-chip" onclick="quickGeo('โรงเรียนนานาชาติวารี เชียงใหม่')">วารีเชียงใหม่</button>
-    <button class="geo-chip" onclick="quickGeo('ถนนมหิดล เชียงใหม่')">ถ.มหิดล</button>
+    <button type="button" class="filter-clear-btn" id="btnClearFilters" onclick="clearAllFilters()">✕ ล้างทั้งหมด</button>
   </div>
 </div>
 <!-- STATS BAR -->
@@ -1037,6 +1033,9 @@ function clearAllFilters() {
   document.getElementById('selStatus').value = 'all';
   // Clear search
   document.getElementById('searchInput').value = '';
+  clearGeoSearch(true);
+  try { localStorage.removeItem(GEO_CACHE_KEY); } catch(e) {}
+  document.getElementById('selSort').value = 'price_asc';
   applyFilters();
 }
 // ปุ่มประเภท — เลือกพร้อมกันได้หลายอัน; "ทั้งหมด" = ล้างการเลือก
@@ -1155,6 +1154,9 @@ function applyFilters() {
   showGrid(filtered);
   document.getElementById('countDisplay').textContent = filtered.length;
   // แสดงปุ่มล้างตัวกรองเมื่อมีการกรองอยู่
+  updateClearButton();
+}
+function updateClearButton() {
   var hasFilter = activeTypes.length > 0
     || activeAgent !== 'all'
     || document.getElementById('selPet').value !== 'all'
@@ -1169,7 +1171,10 @@ function applyFilters() {
     || document.getElementById('selBed').value !== 'all'
     || document.getElementById('selBath').value !== 'all'
     || document.getElementById('selStatus').value !== 'all'
-    || document.getElementById('searchInput').value.trim() !== '';
+    || document.getElementById('searchInput').value !== ''
+    || document.getElementById('geoInput').value !== ''
+    || !!geoOrigin
+    || document.getElementById('selSort').value !== 'price_asc';
   var btnClear = document.getElementById('btnClearFilters');
   if (btnClear) btnClear.classList.toggle('visible', hasFilter);
 }
@@ -1770,11 +1775,24 @@ function fmtDist(km) {
   if (km < 10) return km.toFixed(1) + ' กม.';
   return Math.round(km) + ' กม.';
 }
-function quickGeo(q) {
-  document.getElementById('geoInput').value = q;
-  searchByLocation();
+var geoSearchVersion = 0;
+var geoSearchController = null;
+function cancelGeoRequest() {
+  geoSearchVersion++;
+  if (geoSearchController) geoSearchController.abort();
+  geoSearchController = null;
+  var btn = document.getElementById('geoBtnSearch');
+  if (btn) btn.disabled = false;
+  var dd = document.getElementById('geoDropdown');
+  if (dd) { dd.classList.remove('open'); dd.innerHTML = ''; }
+}
+function onGeoInput() {
+  cancelGeoRequest();
+  updateClearButton();
 }
 function searchByLocation() {
+  cancelGeoRequest();
+  var requestVersion = geoSearchVersion;
   var rawQ = document.getElementById('geoInput').value.trim();
   if (!rawQ) { showToast('กรุณาพิมพ์สถานที่ที่ต้องการค้นหา'); return; }
   // ★ ขยายคำย่อก่อน เช่น "เซ็นเฟส" → "เซ็นทรัล เฟสติวัล เชียงใหม่"
@@ -1817,9 +1835,12 @@ function searchByLocation() {
           + '&viewbox=' + viewbox
           + '&bounded=0'
           + '&accept-language=th';
-  fetch(url, { headers: { 'Accept-Language': 'th' } })
+  geoSearchController = new AbortController();
+  fetch(url, { headers: { 'Accept-Language': 'th' }, signal: geoSearchController.signal })
     .then(function(r) { return r.json(); })
     .then(function(results) {
+      if (requestVersion !== geoSearchVersion) return;
+      geoSearchController = null;
       btn.disabled = false;
       if (Array.isArray(results) && results.length > 0) {
         geoCacheSet(q, results);  // เก็บ cache
@@ -1827,6 +1848,8 @@ function searchByLocation() {
       _renderGeoResults(results, q, dd, aliasUsed ? rawQ : null);
     })
     .catch(function(err) {
+      if (requestVersion !== geoSearchVersion) return;
+      geoSearchController = null;
       btn.disabled = false;
       dd.innerHTML = '<div class="geo-dropdown-empty">' +
         '⚠️ เชื่อมต่อบริการค้นหาไม่ได้<br>' +
@@ -1839,7 +1862,7 @@ function _renderGeoResults(results, q, dd, originalQuery) {
   if (!Array.isArray(results) || results.length === 0) {
     dd.innerHTML = '<div class="geo-dropdown-empty">' +
       '😕 ไม่พบสถานที่ "' + escapeHtml(originalQuery || q) + '"<br>' +
-      '<small style="color:#aaa;font-size:0.78rem;">ลองพิมพ์ชื่อเต็ม หรือกด chip ลัดด้านล่าง</small>' +
+      '<small style="color:#aaa;font-size:0.78rem;">ลองพิมพ์ชื่อสถานที่ให้ชัดเจนขึ้น</small>' +
     '</div>';
     return;
   }
@@ -1884,7 +1907,8 @@ function applyGeoOrigin(r) {
 }
 
 // ล้าง geo search → กลับไป sort ปกติ
-function clearGeoSearch() {
+function clearGeoSearch(skipApply) {
+  cancelGeoRequest();
   geoOrigin = null;
   var pill = document.getElementById('geoActivePill');
   if (pill) pill.classList.remove('visible');
@@ -1892,7 +1916,8 @@ function clearGeoSearch() {
   if (sortSel) sortSel.disabled = false;
   var geoInput = document.getElementById('geoInput');
   if (geoInput) geoInput.value = '';
-  applyFilters();
+  if (!skipApply) applyFilters();
+  document.getElementById('geoActiveText').textContent = '';
 }
 
 // HTML escape ขั้นพื้นฐาน
