@@ -576,7 +576,26 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
 .geo-input-wrap input { min-width: 0; width: 100%; }
 .geo-dropdown { width: 100%; min-width: 0; }
 .filter-clear-btn { min-height: 32px; font-weight: 700; }
-.mobile-clear-btn { display: none; }
+.search-tools {
+  flex: 1; min-width: 0; display: grid;
+  grid-template-columns: minmax(0,1fr) minmax(0,1fr) auto; gap: 8px; align-items: center;
+}
+.search-tools .search-wrap, .search-tools .geo-search-container { min-width: 0; max-width: none; }
+.search-tools .search-wrap input, .search-tools .geo-input-wrap { height: 34px; }
+.search-tools .geo-input-wrap { padding: 3px 4px 3px 10px; }
+.search-tools .geo-input-wrap input { flex: 1; width: 0; height: 28px; }
+.search-tools .geo-dropdown { left: auto; right: 0; width: max(100%,280px); max-width: calc(100vw - 28px); }
+.search-tools .search-icon { pointer-events: none; }
+.search-tools .search-clear-btn {
+  display: inline-flex; align-items: center; justify-content: center; height: 34px;
+  padding: 0 10px; background: #f6c244; color: #1a1a2e; border-color: #f6c244; white-space: nowrap;
+}
+.other-type-select.active { background: white; color: #0f3460; border-color: white; font-weight: 700; }
+@media (min-width: 601px) and (max-width: 900px) {
+  .header-row1 { flex-wrap: wrap; }
+  .header-row1 .search-tools { order: 3; flex-basis: 100%; }
+  .header-row1 .staff-controls { margin-left: auto; }
+}
 @media (max-width: 600px) {
   .header { position: relative; top: auto; }
   .header-row1 { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 6px; align-items: center; }
@@ -585,12 +604,10 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
   .header-row1 .staff-controls::-webkit-scrollbar { display: none; }
   .staff-nav { display: contents; }
   .staff-controls .staff-btn, .staff-nav > a { font-size: 0.58rem; padding: 3px 6px; }
-  .header-row1 .search-wrap { grid-column: 1 / -1; grid-row: 2; width: 100%; min-width: 0; }
+  .header-row1 .search-tools { grid-column: 1 / -1; grid-row: 2; width: 100%; gap: 6px; }
   .header-row2 .filter-num { flex: 1 1 100px; max-width: none; min-width: 0; }
   .header-row2 .filter-select:not(.filter-num) { flex: 1 1 100px; max-width: none; min-width: 0; }
   .header-row2 .filter-btn, .header-row2 .filter-select, .header-row2 .filter-num { min-height: 32px; }
-  .header-row2 .geo-search-container { flex: 1 1 100%; max-width: none; }
-  .header-row2 .filter-clear-btn { width: 100%; justify-content: center; }
 }
 /* บนมือถือให้แถบเครื่องมือเป็นแถวเลื่อนแนวนอน เพื่อเหลือพื้นที่ให้รายการ */
 @media (max-width: 600px) {
@@ -600,12 +617,12 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
   .header-row2 .filter-btn { flex: 0 0 auto; }
   .header-row2 .filter-num { flex: 0 0 120px; min-width: 120px; }
   .header-row2 .filter-select:not(.filter-num) { flex: 0 0 130px; min-width: 130px; }
-  .header-row2 .geo-search-container { flex: 0 0 310px; width: 310px; max-width: none; }
-  .header-row2 .filter-clear-btn { width: auto; min-width: 110px; }
-  .header-row1 .search-wrap { display: flex; align-items: center; gap: 6px; }
-  .header-row1 .search-wrap input { flex: 1 1 auto; min-width: 0; }
-  .mobile-clear-btn { display: inline-flex; flex: 0 0 auto; align-items: center; justify-content: center; min-height: 31px; padding: 0 10px; border: 1px solid rgba(255,255,255,.45); border-radius: 50px; background: #f6c244; color: #1a1a2e; font: 700 .7rem inherit; cursor: pointer; white-space: nowrap; }
-  .header-row2 .filter-clear-btn { display: none; }
+  .search-tools .search-wrap input { padding: 0 10px; font-size: 16px; }
+  .search-tools .geo-input-wrap input { font-size: 16px; }
+  .search-tools input::placeholder { font-size: 12px; }
+  .search-tools .search-icon { display: none; }
+  .search-tools .search-clear-btn { font-size: .7rem; padding: 0 8px; }
+  .header-row2 #selMin, .header-row2 #selMax { flex: 0 0 108px; min-width: 108px; }
 }
 </style>
 <link rel="stylesheet" href="photo-download.css">
@@ -616,10 +633,20 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
 <div class="header">
   <div class="header-row1">
     <div class="header-logo">🏠 The 9 Property<span>บ้านเช่า เชียงใหม่</span></div>
-    <div class="search-wrap">
-      <input type="text" id="searchInput" placeholder="ค้นหาโครงการ, ทำเล, รหัส..." oninput="applyFilters()">
-      <span class="search-icon">🔍</span>
-      <button type="button" class="mobile-clear-btn" onclick="clearAllFilters()">✕ ล้าง</button>
+    <div class="search-tools">
+      <div class="search-wrap">
+        <input type="text" id="searchInput" placeholder="หมู่บ้าน / รหัส" aria-label="ค้นหาหมู่บ้านหรือรหัสทรัพย์" title="ค้นหาหมู่บ้าน โครงการ ทำเล หรือรหัสทรัพย์" oninput="applyFilters()">
+        <span class="search-icon">🔍</span>
+      </div>
+      <div class="geo-search-container">
+        <div class="geo-input-wrap">
+          <input type="text" id="geoInput" placeholder="📍 สถานที่" aria-label="ค้นหาสถานที่หรือพิกัด" title="ค้นหาสถานที่ หรือพิกัด เช่น มช. / 18.80,99.01"
+                 oninput="onGeoInput()" onkeydown="if(event.key==='Enter') searchByLocation()">
+          <button type="button" class="geo-btn-search" id="geoBtnSearch" onclick="searchByLocation()" title="ค้นหาสถานที่" aria-label="ค้นหาสถานที่">🔍</button>
+        </div>
+        <div class="geo-dropdown" id="geoDropdown"></div>
+      </div>
+      <button type="button" class="filter-clear-btn search-clear-btn" id="btnClearFilters" onclick="clearAllFilters()" title="ล้างการค้นหาและตัวกรองทั้งหมด">✕ ล้าง</button>
     </div>
     <div class="staff-controls">
       <button class="staff-btn" id="staffBtn" onclick="staffBtnClick()">🔐 Staff</button>
@@ -635,16 +662,21 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
     </div>
   </div>
   <div class="header-row2">
+    <input type="number" class="filter-select filter-num" id="selMin" placeholder="ราคาต่ำสุด" aria-label="ราคาต่ำสุด" min="0" step="1000" inputmode="numeric" oninput="applyFilters()">
+    <input type="number" class="filter-select filter-num" id="selMax" placeholder="ราคาสูงสุด" aria-label="ราคาสูงสุด" min="0" step="1000" inputmode="numeric" oninput="applyFilters()">
     <button class="filter-btn type-btn active" data-type="all" onclick="setType('all')">ทั้งหมด</button>
     <button class="filter-btn type-btn" data-type="บ้านเดี่ยว" onclick="setType('บ้านเดี่ยว')">🏡 บ้านเดี่ยว</button>
     <button class="filter-btn type-btn" data-type="ทาวน์เฮ้าส์" onclick="setType('ทาวน์เฮ้าส์')">🏘 ทาวน์</button>
     <button class="filter-btn type-btn" data-type="คอนโด" onclick="setType('คอนโด')">🏢 คอนโด</button>
     <button class="filter-btn type-btn" data-type="พูลวิลล่า" onclick="setType('พูลวิลล่า')">🏊 พูลวิลล่า</button>
-    <button class="filter-btn type-btn" data-type="ที่ดิน" onclick="setType('ที่ดิน')">🌳 ที่ดิน</button>
-    <button class="filter-btn type-btn" data-type="อาคารพาณิชย์" onclick="setType('อาคารพาณิชย์')">🏬 อาคารพาณิชย์</button>
-    <button class="filter-btn type-btn" data-type="หอพัก" onclick="setType('หอพัก')">🏠 หอพัก</button>
-    <button class="filter-btn type-btn" data-type="สำนักงาน" onclick="setType('สำนักงาน')">🏢 สำนักงาน</button>
-    <button class="filter-btn type-btn" data-type="โกดัง" onclick="setType('โกดัง')">📦 โกดัง</button>
+    <select class="filter-select other-type-select" id="selOtherType" aria-label="ประเภททรัพย์อื่น" onchange="setOtherType(this.value)">
+      <option value="">ประเภทอื่น</option>
+      <option value="ที่ดิน">🌳 ที่ดิน</option>
+      <option value="หอพัก">🏠 หอพัก</option>
+      <option value="อาคารพาณิชย์">🏬 อาคารพาณิชย์</option>
+      <option value="โกดัง">📦 โกดัง</option>
+      <option value="สำนักงาน">🏢 สำนักงาน</option>
+    </select>
     <div class="filter-sep"></div>
     <button class="filter-btn" id="btnAgentDirect" onclick="setAgent('direct',this)">📌 ติดทรัพย์</button>
     <button class="filter-btn" id="btnAgentCo" onclick="setAgent('co',this)">🤝 Co</button>
@@ -655,8 +687,6 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
       <option value="yes">✅ รับได้</option>
       <option value="no">❌ ไม่รับ</option>
     </select>
-    <input type="number" class="filter-select filter-num" id="selMin" placeholder="ราคาต่ำสุด" min="0" step="1000" inputmode="numeric" oninput="applyFilters()">
-    <input type="number" class="filter-select filter-num" id="selMax" placeholder="ราคาสูงสุด" min="0" step="1000" inputmode="numeric" oninput="applyFilters()">
     <input type="number" class="filter-select filter-num" id="floorMin" placeholder="ชั้นต่ำสุด" min="0" step="1" inputmode="numeric" title="ชั้นต่ำสุด" oninput="applyFilters()">
     <input type="number" class="filter-select filter-num" id="floorMax" placeholder="ชั้นสูงสุด" min="0" step="1" inputmode="numeric" title="ชั้นสูงสุด" oninput="applyFilters()">
     <input type="number" class="filter-select filter-num" id="landMin" placeholder="ที่ดินต่ำ(ตรว.)" min="0" step="1" inputmode="decimal" title="ขนาดที่ดินต่ำสุด (ตร.ว.)" oninput="applyFilters()">
@@ -698,17 +728,7 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
       <option value="C">เกรด C</option><option value="D">เกรด D</option>
     </select>
     <div class="filter-sep"></div>
-    <!-- Location search shares the filter area. -->
     <a class="geo-map-btn" href="map.html" title="ดูบ้านทั้งหมดบนแผนที่">🗺️ ดูแผนที่</a>
-    <div class="geo-search-container">
-      <div class="geo-input-wrap">
-        <input type="text" id="geoInput" placeholder="📍 ค้นหาใกล้... เช่น วารีเชียงใหม่, มช., เซ็นทรัล"
-               oninput="onGeoInput()" onkeydown="if(event.key==='Enter') searchByLocation()">
-        <button class="geo-btn-search" id="geoBtnSearch" onclick="searchByLocation()" title="ค้นหา">🔍</button>
-      </div>
-      <div class="geo-dropdown" id="geoDropdown"></div>
-    </div>
-    <button type="button" class="filter-clear-btn" id="btnClearFilters" onclick="clearAllFilters()">✕ ล้างทั้งหมด</button>
   </div>
 </div>
 <!-- STATS BAR -->
@@ -904,6 +924,7 @@ function searchMatch(hay, query) {
 }
 var allData     = [];
 var activeTypes = [];      // ประเภทที่เลือก (ว่าง = ทั้งหมด) — เลือกได้หลายอันพร้อมกัน
+const OTHER_PROPERTY_TYPES = ['ที่ดิน', 'หอพัก', 'อาคารพาณิชย์', 'โกดัง', 'สำนักงาน'];
 var activeAgent = 'all';   // 'all' | 'direct' | 'co'
 // ─── GEO STATE ───────────────────────────────────────────
 var geoOrigin = null;  // { lat, lng, label } เมื่อค้นหาตามตำแหน่ง
@@ -1105,12 +1126,23 @@ function setType(val) {
   applyFilters();
 }
 // อัปเดตไฮไลต์ปุ่มประเภทให้ตรงกับ activeTypes
+function setOtherType(val) {
+  activeTypes = activeTypes.filter(function(t) { return OTHER_PROPERTY_TYPES.indexOf(t) === -1; });
+  if (OTHER_PROPERTY_TYPES.indexOf(val) !== -1) activeTypes.push(val);
+  refreshTypeButtons();
+  applyFilters();
+}
 function refreshTypeButtons() {
   document.querySelectorAll('.type-btn').forEach(function(b) {
     var t = b.getAttribute('data-type');
     var on = (t === 'all') ? (activeTypes.length === 0) : (activeTypes.indexOf(t) !== -1);
     b.classList.toggle('active', on);
   });
+  var other = document.getElementById('selOtherType');
+  if (other) {
+    other.value = activeTypes.find(function(t) { return OTHER_PROPERTY_TYPES.indexOf(t) !== -1; }) || '';
+    other.classList.toggle('active', other.value !== '');
+  }
 }
 // ปุ่ม "ติดทรัพย์ / Co" — toggle: คลิกซ้ำ = ปิด กลับไป 'all'
 function setAgent(val, btn) {
