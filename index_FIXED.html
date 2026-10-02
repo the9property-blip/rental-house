@@ -247,18 +247,22 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
   animation: spin 0.8s linear infinite; margin: 0 auto 16px;
 }
 /* ─── DETAIL MODAL ─── */
+/* Keep the dialog inside the visible viewport, including browser bars and safe areas. */
 .modal-overlay {
   display: none; position: fixed; inset: 0;
+  height: 100%; height: 100dvh; box-sizing: border-box;
   background: rgba(0,0,0,0.55); z-index: 1000;
-  align-items: center; justify-content: center; padding: 12px;
-  overflow-y: auto;
+  align-items: center; justify-content: center;
+  padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right))
+           max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+  overflow: hidden;
 }
 .modal-overlay.open { display: flex; }
 .modal {
   background: white; border-radius: 20px;
   max-width: 480px; width: 100%;
   animation: slideUp 0.24s ease;
-  max-height: calc(100vh - 24px);
+  max-height: 100%; min-height: 0; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
   overflow-y: auto;
   position: relative;
 }
@@ -283,12 +287,17 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
   font-size: 0.7rem; padding: 4px 10px; border-radius: 50px;
   font-weight: 700; border: 1px solid;
 }
+.modal-closebar {
+  position: sticky; top: 0; z-index: 10; background: #fff;
+  display: flex; align-items: center; justify-content: space-between;
+  min-height: 56px; padding: 6px 12px; border-bottom: 1px solid #eee;
+  color: #1a1a2e; font-size: 0.9rem; font-weight: 700;
+}
 .modal-close {
-  position: absolute; top: 12px; right: 12px; z-index: 10;
-  background: rgba(0,0,0,0.45); border: none; color: white;
-  width: 32px; height: 32px; border-radius: 50%; cursor: pointer;
-  font-size: 1rem; display: flex; align-items: center; justify-content: center;
-  backdrop-filter: blur(4px);
+  flex: 0 0 44px; width: 44px; height: 44px; border-radius: 50%;
+  background: #f0f2f5; border: none; color: #1a1a2e; cursor: pointer;
+  font-size: 1.2rem; display: flex; align-items: center; justify-content: center;
+  touch-action: manipulation;
 }
 .modal-info { padding: 16px 20px 6px; }
 .modal-title { font-size: 1.1rem; font-weight: 800; color: #1a1a2e; margin-bottom: 3px; }
@@ -368,14 +377,6 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
   display: flex; align-items: center; justify-content: center;
 }
 .geo-btn-search:disabled { opacity: 0.5; cursor: wait; }
-.geo-chip {
-  flex-shrink: 0; padding: 4px 11px; border-radius: 50px;
-  border: 1.5px solid rgba(255,255,255,0.35);
-  background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.9);
-  font-size: 0.72rem; cursor: pointer; transition: all 0.2s;
-  font-family: inherit; white-space: nowrap;
-}
-.geo-chip:hover { background: rgba(255,255,255,0.18); }
 .geo-map-btn {
   flex-shrink: 0; padding: 6px 14px; border-radius: 50px;
   background: linear-gradient(135deg, #2563eb, #0f3460);
@@ -385,10 +386,6 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
   box-shadow: 0 2px 9px rgba(37,99,235,0.45);
 }
 .geo-map-btn:hover { filter: brightness(1.13); }
-.geo-chip-label {
-  flex-shrink: 0; font-size: 0.7rem; color: rgba(255,255,255,0.55);
-  white-space: nowrap; padding-right: 2px;
-}
 .geo-dropdown {
   position: absolute; top: 100%; left: 0; min-width: 280px;
   background: white; border-radius: 12px;
@@ -459,8 +456,9 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
 .staff-btn:hover { background: rgba(255,255,255,0.25); }
 .staff-btn.logged-in { background: #f6c244; color: #1a1a2e; border-color: #f6c244; font-weight: 700; }
 
-/* Wrapper ที่ทำให้ Staff button + Schedule button stack แนวตั้ง */
-.staff-controls { display: flex; flex-direction: column; gap: 6px; align-items: stretch; flex-shrink: 0; }
+/* กลุ่มลิงก์ทีมงานอยู่ใต้ปุ่ม Staff เพื่อไม่กินความสูงของส่วนหัว */
+.staff-controls { display: flex; flex-direction: column; gap: 5px; align-items: flex-end; flex-shrink: 0; }
+.staff-nav { display: flex; align-items: center; justify-content: flex-end; gap: 5px; }
 .sale-link-btn {
   background: linear-gradient(135deg, #c0392b, #962d22);
   color: white; border: 1.5px solid rgba(255,255,255,0.3);
@@ -560,7 +558,43 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
 .btn-caption-copy{font-size:0.72rem;font-weight:700;padding:4px 10px;border:none;border-radius:7px;background:#0f3460;color:#fff;cursor:pointer;font-family:inherit;flex:none}
 .btn-caption-copy:active{transform:scale(0.96)}
 .caption-text{max-height:120px;overflow:auto;font-size:11px;line-height:1.5;white-space:pre-wrap;word-break:break-word;background:#fffdf5;border:1px solid #eadba0;border-radius:8px;padding:8px;margin:0;color:#333;font-family:inherit}
+
+/* Keep every search/filter control within the header width. */
+.header-row2 { flex-wrap: wrap; overflow: visible; gap: 7px; }
+.header-row2 .filter-sep { display: none; }
+.geo-search-container { flex: 1 1 260px; min-width: 0; max-width: 460px; }
+.geo-input-wrap { width: 100%; min-width: 0; }
+.geo-input-wrap input { min-width: 0; width: 100%; }
+.geo-dropdown { width: 100%; min-width: 0; }
+.filter-clear-btn { min-height: 32px; font-weight: 700; }
+@media (max-width: 600px) {
+  .header { position: relative; top: auto; }
+  .header-row1 { flex-wrap: wrap; }
+  .header-row1 .staff-controls { order: 2; flex: 1 0 100%; align-items: stretch; }
+  .staff-controls .staff-btn { align-self: flex-end; }
+  .staff-nav { width: 100%; justify-content: stretch; }
+  .staff-nav > a { flex: 0 1 auto; min-width: 0; padding-left: 6px; padding-right: 6px; }
+  .header-row1 .search-wrap { order: 3; flex: 1 0 100%; min-width: 0; }
+  .header-row2 .filter-num { flex: 1 1 100px; max-width: none; min-width: 0; }
+  .header-row2 .filter-select:not(.filter-num) { flex: 1 1 100px; max-width: none; min-width: 0; }
+  .header-row2 .filter-btn, .header-row2 .filter-select, .header-row2 .filter-num { min-height: 32px; }
+  .header-row2 .geo-search-container { flex: 1 1 100%; max-width: none; }
+  .header-row2 .filter-clear-btn { width: 100%; justify-content: center; }
+}
+/* บนมือถือให้แถบเครื่องมือเป็นแถวเลื่อนแนวนอน เพื่อเหลือพื้นที่ให้รายการ */
+@media (max-width: 600px) {
+  .header-row2 { flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; gap: 7px; padding-bottom: 0; scrollbar-width: none; }
+  .header-row2::-webkit-scrollbar { display: none; }
+  .header-row2 > * { flex-shrink: 0; }
+  .header-row2 .filter-btn { flex: 0 0 auto; }
+  .header-row2 .filter-num { flex: 0 0 120px; min-width: 120px; }
+  .header-row2 .filter-select:not(.filter-num) { flex: 0 0 130px; min-width: 130px; }
+  .header-row2 .geo-search-container { flex: 0 0 310px; width: 310px; max-width: none; }
+  .header-row2 .filter-clear-btn { width: auto; min-width: 110px; }
+}
 </style>
+<link rel="stylesheet" href="photo-download.css">
+<script src="photo-download.js"></script>
 </head>
 <body>
 <!-- HEADER -->
@@ -573,13 +607,15 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
     </div>
     <div class="staff-controls">
       <button class="staff-btn" id="staffBtn" onclick="staffBtnClick()">🔐 Staff</button>
-      <a class="sale-link-btn" href="https://the9property-blip.github.io/SaelProperty/" target="_blank" rel="noopener" title="ไปยังเว็บทรัพย์ขาย">🏷️ ทรัพย์ขาย</a>
-      <a class="schedule-btn" id="scheduleBtn"
-         href="https://the9property-blip.github.io/property-posting-schedule/"
-         target="_blank" rel="noopener">📋 ตารางโพสทรัพย์</a>
-      <a class="customer-btn" id="customerBtn"
-         href="https://the9property-blip.github.io/costumer-rent/"
-         target="_blank" rel="noopener">👥 ลูกค้าหาเช่า</a>
+      <div class="staff-nav">
+        <a class="sale-link-btn" href="https://the9property-blip.github.io/SaelProperty/" target="_blank" rel="noopener" title="ไปยังเว็บทรัพย์ขาย">🏷️ ทรัพย์ขาย</a>
+        <a class="schedule-btn" id="scheduleBtn"
+           href="https://the9property-blip.github.io/property-posting-schedule/"
+           target="_blank" rel="noopener">📋 ตารางโพสทรัพย์</a>
+        <a class="customer-btn" id="customerBtn"
+           href="https://the9property-blip.github.io/costumer-rent/"
+           target="_blank" rel="noopener">👥 ลูกค้าหาเช่า</a>
+      </div>
     </div>
   </div>
   <div class="header-row2">
@@ -598,7 +634,14 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
       <option value="yes">✅ รับได้</option>
       <option value="no">❌ ไม่รับ</option>
     </select>
-    
+    <input type="number" class="filter-select filter-num" id="selMin" placeholder="ราคาต่ำสุด" min="0" step="1000" inputmode="numeric" oninput="applyFilters()">
+    <input type="number" class="filter-select filter-num" id="selMax" placeholder="ราคาสูงสุด" min="0" step="1000" inputmode="numeric" oninput="applyFilters()">
+    <input type="number" class="filter-select filter-num" id="floorMin" placeholder="ชั้นต่ำสุด" min="0" step="1" inputmode="numeric" title="ชั้นต่ำสุด" oninput="applyFilters()">
+    <input type="number" class="filter-select filter-num" id="floorMax" placeholder="ชั้นสูงสุด" min="0" step="1" inputmode="numeric" title="ชั้นสูงสุด" oninput="applyFilters()">
+    <input type="number" class="filter-select filter-num" id="landMin" placeholder="ที่ดินต่ำ(ตรว.)" min="0" step="1" inputmode="decimal" title="ขนาดที่ดินต่ำสุด (ตร.ว.)" oninput="applyFilters()">
+    <input type="number" class="filter-select filter-num" id="landMax" placeholder="ที่ดินสูง(ตรว.)" min="0" step="1" inputmode="decimal" title="ขนาดที่ดินสูงสุด (ตร.ว.)" oninput="applyFilters()">
+    <input type="number" class="filter-select filter-num" id="usableMin" placeholder="ใช้สอยต่ำ(ตรม.)" min="0" step="1" inputmode="decimal" title="พื้นที่ใช้สอยต่ำสุด (ตร.ม.)" oninput="applyFilters()">
+    <input type="number" class="filter-select filter-num" id="usableMax" placeholder="ใช้สอยสูง(ตรม.)" min="0" step="1" inputmode="decimal" title="พื้นที่ใช้สอยสูงสุด (ตร.ม.)" oninput="applyFilters()">
     <select class="filter-select" id="selBed" onchange="applyFilters()">
       <option value="all">🛏 ทุกขนาด</option>
       <option value="1">1 นอน</option>
@@ -629,28 +672,17 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
       <option value="soon">📅 ประกาศล่วงหน้า</option>
     </select>
     <div class="filter-sep"></div>
-    <button class="filter-clear-btn" id="btnClearFilters" onclick="clearAllFilters()">✕ ล้างตัวกรอง</button>
-  </div>
-  <!-- GEO ROW: ค้นหาตำแหน่งใกล้เคียง -->
-  <div class="geo-row">
+    <!-- Location search shares the filter area. -->
     <a class="geo-map-btn" href="map.html" title="ดูบ้านทั้งหมดบนแผนที่">🗺️ ดูแผนที่</a>
     <div class="geo-search-container">
       <div class="geo-input-wrap">
         <input type="text" id="geoInput" placeholder="📍 ค้นหาใกล้... เช่น วารีเชียงใหม่, มช., เซ็นทรัล"
-               onkeydown="if(event.key==='Enter') searchByLocation()">
+               oninput="onGeoInput()" onkeydown="if(event.key==='Enter') searchByLocation()">
         <button class="geo-btn-search" id="geoBtnSearch" onclick="searchByLocation()" title="ค้นหา">🔍</button>
       </div>
       <div class="geo-dropdown" id="geoDropdown"></div>
     </div>
-    <span class="geo-chip-label">ลัด:</span>
-    <input type="number" class="filter-select filter-num" id="selMin" placeholder="ราคาต่ำสุด" min="0" step="1000" inputmode="numeric" oninput="applyFilters()">
-    <input type="number" class="filter-select filter-num" id="selMax" placeholder="ราคาสูงสุด" min="0" step="1000" inputmode="numeric" oninput="applyFilters()">
-    <input type="number" class="filter-select filter-num" id="floorMin" placeholder="ชั้นต่ำสุด" min="0" step="1" inputmode="numeric" title="ชั้นต่ำสุด" oninput="applyFilters()">
-    <input type="number" class="filter-select filter-num" id="floorMax" placeholder="ชั้นสูงสุด" min="0" step="1" inputmode="numeric" title="ชั้นสูงสุด" oninput="applyFilters()">
-    <input type="number" class="filter-select filter-num" id="landMin" placeholder="ที่ดินต่ำ(ตรว.)" min="0" step="1" inputmode="decimal" title="ขนาดที่ดินต่ำสุด (ตร.ว.)" oninput="applyFilters()">
-    <input type="number" class="filter-select filter-num" id="landMax" placeholder="ที่ดินสูง(ตรว.)" min="0" step="1" inputmode="decimal" title="ขนาดที่ดินสูงสุด (ตร.ว.)" oninput="applyFilters()">
-    <input type="number" class="filter-select filter-num" id="usableMin" placeholder="ใช้สอยต่ำ(ตรม.)" min="0" step="1" inputmode="decimal" title="พื้นที่ใช้สอยต่ำสุด (ตร.ม.)" oninput="applyFilters()">
-    <input type="number" class="filter-select filter-num" id="usableMax" placeholder="ใช้สอยสูง(ตรม.)" min="0" step="1" inputmode="decimal" title="พื้นที่ใช้สอยสูงสุด (ตร.ม.)" oninput="applyFilters()">
+    <button type="button" class="filter-clear-btn" id="btnClearFilters" onclick="clearAllFilters()">✕ ล้างทั้งหมด</button>
   </div>
 </div>
 <!-- STATS BAR -->
@@ -688,11 +720,11 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
 </div>
 <!-- DETAIL MODAL -->
 <div class="modal-overlay" id="detailOverlay" onclick="if(event.target===this)closeDetail()">
-  <div class="modal">
+  <div class="modal" role="dialog" aria-modal="true" aria-label="รายละเอียดทรัพย์">
+    <div class="modal-closebar"><span>รายละเอียดทรัพย์</span><button type="button" class="modal-close" aria-label="ปิดรายละเอียด" onclick="closeDetail()">✕</button></div>
     <div class="modal-photo" id="dPhoto">
       <div class="modal-photo-placeholder"><span class="ph-icon">🏠</span><span>ไม่มีรูปภาพ</span></div>
     </div>
-    <button class="modal-close" onclick="closeDetail()">✕</button>
     <div class="modal-info">
       <div class="modal-title" id="dProject"></div>
       <div class="modal-sub"   id="dSub"></div>
@@ -721,6 +753,7 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
         <a id="dCallOwner" href="#">📞 โทรเจ้าของ</a>
         <a id="dMapsLink" class="maps" href="#" target="_blank" rel="noopener">🗺 ดูใน Maps</a>
       </div>
+      <div id="dPhotoDownload"></div>
       <div class="caption-block" id="dCaptionBlock" style="display:none;">
         <div class="caption-head"><span class="lbl">ข้อความประกาศ</span>
           <button type="button" class="btn-caption-copy" onclick="copyCaption()">📋 คัดลอกทั้งหมด</button></div>
@@ -874,6 +907,7 @@ function staffBtnClick() {
   if (isStaffLoggedIn()) {
     if (confirm('ออกจากระบบทีมงาน?')) {
       try { sessionStorage.removeItem('staff_token'); } catch(e) {}
+      PropertyPhotos.reset();
       updateStaffBtn();
       loadData(true);
       showToast('👋 ออกจากระบบแล้ว');
@@ -888,7 +922,8 @@ function openStaffModal() {
   document.getElementById('staffLoginModal').classList.add('open');
   setTimeout(function() { document.getElementById('staffPasswordInput').focus(); }, 50);
 }
-function closeStaffModal() {
+function closeStaffModal(keepDownload) {
+  if (!keepDownload) PropertyPhotos.cancelLogin();
   document.getElementById('staffLoginModal').classList.remove('open');
 }
 function doStaffLogin() {
@@ -901,11 +936,12 @@ function doStaffLogin() {
     .then(function(r) { return r.json(); })
     .then(function(json) {
       if (json.staff === true) {
-        closeStaffModal();
+        closeStaffModal(true);
         updateStaffBtn();
         allData = json.data || [];
         applyFilters();
         showToast('✅ เข้าสู่ระบบสำเร็จ');
+        PropertyPhotos.onLogin();
       } else {
         try { sessionStorage.removeItem('staff_token'); } catch(e) {}
         document.getElementById('staffLoginErr').textContent = '❌ รหัสผ่านไม่ถูกต้อง';
@@ -1024,6 +1060,9 @@ function clearAllFilters() {
   document.getElementById('selStatus').value = 'all';
   // Clear search
   document.getElementById('searchInput').value = '';
+  clearGeoSearch(true);
+  try { localStorage.removeItem(GEO_CACHE_KEY); } catch(e) {}
+  document.getElementById('selSort').value = 'price_asc';
   applyFilters();
 }
 // ปุ่มประเภท — เลือกพร้อมกันได้หลายอัน; "ทั้งหมด" = ล้างการเลือก
@@ -1142,6 +1181,9 @@ function applyFilters() {
   showGrid(filtered);
   document.getElementById('countDisplay').textContent = filtered.length;
   // แสดงปุ่มล้างตัวกรองเมื่อมีการกรองอยู่
+  updateClearButton();
+}
+function updateClearButton() {
   var hasFilter = activeTypes.length > 0
     || activeAgent !== 'all'
     || document.getElementById('selPet').value !== 'all'
@@ -1156,7 +1198,10 @@ function applyFilters() {
     || document.getElementById('selBed').value !== 'all'
     || document.getElementById('selBath').value !== 'all'
     || document.getElementById('selStatus').value !== 'all'
-    || document.getElementById('searchInput').value.trim() !== '';
+    || document.getElementById('searchInput').value !== ''
+    || document.getElementById('geoInput').value !== ''
+    || !!geoOrigin
+    || document.getElementById('selSort').value !== 'price_asc';
   var btnClear = document.getElementById('btnClearFilters');
   if (btnClear) btnClear.classList.toggle('visible', hasFilter);
 }
@@ -1287,6 +1332,7 @@ function showError(msg) {
 }
 // ─── DETAIL MODAL ─────────────────────────────────────────
 function openDetail(p) {
+  PropertyPhotos.setDetail(p.code);
   var photoEl = document.getElementById('dPhoto');
   if (p.thumb) {
     // ★ FIX: ใช้ lh3.googleusercontent.com + fallback
@@ -1324,7 +1370,7 @@ function openDetail(p) {
   }
   // ★ STAFF SECTION — แสดงเฉพาะเมื่อ login + มีข้อมูลส่งมาจาก server
   var staffSec = document.getElementById('dStaffSection');
-  if (isStaffLoggedIn() && (p.ownerName || p.ownerTel || p.facebook)) {
+  if (isStaffLoggedIn()) {
     document.getElementById('dOwnerName').textContent = p.ownerName || '–';
     var tel = (p.ownerTel || '').replace(/\s+/g, '');
     document.getElementById('dOwnerTel').textContent = p.ownerTel || '–';
@@ -1756,11 +1802,24 @@ function fmtDist(km) {
   if (km < 10) return km.toFixed(1) + ' กม.';
   return Math.round(km) + ' กม.';
 }
-function quickGeo(q) {
-  document.getElementById('geoInput').value = q;
-  searchByLocation();
+var geoSearchVersion = 0;
+var geoSearchController = null;
+function cancelGeoRequest() {
+  geoSearchVersion++;
+  if (geoSearchController) geoSearchController.abort();
+  geoSearchController = null;
+  var btn = document.getElementById('geoBtnSearch');
+  if (btn) btn.disabled = false;
+  var dd = document.getElementById('geoDropdown');
+  if (dd) { dd.classList.remove('open'); dd.innerHTML = ''; }
+}
+function onGeoInput() {
+  cancelGeoRequest();
+  updateClearButton();
 }
 function searchByLocation() {
+  cancelGeoRequest();
+  var requestVersion = geoSearchVersion;
   var rawQ = document.getElementById('geoInput').value.trim();
   if (!rawQ) { showToast('กรุณาพิมพ์สถานที่ที่ต้องการค้นหา'); return; }
   // ★ ขยายคำย่อก่อน เช่น "เซ็นเฟส" → "เซ็นทรัล เฟสติวัล เชียงใหม่"
@@ -1803,9 +1862,12 @@ function searchByLocation() {
           + '&viewbox=' + viewbox
           + '&bounded=0'
           + '&accept-language=th';
-  fetch(url, { headers: { 'Accept-Language': 'th' } })
+  geoSearchController = new AbortController();
+  fetch(url, { headers: { 'Accept-Language': 'th' }, signal: geoSearchController.signal })
     .then(function(r) { return r.json(); })
     .then(function(results) {
+      if (requestVersion !== geoSearchVersion) return;
+      geoSearchController = null;
       btn.disabled = false;
       if (Array.isArray(results) && results.length > 0) {
         geoCacheSet(q, results);  // เก็บ cache
@@ -1813,6 +1875,8 @@ function searchByLocation() {
       _renderGeoResults(results, q, dd, aliasUsed ? rawQ : null);
     })
     .catch(function(err) {
+      if (requestVersion !== geoSearchVersion) return;
+      geoSearchController = null;
       btn.disabled = false;
       dd.innerHTML = '<div class="geo-dropdown-empty">' +
         '⚠️ เชื่อมต่อบริการค้นหาไม่ได้<br>' +
@@ -1825,7 +1889,7 @@ function _renderGeoResults(results, q, dd, originalQuery) {
   if (!Array.isArray(results) || results.length === 0) {
     dd.innerHTML = '<div class="geo-dropdown-empty">' +
       '😕 ไม่พบสถานที่ "' + escapeHtml(originalQuery || q) + '"<br>' +
-      '<small style="color:#aaa;font-size:0.78rem;">ลองพิมพ์ชื่อเต็ม หรือกด chip ลัดด้านล่าง</small>' +
+      '<small style="color:#aaa;font-size:0.78rem;">ลองพิมพ์ชื่อสถานที่ให้ชัดเจนขึ้น</small>' +
     '</div>';
     return;
   }
@@ -1870,7 +1934,8 @@ function applyGeoOrigin(r) {
 }
 
 // ล้าง geo search → กลับไป sort ปกติ
-function clearGeoSearch() {
+function clearGeoSearch(skipApply) {
+  cancelGeoRequest();
   geoOrigin = null;
   var pill = document.getElementById('geoActivePill');
   if (pill) pill.classList.remove('visible');
@@ -1878,7 +1943,8 @@ function clearGeoSearch() {
   if (sortSel) sortSel.disabled = false;
   var geoInput = document.getElementById('geoInput');
   if (geoInput) geoInput.value = '';
-  applyFilters();
+  if (!skipApply) applyFilters();
+  document.getElementById('geoActiveText').textContent = '';
 }
 
 // HTML escape ขั้นพื้นฐาน
@@ -1888,6 +1954,16 @@ function escapeHtml(s) {
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
+</script>
+<script>
+PropertyPhotos.configure({
+  endpoint: SCRIPT_URL, getToken: getStaffToken, requestLogin: openStaffModal,
+  onUnauthorized: function() {
+    try { sessionStorage.removeItem('staff_token'); } catch(e) {}
+    updateStaffBtn();
+    loadData(false);
+  }
+});
 </script>
 </body>
 </html>
