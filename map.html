@@ -20,6 +20,7 @@
 <!-- Leaflet -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
       integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; overflow: hidden; }
@@ -48,7 +49,7 @@ body {
   width: 100%; padding: 7px 32px 7px 13px; border-radius: 50px; border: none;
   font-size: 0.82rem; outline: none; font-family: inherit; background: rgba(255,255,255,0.96); color: #333;
 }
-.search-icon { position: absolute; right: 11px; top: 50%; transform: translateY(-50%); opacity: 0.4; font-size: 0.82rem; }
+.search-icon { position: absolute; right: 11px; top: 50%; transform: translateY(-50%); opacity: 0.4; font-size: 0.82rem; pointer-events: none; }
 .header-row2 {
   display: flex; align-items: center; gap: 5px; margin-top: 7px;
   overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none;
@@ -192,6 +193,16 @@ body {
 }
 .fab:active { transform: scale(0.92); }
 /* ─── PRICE MARKER ─── */
+.property-cluster { background: transparent; border: 0; }
+.pc-inner {
+  width: 100%; height: 100%; border-radius: 50%; border: 3px solid white;
+  background: #0f3460; color: white; box-shadow: 0 3px 12px rgba(15,52,96,.35);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  cursor: pointer; user-select: none;
+}
+.pc-inner strong { font-size: 16px; line-height: 1.1; }
+.pc-inner span { font-size: 10px; line-height: 1.2; }
+.property-cluster:focus-visible .pc-inner { outline: 3px solid #ffc83d; }
 .pm-icon { width: 0; height: 0; }
 .pm-inner {
   position: absolute; left: 0; top: 0; transform: translate(-50%, -100%);
@@ -553,6 +564,7 @@ body {
   .header-row2 .filter-clear-btn { width: auto; min-width: 110px; }
   .header-row1 .search-wrap { display: flex; align-items: center; gap: 6px; }
   .header-row1 .search-wrap input { flex: 1 1 auto; min-width: 0; }
+  .header-row1 .search-icon { display: none; }
   .mobile-clear-btn { display: inline-flex; flex: 0 0 auto; align-items: center; justify-content: center; min-height: 31px; padding: 0 10px; border: 1px solid rgba(255,255,255,.45); border-radius: 50px; background: #f6c244; color: #1a1a2e; font: 700 .7rem inherit; cursor: pointer; white-space: nowrap; }
   .header-row2 .filter-clear-btn { display: none; }
 }
@@ -745,11 +757,14 @@ body {
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 <script>
 const BROKER_PHONE = '0809945497';
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxu4qqxY58PGGIRBIfLWkCwj9TMIUdCB3DWg7xT2setU60hQsjDwisCplNVpka9UW-zFg/exec';
-// Bounding box เชียงใหม่/ภาคเหนือ — กรองพิกัดผิด (เหมือน AddLatLngScript.gs)
+// ขอบเขตสถานที่สำคัญในเชียงใหม่ และขอบเขตแผนที่ประเทศไทย
 const BOUNDS = { latMin: 17.5, latMax: 20.5, lngMin: 97.5, lngMax: 100.5 };
+const THAILAND_BOUNDS = { latMin: 5.5, latMax: 20.6, lngMin: 97.3, lngMax: 105.7 };
+const PRICE_ZOOM = 15;
 const CM_CENTER = [18.79, 98.98];
 
 // รูปภาพจาก Google Drive (เหมือนหน้า catalog)
@@ -904,14 +919,15 @@ function escapeHtml(s) {
 }
 function validCoord(p) {
   return typeof p.lat === 'number' && typeof p.lng === 'number' &&
-    p.lat >= BOUNDS.latMin && p.lat <= BOUNDS.latMax &&
-    p.lng >= BOUNDS.lngMin && p.lng <= BOUNDS.lngMax;
+    p.lat >= THAILAND_BOUNDS.latMin && p.lat <= THAILAND_BOUNDS.latMax &&
+    p.lng >= THAILAND_BOUNDS.lngMin && p.lng <= THAILAND_BOUNDS.lngMax;
 }
 
 // ════════════════════════════════════════════════════════════
 //  STATE
 // ════════════════════════════════════════════════════════════
 var map, propLayer, lmLayer;
+var priceMarkersShown = false;
 var allData = [];        // ทั้งหมดจาก API
 var entries = [];        // { p, latShown, lngShown, marker, visible }
 var byCode = {};         // code -> entry
@@ -945,17 +961,57 @@ var placeMarker = null;  // หมุดสถานที่ที่ค้น�
 //  INIT MAP
 // ════════════════════════════════════════════════════════════
 function initMap() {
-  map = L.map('map', { zoomControl: true, attributionControl: true, tap: true }).setView(CM_CENTER, 12);
-  // CARTO Voyager — โทนสว่างคล้าย Google Maps
+  var thailand = L.latLngBounds(
+    [THAILAND_BOUNDS.latMin, THAILAND_BOUNDS.lngMin],
+    [THAILAND_BOUNDS.latMax, THAILAND_BOUNDS.lngMax]
+  );
+  map = L.map('map', {
+    zoomControl: true, attributionControl: true,
+    minZoom: 6, maxZoom: 19, maxBounds: thailand, maxBoundsViscosity: 1,
+    bounceAtZoomLimits: false
+  }).setView(CM_CENTER, 12);
+  // โหลดเฉพาะ tile ในกรอบประเทศไทย และรอให้เลื่อน/ซูมเสร็จก่อนโหลด
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  maxZoom: 19,
-  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    minZoom: 6, maxZoom: 19, bounds: thailand, noWrap: true,
+    updateWhenIdle: true, updateWhenZooming: false, keepBuffer: 1,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
   }).addTo(map);
   map.zoomControl.setPosition('topright');
-  propLayer = L.layerGroup().addTo(map);
+  propLayer = L.markerClusterGroup({
+    disableClusteringAtZoom: PRICE_ZOOM, maxClusterRadius: 80,
+    showCoverageOnHover: false, spiderfyOnMaxZoom: false,
+    removeOutsideVisibleBounds: true, animate: false,
+    iconCreateFunction: function(cluster) { return propertyCountIcon(cluster.getChildCount()); }
+  }).addTo(map);
   lmLayer = L.layerGroup().addTo(map);
+  map.on('zoomend', updatePriceMarkers);
   // ปิด popup → ล้าง selection ของการ์ด
   map.on('popupclose', function() { /* คงการไฮไลต์การ์ดไว้ */ });
+}
+
+function propertyCountIcon(count) {
+  var size = count >= 100 ? 56 : 46;
+  return L.divIcon({
+    className: 'property-cluster',
+    html: '<div class="pc-inner"><strong>' + count + '</strong><span>ทรัพย์</span></div>',
+    iconSize: [size, size], iconAnchor: [size / 2, size / 2]
+  });
+}
+function updatePriceMarkers() {
+  var showPrices = map.getZoom() >= PRICE_ZOOM;
+  if (showPrices === priceMarkersShown) return;
+  priceMarkersShown = showPrices;
+  if (!showPrices) map.closePopup();
+  entries.forEach(function(e) {
+    e.marker.setIcon(showPrices ? e.priceIcon : e.countIcon);
+  });
+}
+function openEntryPopup(e) {
+  // สร้างรายละเอียดและโหลดรูปเฉพาะทรัพย์ที่ผู้ใช้เปิด
+  map.openPopup(buildPopup(e.p), e.marker.getLatLng(), {
+    maxWidth: 240, minWidth: 222, closeButton: true, className: 'prop-popup',
+    autoPanPadding: [24, 90], offset: [0, -8]
+  });
 }
 
 // ════════════════════════════════════════════════════════════
@@ -983,6 +1039,9 @@ function loadData() {
 
 // สร้าง entries + กระจาย marker ที่พิกัดซ้ำกัน (spiral) ให้กดได้ทุกอัน
 function buildEntries(list) {
+  map.closePopup();
+  propLayer.clearLayers();
+  priceMarkersShown = map.getZoom() >= PRICE_ZOOM;
   var groups = {};
   noCoordCount = 0;
   list.forEach(function(p) {
@@ -1015,15 +1074,24 @@ function buildEntries(list) {
       html: '<div class="pm-inner ' + (p.ready ? 'pm-ready' : 'pm-soon') + '"><span>' + priceLabel(p) + '</span></div>',
       iconSize: [0, 0], iconAnchor: [0, 0]
     });
-    var m = L.marker([e.latShown, e.lngShown], { icon: icon, riseOnHover: true });
-    m.bindPopup(buildPopup(p), { maxWidth: 240, minWidth: 222, closeButton: true, className: 'prop-popup', autoPanPadding: [24, 90], offset: [0, -8] });
-    m.on('click', function() { onMarkerClick(p.code); });
+    e.priceIcon = icon;
+    e.countIcon = propertyCountIcon(1);
+    var m = L.marker([e.latShown, e.lngShown], {
+      icon: priceMarkersShown ? icon : e.countIcon, riseOnHover: true,
+      title: (p.project || p.code || 'ทรัพย์') + ' — แตะเพื่อดูราคา'
+    });
+    m.on('click', function() {
+      if (map.getZoom() < PRICE_ZOOM) { focusMarker(p.code); return; }
+      openEntryPopup(e);
+      onMarkerClick(p.code);
+    });
     e.marker = m;
   });
 }
 
 // สถานที่สำคัญ
 function buildLandmarks() {
+  lmLayer.clearLayers();
   Object.keys(GEO_KNOWN_PLACES).forEach(function(key) {
     var pl = GEO_KNOWN_PLACES[key];
     if (pl.lat < BOUNDS.latMin || pl.lat > BOUNDS.latMax || pl.lng < BOUNDS.lngMin || pl.lng > BOUNDS.lngMax) return;
@@ -1293,13 +1361,15 @@ function passFilter(p) {
   return true;
 }
 function applyFilters() {
-  var shown = [];
+  var shown = [], add = [], remove = [];
   entries.forEach(function(e) {
     var ok = passFilter(e.p);
-    if (ok && !e.visible) { propLayer.addLayer(e.marker); e.visible = true; }
-    else if (!ok && e.visible) { propLayer.removeLayer(e.marker); e.visible = false; }
+    if (ok && !e.visible) { add.push(e.marker); e.visible = true; }
+    else if (!ok && e.visible) { remove.push(e.marker); e.visible = false; }
     if (ok) shown.push(e);
   });
+  if (remove.length) propLayer.removeLayers(remove);
+  if (add.length) propLayer.addLayers(add);
   if (geoPlace) {
     // มีสถานที่ค้นหา → คำนวณระยะ แล้วเรียงพร้อมก่อน → ใกล้→ไกล
     shown.forEach(function(e) { e.p._dist = haversineKm(geoPlace.lat, geoPlace.lng, e.p.lat, e.p.lng); });
@@ -1381,10 +1451,12 @@ function focusMarker(code) {
   var needMove = !map.getCenter().equals(target, 1e-5) || map.getZoom() !== targetZoom;
   if (needMove) {
     // เปิด popup หลังกล้องเคลื่อนจบ เพื่อให้ autoPan วาง popup ในจอถูกต้อง
-    map.once('moveend', function() { e.marker.openPopup(); bounceMarker(code); });
+    map.once('moveend', function() {
+      propLayer.zoomToShowLayer(e.marker, function() { openEntryPopup(e); bounceMarker(code); });
+    });
     map.flyTo(target, targetZoom, { duration: 0.6 });
   } else {
-    e.marker.openPopup();
+    openEntryPopup(e);
     bounceMarker(code);
   }
 }
@@ -1761,6 +1833,7 @@ function _renderGeoResults(results, q, dd, originalQuery) {
 function applyGeoOrigin(r) {
   var lat = parseFloat(r.lat), lng = parseFloat(r.lon || r.lng);
   if (isNaN(lat) || isNaN(lng)) { showToast('⚠️ ไม่พบพิกัด'); return; }
+  if (!validCoord({ lat: lat, lng: lng })) { showToast('⚠️ แผนที่รองรับเฉพาะพื้นที่ประเทศไทย'); return; }
   var full = r._label || r.display_name || (lat.toFixed(4) + ',' + lng.toFixed(4));
   var label = full.split(',')[0].trim();
   geoPlace = { lat: lat, lng: lng, label: label };
@@ -1812,6 +1885,7 @@ function locateMe() {
   showToast('📍 กำลังหาตำแหน่ง…');
   navigator.geolocation.getCurrentPosition(function(pos) {
     var ll = [pos.coords.latitude, pos.coords.longitude];
+    if (!validCoord({ lat: ll[0], lng: ll[1] })) { showToast('⚠️ ตำแหน่งอยู่นอกขอบเขตแผนที่ประเทศไทย'); return; }
     if (meMarker) map.removeLayer(meMarker);
     meMarker = L.circleMarker(ll, { radius: 9, color: '#fff', weight: 3, fillColor: '#2563eb', fillOpacity: 1 }).addTo(map);
     map.flyTo(ll, 15, { duration: 0.7 });
