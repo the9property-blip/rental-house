@@ -567,14 +567,16 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
 .geo-input-wrap input { min-width: 0; width: 100%; }
 .geo-dropdown { width: 100%; min-width: 0; }
 .filter-clear-btn { min-height: 32px; font-weight: 700; }
+.mobile-clear-btn { display: none; }
 @media (max-width: 600px) {
   .header { position: relative; top: auto; }
-  .header-row1 { flex-wrap: wrap; }
-  .header-row1 .staff-controls { order: 2; flex: 1 0 100%; align-items: stretch; }
-  .staff-controls .staff-btn { align-self: flex-end; }
-  .staff-nav { width: 100%; justify-content: stretch; }
-  .staff-nav > a { flex: 0 1 auto; min-width: 0; padding-left: 6px; padding-right: 6px; }
-  .header-row1 .search-wrap { order: 3; flex: 1 0 100%; min-width: 0; }
+  .header-row1 { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 6px; align-items: center; }
+  .header-row1 .header-logo { grid-column: 1; grid-row: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  .header-row1 .staff-controls { grid-column: 2; grid-row: 1; flex-direction: row; align-items: center; max-width: 235px; overflow-x: auto; scrollbar-width: none; }
+  .header-row1 .staff-controls::-webkit-scrollbar { display: none; }
+  .staff-nav { display: contents; }
+  .staff-controls .staff-btn, .staff-nav > a { font-size: 0.58rem; padding: 3px 6px; }
+  .header-row1 .search-wrap { grid-column: 1 / -1; grid-row: 2; width: 100%; min-width: 0; }
   .header-row2 .filter-num { flex: 1 1 100px; max-width: none; min-width: 0; }
   .header-row2 .filter-select:not(.filter-num) { flex: 1 1 100px; max-width: none; min-width: 0; }
   .header-row2 .filter-btn, .header-row2 .filter-select, .header-row2 .filter-num { min-height: 32px; }
@@ -591,6 +593,10 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
   .header-row2 .filter-select:not(.filter-num) { flex: 0 0 130px; min-width: 130px; }
   .header-row2 .geo-search-container { flex: 0 0 310px; width: 310px; max-width: none; }
   .header-row2 .filter-clear-btn { width: auto; min-width: 110px; }
+  .header-row1 .search-wrap { display: flex; align-items: center; gap: 6px; }
+  .header-row1 .search-wrap input { flex: 1 1 auto; min-width: 0; }
+  .mobile-clear-btn { display: inline-flex; flex: 0 0 auto; align-items: center; justify-content: center; min-height: 31px; padding: 0 10px; border: 1px solid rgba(255,255,255,.45); border-radius: 50px; background: #f6c244; color: #1a1a2e; font: 700 .7rem inherit; cursor: pointer; white-space: nowrap; }
+  .header-row2 .filter-clear-btn { display: none; }
 }
 </style>
 <link rel="stylesheet" href="photo-download.css">
@@ -604,6 +610,7 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
     <div class="search-wrap">
       <input type="text" id="searchInput" placeholder="ค้นหาโครงการ, ทำเล, รหัส..." oninput="applyFilters()">
       <span class="search-icon">🔍</span>
+      <button type="button" class="mobile-clear-btn" onclick="clearAllFilters()">✕ ล้าง</button>
     </div>
     <div class="staff-controls">
       <button class="staff-btn" id="staffBtn" onclick="staffBtnClick()">🔐 Staff</button>
