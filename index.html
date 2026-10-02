@@ -203,6 +203,15 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
   box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 .survey-badge.below { top: 46px; }  /* ถ้ามีป้าย Co อยู่แล้ว ให้ Survey ลงมาด้านล่าง */
+.grade-badge {
+  position: absolute; top: 10px; right: 10px; z-index: 2;
+  min-width: 28px; padding: 4px 8px; border-radius: 50px;
+  background: linear-gradient(135deg,#fff7cc,#f1c40f); color: #6a4a00;
+  border: 1px solid rgba(255,255,255,.8); box-shadow: 0 2px 8px rgba(0,0,0,.2);
+  font-size: .72rem; font-weight: 900; text-align: center;
+}
+.co-badge.grade-below { top: 46px; }
+.survey-badge.grade-below { top: 82px; }
 /* status row ใน modal */
 .status-pill {
   display: inline-block; padding: 3px 11px; border-radius: 50px;
@@ -678,6 +687,11 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
       <option value="ready">✓ พร้อมเข้าพัก</option>
       <option value="soon">📅 ประกาศล่วงหน้า</option>
     </select>
+    <select class="filter-select" id="selGrade" onchange="applyFilters()">
+      <option value="all">⭐ ทุกเกรด</option>
+      <option value="A">เกรด A</option><option value="B">เกรด B</option>
+      <option value="C">เกรด C</option><option value="D">เกรด D</option>
+    </select>
     <div class="filter-sep"></div>
     <!-- Location search shares the filter area. -->
     <a class="geo-map-btn" href="map.html" title="ดูบ้านทั้งหมดบนแผนที่">🗺️ ดูแผนที่</a>
@@ -1065,6 +1079,7 @@ function clearAllFilters() {
   document.getElementById('selBed').value    = 'all';
   document.getElementById('selBath').value   = 'all';
   document.getElementById('selStatus').value = 'all';
+  document.getElementById('selGrade').value = 'all';
   // Clear search
   document.getElementById('searchInput').value = '';
   clearGeoSearch(true);
@@ -1125,6 +1140,7 @@ function applyFilters() {
   var bath     = document.getElementById('selBath').value;
   var sort     = document.getElementById('selSort').value;
   var statusF  = (document.getElementById('selStatus') || {}).value || 'all';
+  var gradeF   = (document.getElementById('selGrade') || {}).value || 'all';
   var filtered = allData.filter(function(p) {
     if (activeTypes.length && activeTypes.indexOf(p.type) === -1) return false;
     if (p.price > 0 && (p.price < priceMin || p.price > priceMax)) return false;
@@ -1145,6 +1161,7 @@ function applyFilters() {
     }
     if (statusF === 'ready' && !p.ready) return false;
     if (statusF === 'soon'  &&  p.ready) return false;
+    if (gradeF !== 'all' && String(p.grade || '').toUpperCase() !== gradeF) return false;
     if (activeAgent === 'co'     && !p.coAgent) return false;
     if (activeAgent === 'direct' &&  p.coAgent) return false;
     if (activeAgent === 'survey' && !isSurvey(p)) return false;
@@ -1205,6 +1222,7 @@ function updateClearButton() {
     || document.getElementById('selBed').value !== 'all'
     || document.getElementById('selBath').value !== 'all'
     || document.getElementById('selStatus').value !== 'all'
+    || document.getElementById('selGrade').value !== 'all'
     || document.getElementById('searchInput').value !== ''
     || document.getElementById('geoInput').value !== ''
     || !!geoOrigin
@@ -1285,10 +1303,12 @@ function showGrid(data) {
     // ★ NEW: รูปบนการ์ด + status badge (ซ้ายบน) + Co badge (ขวาบน)
     var sBadge  = statusBadgeHtml(p);
     var coBadge = p.coAgent ? '<span class="co-badge">Co</span>' : '';
-    var surveyBadge = isSurvey(p) ? '<span class="survey-badge' + (p.coAgent ? ' below' : '') + '">Survey</span>' : '';
+    var gradeBadge = p.grade ? '<span class="grade-badge">เกรด ' + escapeHtml(p.grade) + '</span>' : '';
+    if (p.grade && p.coAgent) coBadge = '<span class="co-badge grade-below">Co</span>';
+    var surveyBadge = isSurvey(p) ? '<span class="survey-badge' + (p.coAgent || p.grade ? ' grade-below' : '') + '">Survey</span>' : '';
     var photoBlock = p.thumb
-      ? '<div class="card-photo"><img src="' + photoUrl(p.thumb, 400) + '" loading="lazy" alt="' + (p.project||'') + '" onerror="onPhotoError(this,\'' + p.thumb + '\')">' + sBadge + coBadge + surveyBadge + '</div>'
-      : '<div class="card-photo"><div class="card-photo-placeholder"><span class="ph-icon">🏠</span><span>ยังไม่มีรูป</span></div>' + sBadge + coBadge + surveyBadge + '</div>';
+      ? '<div class="card-photo"><img src="' + photoUrl(p.thumb, 400) + '" loading="lazy" alt="' + (p.project||'') + '" onerror="onPhotoError(this,\'' + p.thumb + '\')">' + sBadge + gradeBadge + coBadge + surveyBadge + '</div>'
+      : '<div class="card-photo"><div class="card-photo-placeholder"><span class="ph-icon">🏠</span><span>ยังไม่มีรูป</span></div>' + sBadge + gradeBadge + coBadge + surveyBadge + '</div>';
     // ★ GEO: badge ระยะทางเมื่อกำลังค้นหาตามตำแหน่ง
     var distBlock = '';
     if (geoOrigin) {

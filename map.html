@@ -337,6 +337,10 @@ body {
   background: linear-gradient(135deg,#a78bfa,#7c3aed); color: #fff;
   border: 1px solid rgba(255,255,255,0.5); box-shadow: 0 1px 4px rgba(0,0,0,0.2);
 }
+.pp-gradebadge, .mc-gradebadge { position:absolute; top:5px; right:5px; z-index:2; min-width:24px; padding:2px 6px; border-radius:50px; background:linear-gradient(135deg,#fff7cc,#f1c40f); color:#6a4a00; border:1px solid rgba(255,255,255,.8); box-shadow:0 1px 5px rgba(0,0,0,.2); font-size:.58rem; font-weight:900; text-align:center; }
+.pp-gradebadge { top:8px; right:8px; font-size:.64rem; padding:3px 8px; }
+.pp-cobadge.grade-below, .mc-cobadge.grade-below { top:34px; }
+.pp-surveybadge.grade-below, .mc-surveybadge.grade-below { top:62px; }
 .mc-info { flex: 1; min-width: 0; padding: 8px 9px 7px; display: flex; flex-direction: column; }
 .mc-price { font-size: 0.98rem; font-weight: 800; color: #e74c3c; line-height: 1; }
 .mc-price small { font-size: 0.6rem; color: #bbb; font-weight: 400; }
@@ -632,6 +636,11 @@ body {
       <option value="all">📋 ทุกสถานะ</option>
       <option value="ready">✓ พร้อมเข้าพัก</option>
       <option value="soon">📅 ประกาศล่วงหน้า</option>
+    </select>
+    <select class="filter-select" id="selGrade" onchange="applyFilters()">
+      <option value="all">⭐ ทุกเกรด</option>
+      <option value="A">เกรด A</option><option value="B">เกรด B</option>
+      <option value="C">เกรด C</option><option value="D">เกรด D</option>
     </select>
     <!-- Location search shares the filter area. -->
     <div class="geo-search-container">
@@ -1053,13 +1062,16 @@ function buildPopup(p) {
     ? '<span class="pp-statusbadge ready">✓ พร้อม</span>'
     : '<span class="pp-statusbadge soon">📅 ' + (fmtAvailableDate(p.availableDate) || 'เร็วๆ นี้') + '</span>';
   var coBadge = p.coAgent ? '<span class="pp-cobadge">Co</span>' : '';
-  var surveyBadge = isSurvey(p) ? '<span class="pp-surveybadge">Survey</span>' : '';
+  var gradeBadge = p.grade ? '<span class="pp-gradebadge">เกรด ' + escapeHtml(p.grade) + '</span>' : '';
+  if (p.grade && p.coAgent) coBadge = '<span class="pp-cobadge grade-below">Co</span>';
+  var surveyBadge = isSurvey(p) ? '<span class="pp-surveybadge' + (p.grade ? ' grade-below' : '') + '">Survey</span>' : '';
   var mapsHref = 'https://www.google.com/maps?q=' + p.lat + ',' + p.lng;
   return '' +
     '<div class="pp-photo" onclick="openDetailByCode(\'' + p.code + '\')">' +
       photoBlockHtml(p, 'pp', true) +
       '<span class="pp-typebadge">' + escapeHtml(p.type || '') + '</span>' +
       statusBadge +
+      gradeBadge +
       coBadge +
       surveyBadge +
     '</div>' +
@@ -1082,12 +1094,14 @@ function miniCardHtml(p) {
     ? '<span class="mc-status ready">✓ พร้อม</span>'
     : '<span class="mc-status soon">📅 ' + (fmtAvailableDate(p.availableDate) || 'เร็วๆ') + '</span>';
   var coBadge = p.coAgent ? '<span class="mc-cobadge">Co</span>' : '';
-  var surveyBadge = isSurvey(p) ? '<span class="mc-surveybadge">Survey</span>' : '';
+  var gradeBadge = p.grade ? '<span class="mc-gradebadge">เกรด ' + escapeHtml(p.grade) + '</span>' : '';
+  if (p.grade && p.coAgent) coBadge = '<span class="mc-cobadge grade-below">Co</span>';
+  var surveyBadge = isSurvey(p) ? '<span class="mc-surveybadge' + (p.grade ? ' grade-below' : '') + '">Survey</span>' : '';
   var dist = (p._dist != null)
     ? '<div class="mc-dist' + (p._dist > 5 ? ' far' : '') + '">📍 ' + fmtDist(p._dist) + '</div>'
     : '';
   return '<div class="mini-card" data-code="' + p.code + '" title="แตะเพื่อดูตำแหน่งบนแผนที่" onclick="focusMarker(\'' + p.code + '\')">' +
-    '<div class="mc-photo">' + photo + status + coBadge + surveyBadge + '</div>' +
+    '<div class="mc-photo">' + photo + status + gradeBadge + coBadge + surveyBadge + '</div>' +
     '<div class="mc-info">' +
       dist +
       '<div class="mc-price">฿' + fmtPrice(p.price) + ' <small>/ด.</small></div>' +
@@ -1136,6 +1150,7 @@ function clearAllFilters() {
   document.getElementById('selBed').value = 'all';
   document.getElementById('selBath').value = 'all';
   document.getElementById('selStatus').value = 'all';
+  document.getElementById('selGrade').value = 'all';
   document.getElementById('searchInput').value = '';
   clearGeoSearch(true);
   try { localStorage.removeItem(GEO_CACHE_KEY); } catch(e) {}
@@ -1242,6 +1257,7 @@ function passFilter(p) {
   var bed    = document.getElementById('selBed').value;
   var bath   = document.getElementById('selBath').value;
   var statusF= document.getElementById('selStatus').value;
+  var gradeF = document.getElementById('selGrade').value;
   if (activeTypes.length && activeTypes.indexOf(p.type) === -1) return false;
   if (p.price > 0 && (p.price < pMin || p.price > pMax)) return false;
   if (floorOn)  { var flV = parseFloat(String(p.floor||'').replace(/[^0-9.]/g,''));  if (isNaN(flV) || flV < floorMin || flV > floorMax) return false; }
@@ -1261,6 +1277,7 @@ function passFilter(p) {
   }
   if (statusF === 'ready' && !p.ready) return false;
   if (statusF === 'soon'  &&  p.ready) return false;
+  if (gradeF !== 'all' && String(p.grade || '').toUpperCase() !== gradeF) return false;
   if (activeAgent === 'co'     && !p.coAgent) return false;
   if (activeAgent === 'direct' &&  p.coAgent) return false;
   if (activeAgent === 'survey' && !isSurvey(p)) return false;
@@ -1316,6 +1333,7 @@ function updateClearButton() {
     document.getElementById('selBed').value !== 'all' ||
     document.getElementById('selBath').value !== 'all' ||
     document.getElementById('selStatus').value !== 'all' ||
+    document.getElementById('selGrade').value !== 'all' ||
     document.getElementById('searchInput').value !== ''
     || document.getElementById('geoInput').value !== ''
     || !!geoPlace;
