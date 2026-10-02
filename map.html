@@ -422,7 +422,8 @@ body {
 }
 .staff-btn:hover { background: rgba(255,255,255,0.25); }
 .staff-btn.logged-in { background: #f6c244; color: #1a1a2e; border-color: #f6c244; font-weight: 700; }
-.nav-link-btn { flex-shrink: 0; padding: 4px 11px; border-radius: 50px; border: 1.5px solid rgba(255,255,255,0.35); background: linear-gradient(135deg, #c0392b, #962d22); color: white; font-size: 0.73rem; cursor: pointer; font-family: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; font-weight: 600; }
+.staff-controls { display: flex; flex-direction: column; align-items: stretch; gap: 6px; flex-shrink: 0; }
+.nav-link-btn { flex-shrink: 0; padding: 4px 11px; border-radius: 50px; border: 1.5px solid rgba(255,255,255,0.35); background: linear-gradient(135deg, #c0392b, #962d22); color: white; font-size: 0.73rem; cursor: pointer; font-family: inherit; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 4px; white-space: nowrap; font-weight: 600; }
 .nav-link-btn:hover { filter: brightness(1.18); }
 .nav-link-btn.sched { background: linear-gradient(135deg, #2c7a4b, #1a365d); display: none; }
 .nav-link-btn.sched.visible { display: inline-flex; }
@@ -546,7 +547,12 @@ body {
       <input type="text" id="searchInput" placeholder="ค้นหาโครงการ, ทำเล, รหัส..." oninput="applyFilters()">
       <span class="search-icon">🔍</span>
     </div>
-    <button class="staff-btn" id="staffBtn" onclick="staffBtnClick()">🔐 Staff</button>
+    <div class="staff-controls">
+      <button class="staff-btn" id="staffBtn" onclick="staffBtnClick()">🔐 Staff</button>
+      <a class="nav-link-btn" href="https://the9property-blip.github.io/SaelProperty/" target="_blank" rel="noopener" title="ไปยังเว็บทรัพย์ขาย">🏷️ ทรัพย์ขาย</a>
+      <a class="nav-link-btn sched" id="scheduleBtn" href="https://the9property-blip.github.io/property-posting-schedule/" target="_blank" rel="noopener">📋 ตารางโพสทรัพย์</a>
+      <a class="nav-link-btn cust" id="customerBtn" href="https://the9property-blip.github.io/costumer-rent/" target="_blank" rel="noopener">👥 ลูกค้าหาเช่า</a>
+    </div>
   </div>
   <div class="header-row2">
     <button class="filter-btn type-btn active" data-type="all" onclick="setType('all')">ทั้งหมด</button>
@@ -601,11 +607,6 @@ body {
       <option value="ready">✓ พร้อมเข้าพัก</option>
       <option value="soon">📅 ประกาศล่วงหน้า</option>
     </select>
-    <div class="filter-sep"></div>
-    <div class="filter-sep"></div>
-    <a class="nav-link-btn" href="https://the9property-blip.github.io/SaelProperty/" target="_blank" rel="noopener" title="ไปยังเว็บทรัพย์ขาย">🏷️ ทรัพย์ขาย</a>
-    <a class="nav-link-btn sched" id="scheduleBtn" href="https://the9property-blip.github.io/property-posting-schedule/" target="_blank" rel="noopener">📋 ตารางโพสทรัพย์</a>
-    <a class="nav-link-btn cust" id="customerBtn" href="https://the9property-blip.github.io/costumer-rent/" target="_blank" rel="noopener">👥 ลูกค้าหาเช่า</a>
     <!-- Location search shares the filter area. -->
     <div class="geo-search-container">
       <div class="geo-input-wrap">
