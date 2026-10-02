@@ -577,6 +577,7 @@ body {
   .header-row2 .filter-btn { flex: 0 0 auto; }
   .header-row2 .filter-num { flex: 0 0 120px; min-width: 120px; }
   .header-row2 .filter-select:not(.filter-num) { flex: 0 0 130px; min-width: 130px; }
+  .header-row2 .filter-select.room-feature-select { flex-basis: 160px; min-width: 160px; }
   .search-tools .search-wrap input { padding: 0 10px; font-size: 16px; }
   .search-tools .geo-input-wrap input { font-size: 16px; }
   .search-tools input::placeholder { font-size: 12px; }
@@ -591,6 +592,8 @@ body {
 </style>
 <link rel="stylesheet" href="photo-download.css">
 <script src="photo-download.js"></script>
+<link rel="stylesheet" href="property-rental.css">
+<script src="property-rental.js"></script>
 </head>
 <body>
 <!-- HEADER -->
@@ -659,24 +662,24 @@ body {
       <option value="1">1 นอน</option>
       <option value="2">2 นอน</option>
       <option value="3">3 นอน</option>
-      <option value="4">4 นอน</option>
-      <option value="5">5 นอน</option>
-      <option value="6">6 นอน</option>
-      <option value="7">7 นอน</option>
-      <option value="8">8 นอน</option>
-      <option value="9">9+ นอน</option>
+      <option value="4+">4+ นอน</option>
     </select>
     <select class="filter-select" id="selBath" onchange="applyFilters()">
       <option value="all">🚿 ทุกห้องน้ำ</option>
       <option value="1">1 น้ำ</option>
       <option value="2">2 น้ำ</option>
       <option value="3">3 น้ำ</option>
-      <option value="4">4 น้ำ</option>
-      <option value="5">5 น้ำ</option>
-      <option value="6">6 น้ำ</option>
-      <option value="7">7 น้ำ</option>
-      <option value="8">8 น้ำ</option>
-      <option value="9">9+ น้ำ</option>
+      <option value="4+">4+ น้ำ</option>
+    </select>
+    <select class="filter-select room-feature-select" id="selMaidRoom" aria-label="ห้องแม่บ้าน" onchange="applyFilters()">
+      <option value="all">ห้องแม่บ้าน: ทั้งหมด</option>
+      <option value="yes">มีห้องแม่บ้าน</option>
+      <option value="no">ไม่มีห้องแม่บ้าน</option>
+    </select>
+    <select class="filter-select room-feature-select" id="selDownstairsBedroom" aria-label="ห้องนอนชั้นล่าง" onchange="applyFilters()">
+      <option value="all">นอนชั้นล่าง: ทั้งหมด</option>
+      <option value="yes">มีห้องนอนชั้นล่าง</option>
+      <option value="no">ไม่มีห้องนอนชั้นล่าง</option>
     </select>
     <select class="filter-select" id="selStatus" onchange="applyFilters()">
       <option value="all">📋 ทุกสถานะ</option>
@@ -738,12 +741,8 @@ body {
       <div class="modal-row" id="dFacebookRow" style="display:none;"><span class="lbl">โพส FB</span> <span class="val" id="dFacebookVal">–</span></div>
       <div class="modal-row"><span class="lbl">พิกัด</span>
         <span class="val-copy"><span class="val" id="dCoords">–</span><button type="button" class="btn-copy" id="dCoordsCopy" title="คัดลอกลิงก์ Google Maps" onclick="copyCoords()">📋</button></span></div>
-      <div class="staff-actions">
-        <a id="dCallOwner" href="#">📞 โทรเจ้าของ</a>
-        <a id="dStaffMaps" class="maps" href="#" target="_blank" rel="noopener">🗺 ดูใน Maps</a>
-        <a id="dDriveLink" class="drive" href="#" target="_blank" rel="noopener" style="display:none;">📁 Drive</a>
-      </div>
       <div id="dPhotoDownload"></div>
+      <div id="dRentalAction"></div>
       <div class="caption-block" id="dCaptionBlock" style="display:none;">
         <div class="caption-head"><span class="lbl">ข้อความประกาศ</span>
           <button type="button" class="btn-caption-copy" onclick="copyCaption()">📋 คัดลอกทั้งหมด</button></div>
@@ -753,7 +752,6 @@ body {
     <div class="modal-actions">
       <button class="btn-call" onclick="window.location.href='tel:0809945497'">📞 โทรสอบถาม</button>
       <button class="btn-line" onclick="alert('Line ID: @the9property หรือโทร 0809945497')">💬 Line</button>
-      <a class="btn-maps" id="dMapsLink" href="#" target="_blank" rel="noopener" title="ดูใน Google Maps">🗺️</a>
     </div>
   </div>
 </div>
@@ -761,7 +759,7 @@ body {
 <div class="staff-modal-overlay" id="staffLoginModal" onclick="if(event.target===this)closeStaffModal()">
   <div class="staff-modal">
     <h3>🔐 เข้าสู่ระบบทีมงาน</h3>
-    <div class="sub">หลังเข้าสู่ระบบจะเห็นเบอร์เจ้าของ, พิกัด และลิงก์ Drive</div>
+    <div class="sub">ดูข้อมูลเจ้าของ ดาวน์โหลดภาพ และบันทึกทรัพย์เช่าแล้ว</div>
     <input type="password" id="staffPasswordInput" placeholder="รหัสผ่าน"
            onkeydown="if(event.key==='Enter') doStaffLogin()" autocomplete="current-password">
     <div class="err" id="staffLoginErr"></div>
@@ -1255,6 +1253,8 @@ function clearAllFilters() {
   document.getElementById('selBed').value = 'all';
   document.getElementById('selBath').value = 'all';
   document.getElementById('selStatus').value = 'all';
+  document.getElementById('selMaidRoom').value = 'all';
+  document.getElementById('selDownstairsBedroom').value = 'all';
   document.getElementById('selGrade').value = 'all';
   document.getElementById('searchInput').value = '';
   clearGeoSearch(true);
@@ -1361,6 +1361,8 @@ function passFilter(p) {
   var usableOn = usableMin > 0 || usableMax !== Infinity;
   var bed    = document.getElementById('selBed').value;
   var bath   = document.getElementById('selBath').value;
+  var maidRoom = document.getElementById('selMaidRoom').value;
+  var downstairsBedroom = document.getElementById('selDownstairsBedroom').value;
   var statusF= document.getElementById('selStatus').value;
   var gradeF = document.getElementById('selGrade').value;
   if (activeTypes.length && activeTypes.indexOf(p.type) === -1) return false;
@@ -1372,14 +1374,16 @@ function passFilter(p) {
   if (pet === 'no'  && !(p.pet||'').includes('ไม่')) return false;
   if (bed !== 'all') {
     var br = parseInt(p.bedroom) || 0;
-    if (bed === '9' && br < 9) return false;
-    if (bed !== '9' && br !== parseInt(bed)) return false;
+    if (bed === '4+' && br < 4) return false;
+    if (bed !== '4+' && br !== parseInt(bed)) return false;
   }
   if (bath !== 'all') {
     var ba = parseInt(p.bathroom) || 0;
-    if (bath === '9' && ba < 9) return false;
-    if (bath !== '9' && ba !== parseInt(bath)) return false;
+    if (bath === '4+' && ba < 4) return false;
+    if (bath !== '4+' && ba !== parseInt(bath)) return false;
   }
+  if (maidRoom !== 'all' && p.maidRoom !== (maidRoom === 'yes')) return false;
+  if (downstairsBedroom !== 'all' && p.downstairsBedroom !== (downstairsBedroom === 'yes')) return false;
   if (statusF === 'ready' && !p.ready) return false;
   if (statusF === 'soon'  &&  p.ready) return false;
   if (gradeF !== 'all' && String(p.grade || '').toUpperCase() !== gradeF) return false;
@@ -1439,6 +1443,8 @@ function updateClearButton() {
     document.getElementById('usableMax').value.trim() !== '' ||
     document.getElementById('selBed').value !== 'all' ||
     document.getElementById('selBath').value !== 'all' ||
+    document.getElementById('selMaidRoom').value !== 'all' ||
+    document.getElementById('selDownstairsBedroom').value !== 'all' ||
     document.getElementById('selStatus').value !== 'all' ||
     document.getElementById('selGrade').value !== 'all' ||
     document.getElementById('searchInput').value !== ''
@@ -1537,6 +1543,7 @@ function openDetailByCode(code) {
 }
 function openDetail(p) {
   PropertyPhotos.setDetail(p.code);
+  PropertyRental.setDetail(p);
   var photoEl = document.getElementById('dPhoto');
   if (p.thumb) {
     photoEl.innerHTML = '<img src="' + photoUrl(p.thumb, 800) + '" alt="' + escapeHtml(p.project || '') + '" onerror="onModalPhotoError(this,\'' + p.thumb + '\')">' +
@@ -1562,22 +1569,11 @@ function openDetail(p) {
   } else {
     dCodeEl.textContent = p.code || '–';
   }
-  var mapsLink = document.getElementById('dMapsLink');
-  if (validCoord(p)) {
-    mapsLink.href = 'https://www.google.com/maps?q=' + p.lat + ',' + p.lng;
-    mapsLink.style.display = '';
-  } else {
-    mapsLink.style.display = 'none';
-  }
   // STAFF SECTION
   var staffSec = document.getElementById('dStaffSection');
   if (isStaffLoggedIn()) {
     document.getElementById('dOwnerName').textContent = p.ownerName || '–';
-    var tel = (p.ownerTel || '').toString().replace(/[^0-9+]/g, '');
     document.getElementById('dOwnerTel').textContent = p.ownerTel || '–';
-    var callOwner = document.getElementById('dCallOwner');
-    callOwner.href = tel ? ('tel:' + tel) : '#';
-    callOwner.style.opacity = tel ? '1' : '0.4';
     // โพส FB (staff) — URL → ลิงก์, ข้อความ → แสดงข้อความ
     var fbRow = document.getElementById('dFacebookRow');
     var fbVal = document.getElementById('dFacebookVal');
@@ -1596,29 +1592,17 @@ function openDetail(p) {
     }
     // พิกัด → ลิงก์ Google Maps + ปุ่ม copy
     var coordsEl = document.getElementById('dCoords');
-    var staffMaps = document.getElementById('dStaffMaps');
     var coordsCopy = document.getElementById('dCoordsCopy');
     if (validCoord(p)) {
       var mapsHref = 'https://www.google.com/maps?q=' + p.lat + ',' + p.lng;
       _coordsHref = mapsHref;
       coordsEl.innerHTML = '<a href="' + mapsHref + '" target="_blank" rel="noopener">' +
         p.lat.toFixed(6) + ', ' + p.lng.toFixed(6) + ' 🗺</a>';
-      staffMaps.href = mapsHref;
-      staffMaps.style.display = '';
       if (coordsCopy) coordsCopy.style.display = '';
     } else {
       _coordsHref = '';
       coordsEl.textContent = '— ไม่ระบุพิกัด';
-      staffMaps.style.display = 'none';
       if (coordsCopy) coordsCopy.style.display = 'none';
-    }
-    // Drive link
-    var driveLink = document.getElementById('dDriveLink');
-    if (p.folderUrl) {
-      driveLink.href = p.folderUrl;
-      driveLink.style.display = '';
-    } else {
-      driveLink.style.display = 'none';
     }
     // ดึง caption {รหัส}-1.txt
     loadCaption(p.code);
@@ -1633,7 +1617,7 @@ function onModalPhotoError(img, fallbackId) {
   if (!img.dataset.fb && fallbackId) { img.dataset.fb = '1'; img.src = photoUrlFallback(fallbackId); return; }
   img.parentElement.innerHTML = '<div class="modal-photo-placeholder"><span class="ph-icon">🏠</span><span>ไม่มีรูปภาพ</span></div>';
 }
-function closeDetail() { document.getElementById('detailOverlay').classList.remove('open'); }
+function closeDetail() { PropertyRental.cancelConfirmation(); document.getElementById('detailOverlay').classList.remove('open'); }
 
 // ════════════════════════════════════════════════════════════
 //  GEO SEARCH — ค้นหาสถานที่สำคัญ → บินไป + ปักหมุด + เรียงบ้านตามระยะ
@@ -2075,6 +2059,19 @@ PropertyPhotos.configure({
     try { sessionStorage.removeItem('staff_token'); } catch(e) {}
     updateStaffBtn();
     loadData();
+  }
+});
+PropertyRental.configure({
+  endpoint: SCRIPT_URL, getToken: getStaffToken, requestLogin: openStaffModal, notify: showToast,
+  onUnauthorized: function() {
+    try { sessionStorage.removeItem('staff_token'); } catch(e) {}
+    updateStaffBtn(); closeDetail(); loadData();
+  },
+  onComplete: function(code) {
+    PropertyPhotos.reset();
+    allData = allData.filter(function(p) { return String(p.code || '').toUpperCase() !== code.toUpperCase(); });
+    selectedCode = null; closeDetail();
+    buildEntries(allData); applyFilters(); loadData();
   }
 });
 </script>
