@@ -1188,7 +1188,7 @@ function applyFilters() {
     if (floorOn)  { var flV = parseFloat(String(p.floor||'').replace(/[^0-9.]/g,''));  if (isNaN(flV) || flV < floorMin || flV > floorMax) return false; }
     if (landOn)   { var ldV = parseFloat(String(p.land||'').replace(/[^0-9.]/g,''));   if (isNaN(ldV) || ldV < landMin || ldV > landMax) return false; }
     if (usableOn) { var usV = parseFloat(String(p.usable||'').replace(/[^0-9.]/g,'')); if (isNaN(usV) || usV < usableMin || usV > usableMax) return false; }
-    if (pet === 'yes' && !(p.pet||'').includes('รับ'))  return false;
+    if (pet === 'yes' && (!(p.pet||'').includes('รับ') || (p.pet||'').includes('ไม่'))) return false;
     if (pet === 'no'  && !(p.pet||'').includes('ไม่'))  return false;
     if (bed !== 'all') {
       var br = parseInt(p.bedroom) || 0;
@@ -1405,7 +1405,11 @@ function showError(msg) {
 // ─── DETAIL MODAL ─────────────────────────────────────────
 function openDetail(p) {
   PropertyPhotos.setDetail(p.code);
-  PropertyRental.setDetail(p);
+  if (window.PropertyRental) {
+    PropertyRental.setDetail(p);
+  } else {
+    document.getElementById('dRentalAction').textContent = 'ระบบบันทึกเช่าแล้วยังโหลดไม่สำเร็จ กรุณารีเฟรชหน้าเว็บ';
+  }
   var photoEl = document.getElementById('dPhoto');
   if (p.thumb) {
     // ★ FIX: ใช้ lh3.googleusercontent.com + fallback
@@ -1497,7 +1501,7 @@ function onModalPhotoError(img, fallbackId) {
     '<div class="modal-photo-placeholder"><span class="ph-icon">🏠</span><span>ไม่มีรูปภาพ</span></div>';
 }
 function closeDetail() {
-  PropertyRental.cancelConfirmation();
+  if (window.PropertyRental) PropertyRental.cancelConfirmation();
   document.getElementById('detailOverlay').classList.remove('open');
 }
 document.addEventListener('keydown', function(e) {
@@ -2028,6 +2032,7 @@ PropertyPhotos.configure({
     loadData(false);
   }
 });
+if (window.PropertyRental) {
 PropertyRental.configure({
   endpoint: SCRIPT_URL, getToken: getStaffToken, requestLogin: openStaffModal, notify: showToast,
   onUnauthorized: function() {
@@ -2040,6 +2045,7 @@ PropertyRental.configure({
     closeDetail(); applyFilters(); loadData(false);
   }
 });
+}
 </script>
 </body>
 </html>

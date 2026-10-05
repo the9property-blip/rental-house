@@ -1370,7 +1370,7 @@ function passFilter(p) {
   if (floorOn)  { var flV = parseFloat(String(p.floor||'').replace(/[^0-9.]/g,''));  if (isNaN(flV) || flV < floorMin || flV > floorMax) return false; }
   if (landOn)   { var ldV = parseFloat(String(p.land||'').replace(/[^0-9.]/g,''));   if (isNaN(ldV) || ldV < landMin || ldV > landMax) return false; }
   if (usableOn) { var usV = parseFloat(String(p.usable||'').replace(/[^0-9.]/g,'')); if (isNaN(usV) || usV < usableMin || usV > usableMax) return false; }
-  if (pet === 'yes' && !(p.pet||'').includes('รับ')) return false;
+  if (pet === 'yes' && (!(p.pet||'').includes('รับ') || (p.pet||'').includes('ไม่'))) return false;
   if (pet === 'no'  && !(p.pet||'').includes('ไม่')) return false;
   if (bed !== 'all') {
     var br = parseInt(p.bedroom) || 0;
