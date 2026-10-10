@@ -937,7 +937,23 @@ var activeAgent = 'all';   // 'all' | 'direct' | 'co'
 var geoOrigin = null;  // { lat, lng, label } เมื่อค้นหาตามตำแหน่ง
 // ─── STAFF AUTH ──────────────────────────────────────────
 function getStaffToken() {
-  try { return sessionStorage.getItem('staff_token') || ''; } catch(e) { return ''; }
+  try {
+    var prefix = 'staff_token=';
+    var cookie = document.cookie.split(';').map(function(value) { return value.trim(); }).find(function(value) { return value.indexOf(prefix) === 0; });
+    return cookie ? decodeURIComponent(cookie.slice(prefix.length)) : '';
+  } catch(e) { return ''; }
+}
+function setStaffToken(token) {
+  var path = location.pathname.slice(0, location.pathname.lastIndexOf('/') + 1) || '/';
+  document.cookie = 'staff_token=' + encodeURIComponent(token) + '; path=' + path + '; SameSite=Strict' + (location.protocol === 'https:' ? '; Secure' : '');
+}
+function clearStaffToken() {
+  var path = location.pathname.slice(0, location.pathname.lastIndexOf('/') + 1) || '/';
+  document.cookie = 'staff_token=; path=' + path + '; Max-Age=0; SameSite=Strict' + (location.protocol === 'https:' ? '; Secure' : '');
+  try { sessionStorage.removeItem('staff_token'); } catch(e) {}
+}
+function notifyStaffSessionChange() {
+  try { localStorage.setItem('staff_auth_changed', String(Date.now())); } catch(e) {}
 }
 function isStaffLoggedIn() { return !!getStaffToken(); }
 function updateStaffBtn() {
@@ -960,7 +976,7 @@ function updateStaffBtn() {
 function staffBtnClick() {
   if (isStaffLoggedIn()) {
     if (confirm('ออกจากระบบทีมงาน?')) {
-      try { sessionStorage.removeItem('staff_token'); } catch(e) {}
+      clearStaffToken(); notifyStaffSessionChange();
       PropertyPhotos.reset();
       updateStaffBtn();
       loadData(true);
@@ -985,24 +1001,25 @@ function doStaffLogin() {
   if (!pw) { document.getElementById('staffLoginErr').textContent = 'กรุณาใส่รหัสผ่าน'; return; }
   document.getElementById('staffLoginErr').textContent = '⏳ กำลังตรวจสอบ...';
   // เก็บ token ชั่วคราว แล้วลองโหลดข้อมูล — ถ้า server บอก staff:true = รหัสถูก
-  try { sessionStorage.setItem('staff_token', pw); } catch(e) {}
+  setStaffToken(pw);
   fetch(SCRIPT_URL + '?token=' + encodeURIComponent(pw))
     .then(function(r) { return r.json(); })
     .then(function(json) {
       if (json.staff === true) {
         closeStaffModal(true);
+        notifyStaffSessionChange();
         updateStaffBtn();
         allData = json.data || [];
         applyFilters();
         showToast('✅ เข้าสู่ระบบสำเร็จ');
         PropertyPhotos.onLogin();
       } else {
-        try { sessionStorage.removeItem('staff_token'); } catch(e) {}
+        clearStaffToken();
         document.getElementById('staffLoginErr').textContent = '❌ รหัสผ่านไม่ถูกต้อง';
       }
     })
     .catch(function(err) {
-      try { sessionStorage.removeItem('staff_token'); } catch(e) {}
+      clearStaffToken();
       document.getElementById('staffLoginErr').textContent = '⚠️ เชื่อมต่อไม่ได้: ' + err.message;
     });
 }
@@ -1010,6 +1027,13 @@ window.onload = function() {
   updateStaffBtn();
   loadData(false);
 };
+window.addEventListener('storage', function(e) {
+  if (!e || e.key !== 'staff_auth_changed') return;
+  PropertyPhotos.reset();
+  updateStaffBtn();
+  if (!getStaffToken()) closeDetail();
+  loadData(false);
+});
 // ปิด login modal ด้วย Escape
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape' && document.getElementById('staffLoginModal').classList.contains('open')) {
@@ -2034,7 +2058,7 @@ function escapeHtml(s) {
 PropertyPhotos.configure({
   endpoint: SCRIPT_URL, getToken: getStaffToken, requestLogin: openStaffModal,
   onUnauthorized: function() {
-    try { sessionStorage.removeItem('staff_token'); } catch(e) {}
+    clearStaffToken(); notifyStaffSessionChange();
     updateStaffBtn();
     loadData(false);
   }
@@ -2043,7 +2067,7 @@ if (window.PropertyRental) {
 PropertyRental.configure({
   endpoint: SCRIPT_URL, getToken: getStaffToken, requestLogin: openStaffModal, notify: showToast,
   onUnauthorized: function() {
-    try { sessionStorage.removeItem('staff_token'); } catch(e) {}
+    clearStaffToken(); notifyStaffSessionChange();
     updateStaffBtn(); closeDetail(); loadData(false);
   },
   onComplete: function(code) {
