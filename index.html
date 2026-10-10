@@ -625,10 +625,15 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
   .search-tools .search-clear-btn { font-size: .7rem; padding: 0 8px; }
   .header-row2 #selMin, .header-row2 #selMax { flex: 0 0 108px; min-width: 108px; }
 }
+/* rental-button-layout-20261010 */
+#dRentalAction{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:8px!important;margin-top:10px!important}
+#dRentalAction>.rental-action-button{display:block!important;width:100%!important;min-width:0!important;min-height:34px!important;height:auto!important;padding:6px 5px!important;border-radius:8px!important;font-size:11px!important;line-height:1.25!important;white-space:normal!important}
+#dRentalAction>.rental-delete-button{background:#b3261e!important;border-color:#942018!important;color:#fff!important}
+#dRentalAction>.rental-action-status,#dRentalAction>.rental-confirmation{grid-column:1/-1!important}
 </style>
 <link rel="stylesheet" href="photo-download.css">
 <script src="photo-download.js"></script>
-<link rel="stylesheet" href="property-rental.css">
+<link rel="stylesheet" href="property-rental.css?v=20261010-buttons">
 <script src="property-rental.js"></script>
 </head>
 <body>

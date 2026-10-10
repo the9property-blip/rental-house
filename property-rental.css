@@ -1,11 +1,14 @@
-#dRentalAction { margin-top: 10px; }
+#dRentalAction { margin-top: 10px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
+#dRentalAction > .rental-action-status, #dRentalAction > .rental-confirmation { grid-column: 1 / -1; }
 .rental-action-button {
-  display: block; width: 100%; box-sizing: border-box; min-height: 44px;
-  padding: 10px 12px; border: 1px solid #177344; border-radius: 9px;
-  background: #16824d; color: #fff; font: inherit; font-size: 13px;
+  display: block; width: 100%; box-sizing: border-box; min-height: 36px;
+  padding: 6px 8px; border: 1px solid #177344; border-radius: 8px;
+  background: #16824d; color: #fff; font: inherit; font-size: 11px;
   font-weight: 600; cursor: pointer; text-align: center;
 }
 .rental-action-button:hover { background: #116b3d; }
+.rental-delete-button { background: #b3261e; border-color: #942018; }
+.rental-delete-button:hover { background: #942018; }
 .rental-action-button:disabled { opacity: .65; cursor: wait; }
 .rental-action-button:focus-visible { outline: 3px solid #4285f4; outline-offset: 2px; }
 .rental-action-status { margin: 8px 0 0; color: #604813; font-size: 13px; line-height: 1.6; overflow-wrap: anywhere; }
@@ -15,4 +18,5 @@
 .rental-confirmation-actions { display: flex; gap: 8px; }
 .rental-confirmation-actions button { flex: 1; min-height: 44px; padding: 8px 12px; border: 1px solid #ccc; border-radius: 8px; background: #f5f5f5; color: #333; cursor: pointer; font: inherit; }
 .rental-confirmation-actions .rental-confirm-agree { background: #16824d; border-color: #177344; color: #fff; }
+.rental-confirmation-actions .rental-confirm-delete { background: #b3261e; border-color: #942018; }
 .rental-confirmation-actions button:focus-visible { outline: 3px solid #4285f4; outline-offset: 2px; }
