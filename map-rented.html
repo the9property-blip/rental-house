@@ -1984,8 +1984,30 @@ document.addEventListener('click', function(e) {
 //  STAFF AUTH
 // ════════════════════════════════════════════════════════════
 function getStaffToken() {
-  try { return sessionStorage.getItem('staff_token') || ''; } catch(e) { return ''; }
+  try {
+    var prefix = 'staff_token=';
+    var cookie = document.cookie.split(';').map(function(value) { return value.trim(); }).find(function(value) { return value.indexOf(prefix) === 0; });
+    return cookie ? decodeURIComponent(cookie.slice(prefix.length)) : '';
+  } catch(e) { return ''; }
 }
+function setStaffToken(token) {
+  var path = location.pathname.slice(0, location.pathname.lastIndexOf('/') + 1) || '/';
+  document.cookie = 'staff_token=' + encodeURIComponent(token) + '; path=' + path + '; SameSite=Strict' + (location.protocol === 'https:' ? '; Secure' : '');
+}
+function clearStaffToken() {
+  var path = location.pathname.slice(0, location.pathname.lastIndexOf('/') + 1) || '/';
+  document.cookie = 'staff_token=; path=' + path + '; Max-Age=0; SameSite=Strict' + (location.protocol === 'https:' ? '; Secure' : '');
+  try { sessionStorage.removeItem('staff_token'); } catch(e) {}
+}
+function notifyStaffSessionChange() {
+  try { localStorage.setItem('staff_auth_changed', String(Date.now())); } catch(e) {}
+}
+// Upgrade the current tab's old login to a session shared by new tabs.
+try {
+  var previousStaffToken = sessionStorage.getItem('staff_token');
+  if (previousStaffToken && !getStaffToken()) setStaffToken(previousStaffToken);
+  sessionStorage.removeItem('staff_token');
+} catch(e) {}
 function isStaffLoggedIn() { return !!getStaffToken(); }
 function updateStaffBtn() {
   var btn = document.getElementById('staffBtn');
@@ -2007,7 +2029,7 @@ function updateStaffBtn() {
 function staffBtnClick() {
   if (isStaffLoggedIn()) {
     if (confirm('ออกจากระบบทีมงาน?')) {
-      try { sessionStorage.removeItem('staff_token'); } catch(e) {}
+      clearStaffToken(); notifyStaffSessionChange();
       PropertyPhotos.reset();
       updateStaffBtn();
       loadData();
@@ -2031,12 +2053,13 @@ function doStaffLogin() {
   var pw = document.getElementById('staffPasswordInput').value;
   if (!pw) { document.getElementById('staffLoginErr').textContent = 'กรุณาใส่รหัสผ่าน'; return; }
   document.getElementById('staffLoginErr').textContent = '⏳ กำลังตรวจสอบ...';
-  try { sessionStorage.setItem('staff_token', pw); } catch(e) {}
+  setStaffToken(pw);
   fetch(SCRIPT_URL + '?action=rentedMap&token=' + encodeURIComponent(pw))
     .then(function(r) { return r.json(); })
     .then(function(json) {
       if (json.staff === true) {
         closeStaffModal(true);
+        notifyStaffSessionChange();
         updateStaffBtn();
         allData = json.data || [];
         buildEntries(allData);
@@ -2044,12 +2067,12 @@ function doStaffLogin() {
         showToast('✅ เข้าสู่ระบบสำเร็จ');
         PropertyPhotos.onLogin();
       } else {
-        try { sessionStorage.removeItem('staff_token'); } catch(e) {}
+        clearStaffToken(); notifyStaffSessionChange();
         document.getElementById('staffLoginErr').textContent = '❌ รหัสผ่านไม่ถูกต้อง';
       }
     })
     .catch(function(err) {
-      try { sessionStorage.removeItem('staff_token'); } catch(e) {}
+      clearStaffToken(); notifyStaffSessionChange();
       document.getElementById('staffLoginErr').textContent = '⚠️ เชื่อมต่อไม่ได้: ' + err.message;
     });
 }
@@ -2068,6 +2091,13 @@ window.addEventListener('load', function() {
   updateStaffBtn();
   loadData();
 });
+window.addEventListener('storage', function(e) {
+  if (!e || e.key !== 'staff_auth_changed') return;
+  PropertyPhotos.reset();
+  updateStaffBtn();
+  if (!getStaffToken()) closeDetail();
+  loadData();
+});
 window.addEventListener('resize', function() { if (map) map.invalidateSize(); });
 </script>
 <script>
@@ -2075,7 +2105,7 @@ PropertyPhotos.configure({
   dataset: 'rented',
   endpoint: SCRIPT_URL, getToken: getStaffToken, requestLogin: openStaffModal,
   onUnauthorized: function() {
-    try { sessionStorage.removeItem('staff_token'); } catch(e) {}
+    clearStaffToken(); notifyStaffSessionChange();
     updateStaffBtn();
     loadData();
   }
@@ -2085,7 +2115,7 @@ PropertyRental.configure({
   action: 'restoreRental',
   endpoint: SCRIPT_URL, getToken: getStaffToken, requestLogin: openStaffModal, notify: showToast,
   onUnauthorized: function() {
-    try { sessionStorage.removeItem('staff_token'); } catch(e) {}
+    clearStaffToken(); notifyStaffSessionChange();
     updateStaffBtn(); closeDetail(); loadData();
   },
   onComplete: function(code) {
