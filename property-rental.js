@@ -5,6 +5,7 @@ window.PropertyRental = (function () {
   var messages = {
     busy: 'มีรายการกำลังบันทึกอยู่ กรุณารอสักครู่แล้วลองใหม่',
     confirmation_required: 'กรุณายืนยันว่าทรัพย์ถูกเช่าแล้วก่อนบันทึก',
+    invalid_delete_code: 'รหัสยืนยันไม่ถูกต้อง กรุณากรอก 1140 ก่อนลบ',
     invalid_code: 'รหัสทรัพย์ไม่ถูกต้อง',
     invalid_version: 'ข้อมูลทรัพย์ยังไม่พร้อม กรุณาโหลดข้อมูลใหม่แล้วลองอีกครั้ง',
     missing_sheet: 'ไม่พบแท็บรายชื่อบ้านเช่าหรือเช่าแล้ว กรุณาติดต่อผู้ดูแล',
@@ -47,13 +48,22 @@ window.PropertyRental = (function () {
       box.setAttribute('role', 'alertdialog'); box.setAttribute('aria-labelledby', 'rentalConfirmTitle');
       var title = document.createElement('p'); title.id = 'rentalConfirmTitle';
       title.textContent = request.deleting ? 'ยืนยันลบทรัพย์รหัส ' + request.code + '? แถวข้อมูลจะถูกลบออกจากแถบ ' + (returning() ? 'เช่าแล้ว' : 'รายชื่อบ้านเช่า') + ' และโฟลเดอร์รูปทั้งหมดของรหัสนี้ในแหล่งเดียวกันจะถูกย้ายไปถังขยะ' : (returning() ? 'ยืนยันนำทรัพย์รหัส ' + request.code + ' กลับไปปล่อยเช่า พร้อมย้ายข้อมูลและโฟลเดอร์รูปตามประเภททรัพย์?' : 'ยืนยันว่าทรัพย์รหัส ' + request.code + ' ถูกเช่าแล้ว?'); box.appendChild(title);
+      var deleteCode = null;
+      if (request.deleting) {
+        var codeLabel = document.createElement('label'); codeLabel.className = 'rental-delete-code-label';
+        codeLabel.textContent = 'กรอกรหัส 1140 เพื่อยืนยันการลบ';
+        deleteCode = document.createElement('input'); deleteCode.type = 'password'; deleteCode.inputMode = 'numeric';
+        deleteCode.autocomplete = 'off'; deleteCode.maxLength = 4; deleteCode.className = 'rental-delete-code-input';
+        deleteCode.setAttribute('aria-label', 'กรอกรหัสยืนยัน 1140'); codeLabel.appendChild(deleteCode); box.appendChild(codeLabel);
+      }
       var actions = document.createElement('div'); actions.className = 'rental-confirmation-actions';
       var cancel = document.createElement('button'); cancel.type = 'button'; cancel.textContent = 'ยกเลิก';
       var agree = document.createElement('button'); agree.type = 'button'; agree.textContent = 'ตกลง'; agree.className = 'rental-confirm-agree';
       if (request.deleting) { agree.textContent = 'ยืนยันลบ'; agree.className += ' rental-confirm-delete'; }
+      if (deleteCode) { agree.disabled = true; deleteCode.oninput = function () { agree.disabled = deleteCode.value !== '1140'; }; }
       var pending = { finish: function (accepted) {
         if (confirmation !== pending) return;
-        confirmation = null; box.remove(); resolve(accepted);
+        confirmation = null; box.remove(); resolve({ accepted: accepted, deleteCode: accepted && deleteCode ? deleteCode.value : '' });
         if (button && button.focus) button.focus();
       } };
       confirmation = pending;
@@ -80,7 +90,8 @@ window.PropertyRental = (function () {
     refresh(); report('', false);
     var timer;
     try {
-      if (!(await confirmRental(request))) return;
+      var confirmationResult = await confirmRental(request);
+      if (!confirmationResult.accepted) return;
       if (config.getToken() !== token || !detail || detail.code !== request.code || detail.version !== request.version) return;
       active.saving = true;
       refresh(); report(deleting ? 'กำลังลบข้อมูลและย้ายโฟลเดอร์รูปไปถังขยะ กรุณารอ…' : 'กำลังคัดลอกข้อมูลและย้ายโฟลเดอร์ กรุณารอ…', false);
@@ -88,7 +99,7 @@ window.PropertyRental = (function () {
       timer = setTimeout(function () { controller.abort(); }, 120000);
       var response = await fetch(config.endpoint, {
         method: 'POST', headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
-        body: JSON.stringify({ action: deleting ? 'deleteRental' : (config.action || 'markRented'), dataset: returning() ? 'rented' : 'active', token: token, code: request.code, version: request.version, confirmed: true }),
+        body: JSON.stringify({ action: deleting ? 'deleteRental' : (config.action || 'markRented'), dataset: returning() ? 'rented' : 'active', token: token, code: request.code, version: request.version, confirmed: true, deleteCode: deleting ? confirmationResult.deleteCode : undefined }),
         signal: controller.signal
       });
       if (!response.ok) throw new Error('network');
