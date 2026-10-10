@@ -5,7 +5,7 @@ window.PropertyRental = (function () {
   var messages = {
     busy: 'มีรายการกำลังบันทึกอยู่ กรุณารอสักครู่แล้วลองใหม่',
     confirmation_required: 'กรุณายืนยันว่าทรัพย์ถูกเช่าแล้วก่อนบันทึก',
-    invalid_delete_code: 'รหัสยืนยันไม่ถูกต้อง กรุณากรอก 1140 ก่อนลบ',
+    invalid_delete_code: 'รหัสผ่านไม่ถูกต้อง กรุณาตรวจสอบแล้วลองอีกครั้ง',
     invalid_code: 'รหัสทรัพย์ไม่ถูกต้อง',
     invalid_version: 'ข้อมูลทรัพย์ยังไม่พร้อม กรุณาโหลดข้อมูลใหม่แล้วลองอีกครั้ง',
     missing_sheet: 'ไม่พบแท็บรายชื่อบ้านเช่าหรือเช่าแล้ว กรุณาติดต่อผู้ดูแล',
@@ -50,11 +50,10 @@ window.PropertyRental = (function () {
       title.textContent = request.deleting ? 'ยืนยันลบทรัพย์รหัส ' + request.code + '? แถวข้อมูลจะถูกลบออกจากแถบ ' + (returning() ? 'เช่าแล้ว' : 'รายชื่อบ้านเช่า') + ' และโฟลเดอร์รูปทั้งหมดของรหัสนี้ในแหล่งเดียวกันจะถูกย้ายไปถังขยะ' : (returning() ? 'ยืนยันนำทรัพย์รหัส ' + request.code + ' กลับไปปล่อยเช่า พร้อมย้ายข้อมูลและโฟลเดอร์รูปตามประเภททรัพย์?' : 'ยืนยันว่าทรัพย์รหัส ' + request.code + ' ถูกเช่าแล้ว?'); box.appendChild(title);
       var deleteCode = null;
       if (request.deleting) {
-        var codeLabel = document.createElement('label'); codeLabel.className = 'rental-delete-code-label';
-        codeLabel.textContent = 'กรอกรหัส 1140 เพื่อยืนยันการลบ';
+        var codeLabel = document.createElement('div'); codeLabel.className = 'rental-delete-code-label';
         deleteCode = document.createElement('input'); deleteCode.type = 'password'; deleteCode.inputMode = 'numeric';
         deleteCode.autocomplete = 'off'; deleteCode.maxLength = 4; deleteCode.className = 'rental-delete-code-input';
-        deleteCode.setAttribute('aria-label', 'กรอกรหัสยืนยัน 1140'); codeLabel.appendChild(deleteCode); box.appendChild(codeLabel);
+        deleteCode.setAttribute('aria-label', 'กรอกรหัสผ่านเพื่อยืนยันการลบ'); codeLabel.appendChild(deleteCode); box.appendChild(codeLabel);
       }
       var actions = document.createElement('div'); actions.className = 'rental-confirmation-actions';
       var cancel = document.createElement('button'); cancel.type = 'button'; cancel.textContent = 'ยกเลิก';
