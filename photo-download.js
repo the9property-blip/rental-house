@@ -206,7 +206,7 @@ window.PropertyPhotos = (function () {
       // Never put the download credential in the URL or persist the generated ZIP.
       var response = await fetch(config.endpoint, {
         method: 'POST', headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
-        body: JSON.stringify({ action: 'downloadPhotos', code: code, token: token, format: mobileImages ? 'images' : 'zip' }),
+        body: JSON.stringify({ action: 'downloadPhotos', code: code, token: token, dataset: config.dataset, format: mobileImages ? 'images' : 'zip' }),
         credentials: 'omit', cache: 'no-store', redirect: 'follow', signal: signal
       });
       if (!response.ok) throw new Error('network');

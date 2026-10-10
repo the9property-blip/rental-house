@@ -8,21 +8,24 @@ window.PropertyRental = (function () {
     invalid_code: 'รหัสทรัพย์ไม่ถูกต้อง',
     invalid_version: 'ข้อมูลทรัพย์ยังไม่พร้อม กรุณาโหลดข้อมูลใหม่แล้วลองอีกครั้ง',
     missing_sheet: 'ไม่พบแท็บรายชื่อบ้านเช่าหรือเช่าแล้ว กรุณาติดต่อผู้ดูแล',
-    source_missing: 'ไม่พบรหัสนี้ในรายชื่อบ้านเช่า กรุณาโหลดข้อมูลใหม่',
+    source_missing: 'ไม่พบรหัสนี้ในแถบต้นทาง กรุณาโหลดข้อมูลใหม่',
     source_changed: 'ข้อมูลทรัพย์เปลี่ยนไป กรุณาโหลดข้อมูลใหม่ก่อนยืนยันอีกครั้ง',
     duplicate_code: 'พบรหัสซ้ำในรายชื่อบ้านเช่า กรุณาตรวจสอบข้อมูลก่อน',
-    no_rent_folder: 'ไม่พบโฟลเดอร์รหัสนี้ภายใน Rent จึงยังไม่ได้บันทึกเช่าแล้ว',
-    destination_mismatch: 'โฟลเดอร์ปลายทางไม่ตรงกับ 0-2บ้านที่ปล่อยเช่าแล้วภายใน Rent กรุณาติดต่อผู้ดูแล',
+    no_rent_folder: 'ไม่พบโฟลเดอร์รหัสนี้ในโฟลเดอร์ต้นทาง จึงยังไม่ได้ย้ายทรัพย์',
+    unsupported_type: 'ยังไม่ได้ระบุประเภททรัพย์ กรุณาตรวจสอบข้อมูล',
+    invalid_return_count: 'จำนวนครั้งในคอลัมน์ AC ต้องเป็นจำนวนเต็มตั้งแต่ 0 ขึ้นไป',
+    destination_mismatch: 'ไม่พบโฟลเดอร์ปลายทางที่ถูกต้องภายใน Rent กรุณาติดต่อผู้ดูแล',
     outside_rent: 'โฟลเดอร์ของทรัพย์ไม่อยู่ในขอบเขต Rent จึงหยุดการย้าย',
     folder_scan_timeout: 'ค้นหาโฟลเดอร์ไม่ครบในเวลาที่กำหนด ยังไม่ได้เริ่มย้ายข้อมูล กรุณาลองใหม่',
     too_many_folders: 'พบโฟลเดอร์รหัสเดียวกันจำนวนมาก กรุณาตรวจสอบกับผู้ดูแล',
     archive_conflict: 'ข้อมูลที่สำรองไว้ไม่ตรงกับรายการเดิม กรุณาให้ผู้ดูแลตรวจสอบก่อนทำต่อ',
     rental_incomplete: 'ยังไม่ยืนยันว่าบันทึกครบทุกขั้นตอน กรุณาลองอีกครั้ง ระบบจะตรวจรายการเดิมก่อนทำต่อ'
   };
+  function returning() { return config && config.action === 'restoreRental'; }
   function refresh() {
     if (button) {
       button.disabled = !!active || !detail || !config.getToken() || !/^[a-f0-9]{64}$/.test(detail.version);
-      button.textContent = active && active.saving && detail && active.code === detail.code ? 'กำลังบันทึกเช่าแล้ว…' : 'เช่าแล้ว';
+      button.textContent = active && active.saving && detail && active.code === detail.code ? 'กำลังบันทึก…' : (returning() ? 'นำทรัพย์กลับไปปล่อยเช่า' : 'เช่าแล้ว');
     }
   }
   function report(message, error) {
@@ -36,7 +39,7 @@ window.PropertyRental = (function () {
       var box = document.createElement('section'); box.className = 'rental-confirmation';
       box.setAttribute('role', 'alertdialog'); box.setAttribute('aria-labelledby', 'rentalConfirmTitle');
       var title = document.createElement('p'); title.id = 'rentalConfirmTitle';
-      title.textContent = 'ยืนยันว่าทรัพย์รหัส ' + request.code + ' ถูกเช่าแล้ว?'; box.appendChild(title);
+      title.textContent = returning() ? 'ยืนยันนำทรัพย์รหัส ' + request.code + ' กลับไปปล่อยเช่า พร้อมย้ายข้อมูลและโฟลเดอร์รูปตามประเภททรัพย์?' : 'ยืนยันว่าทรัพย์รหัส ' + request.code + ' ถูกเช่าแล้ว?'; box.appendChild(title);
       var actions = document.createElement('div'); actions.className = 'rental-confirmation-actions';
       var cancel = document.createElement('button'); cancel.type = 'button'; cancel.textContent = 'ยกเลิก';
       var agree = document.createElement('button'); agree.type = 'button'; agree.textContent = 'ตกลง'; agree.className = 'rental-confirm-agree';
@@ -75,7 +78,7 @@ window.PropertyRental = (function () {
       timer = setTimeout(function () { controller.abort(); }, 120000);
       var response = await fetch(config.endpoint, {
         method: 'POST', headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
-        body: JSON.stringify({ action: 'markRented', token: token, code: request.code, version: request.version, confirmed: true }),
+        body: JSON.stringify({ action: config.action || 'markRented', token: token, code: request.code, version: request.version, confirmed: true }),
         signal: controller.signal
       });
       if (!response.ok) throw new Error('network');
@@ -91,7 +94,7 @@ window.PropertyRental = (function () {
       if (result.code !== request.code) throw new Error('invalid_response');
       if (detail && detail.code === request.code) detail = null;
       config.onComplete(request.code);
-      config.notify('บันทึกว่าทรัพย์ ' + request.code + ' เช่าแล้วสำเร็จ');
+      config.notify(returning() ? 'นำทรัพย์ ' + request.code + ' กลับไปปล่อยเช่าสำเร็จ' : 'บันทึกว่าทรัพย์ ' + request.code + ' เช่าแล้วสำเร็จ');
     } catch (err) {
       if (config.getToken() === token && detail && detail.code === request.code)
         report('ยังไม่ได้รับผลยืนยัน กรุณาโหลดข้อมูลใหม่หรือลองอีกครั้ง ระบบจะตรวจรายการเดิมก่อนทำต่อ', true);
