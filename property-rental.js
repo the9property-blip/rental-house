@@ -1,7 +1,7 @@
 /* Staff-only rental archiving shared by the catalog and map. */
 window.PropertyRental = (function () {
   'use strict';
-  var config, detail = null, active = null, button = null, status = null, confirmation = null;
+  var config, detail = null, active = null, button = null, deleteButton = null, status = null, confirmation = null;
   var messages = {
     busy: 'มีรายการกำลังบันทึกอยู่ กรุณารอสักครู่แล้วลองใหม่',
     confirmation_required: 'กรุณายืนยันว่าทรัพย์ถูกเช่าแล้วก่อนบันทึก',
@@ -18,6 +18,9 @@ window.PropertyRental = (function () {
     outside_rent: 'โฟลเดอร์ของทรัพย์ไม่อยู่ในขอบเขต Rent จึงหยุดการย้าย',
     folder_scan_timeout: 'ค้นหาโฟลเดอร์ไม่ครบในเวลาที่กำหนด ยังไม่ได้เริ่มย้ายข้อมูล กรุณาลองใหม่',
     too_many_folders: 'พบโฟลเดอร์รหัสเดียวกันจำนวนมาก กรุณาตรวจสอบกับผู้ดูแล',
+    invalid_dataset: 'แหล่งข้อมูลไม่ถูกต้อง กรุณาโหลดหน้าเว็บใหม่',
+    deletion_pending: 'มีการลบทรัพย์ค้างอยู่ กรุณาทำรายการลบเดิมให้เสร็จก่อน',
+    deletion_incomplete: 'ยังลบไม่ครบทุกขั้นตอน กรุณาลองลบรายการเดิมอีกครั้ง ระบบจะตรวจสอบก่อนทำต่อ',
     archive_conflict: 'ข้อมูลที่สำรองไว้ไม่ตรงกับรายการเดิม กรุณาให้ผู้ดูแลตรวจสอบก่อนทำต่อ',
     rental_incomplete: 'ยังไม่ยืนยันว่าบันทึกครบทุกขั้นตอน กรุณาลองอีกครั้ง ระบบจะตรวจรายการเดิมก่อนทำต่อ'
   };
@@ -25,7 +28,11 @@ window.PropertyRental = (function () {
   function refresh() {
     if (button) {
       button.disabled = !!active || !detail || !config.getToken() || !/^[a-f0-9]{64}$/.test(detail.version);
-      button.textContent = active && active.saving && detail && active.code === detail.code ? 'กำลังบันทึก…' : (returning() ? 'นำทรัพย์กลับไปปล่อยเช่า' : 'เช่าแล้ว');
+      button.textContent = active && !active.deleting && active.saving && detail && active.code === detail.code ? 'กำลังบันทึก…' : (returning() ? 'นำทรัพย์กลับไปปล่อยเช่า' : 'เช่าแล้ว');
+    }
+    if (deleteButton) {
+      deleteButton.disabled = !!active || !detail || !config.getToken() || !/^[a-f0-9]{64}$/.test(detail.version);
+      deleteButton.textContent = active && active.deleting && active.saving && detail && active.code === detail.code ? 'กำลังลบ…' : 'ลบข้อมูล';
     }
   }
   function report(message, error) {
@@ -39,10 +46,11 @@ window.PropertyRental = (function () {
       var box = document.createElement('section'); box.className = 'rental-confirmation';
       box.setAttribute('role', 'alertdialog'); box.setAttribute('aria-labelledby', 'rentalConfirmTitle');
       var title = document.createElement('p'); title.id = 'rentalConfirmTitle';
-      title.textContent = returning() ? 'ยืนยันนำทรัพย์รหัส ' + request.code + ' กลับไปปล่อยเช่า พร้อมย้ายข้อมูลและโฟลเดอร์รูปตามประเภททรัพย์?' : 'ยืนยันว่าทรัพย์รหัส ' + request.code + ' ถูกเช่าแล้ว?'; box.appendChild(title);
+      title.textContent = request.deleting ? 'ยืนยันลบทรัพย์รหัส ' + request.code + '? แถวข้อมูลจะถูกลบออกจากแถบ ' + (returning() ? 'เช่าแล้ว' : 'รายชื่อบ้านเช่า') + ' และโฟลเดอร์รูปทั้งหมดของรหัสนี้ในแหล่งเดียวกันจะถูกย้ายไปถังขยะ' : (returning() ? 'ยืนยันนำทรัพย์รหัส ' + request.code + ' กลับไปปล่อยเช่า พร้อมย้ายข้อมูลและโฟลเดอร์รูปตามประเภททรัพย์?' : 'ยืนยันว่าทรัพย์รหัส ' + request.code + ' ถูกเช่าแล้ว?'); box.appendChild(title);
       var actions = document.createElement('div'); actions.className = 'rental-confirmation-actions';
       var cancel = document.createElement('button'); cancel.type = 'button'; cancel.textContent = 'ยกเลิก';
       var agree = document.createElement('button'); agree.type = 'button'; agree.textContent = 'ตกลง'; agree.className = 'rental-confirm-agree';
+      if (request.deleting) { agree.textContent = 'ยืนยันลบ'; agree.className += ' rental-confirm-delete'; }
       var pending = { finish: function (accepted) {
         if (confirmation !== pending) return;
         confirmation = null; box.remove(); resolve(accepted);
@@ -60,12 +68,14 @@ window.PropertyRental = (function () {
       if (box.scrollIntoView) box.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     });
   }
-  async function markRented() {
+  function markRented() { return performAction(false); }
+  function deleteRental() { return performAction(true); }
+  async function performAction(deleting) {
     if (active || !detail) return;
     var token = config.getToken();
     if (!token) { config.requestLogin(); return; }
     if (!/^[a-f0-9]{64}$/.test(detail.version)) { report(messages.invalid_version, true); return; }
-    var request = { code: detail.code, version: detail.version };
+    var request = { code: detail.code, version: detail.version, deleting: deleting };
     active = request;
     refresh(); report('', false);
     var timer;
@@ -73,12 +83,12 @@ window.PropertyRental = (function () {
       if (!(await confirmRental(request))) return;
       if (config.getToken() !== token || !detail || detail.code !== request.code || detail.version !== request.version) return;
       active.saving = true;
-      refresh(); report('กำลังคัดลอกข้อมูลและย้ายโฟลเดอร์ กรุณารอ…', false);
+      refresh(); report(deleting ? 'กำลังลบข้อมูลและย้ายโฟลเดอร์รูปไปถังขยะ กรุณารอ…' : 'กำลังคัดลอกข้อมูลและย้ายโฟลเดอร์ กรุณารอ…', false);
       var controller = new AbortController();
       timer = setTimeout(function () { controller.abort(); }, 120000);
       var response = await fetch(config.endpoint, {
         method: 'POST', headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
-        body: JSON.stringify({ action: config.action || 'markRented', token: token, code: request.code, version: request.version, confirmed: true }),
+        body: JSON.stringify({ action: deleting ? 'deleteRental' : (config.action || 'markRented'), dataset: returning() ? 'rented' : 'active', token: token, code: request.code, version: request.version, confirmed: true }),
         signal: controller.signal
       });
       if (!response.ok) throw new Error('network');
@@ -94,7 +104,7 @@ window.PropertyRental = (function () {
       if (result.code !== request.code) throw new Error('invalid_response');
       if (detail && detail.code === request.code) detail = null;
       config.onComplete(request.code);
-      config.notify(returning() ? 'นำทรัพย์ ' + request.code + ' กลับไปปล่อยเช่าสำเร็จ' : 'บันทึกว่าทรัพย์ ' + request.code + ' เช่าแล้วสำเร็จ');
+      config.notify(deleting ? 'ลบข้อมูลและโฟลเดอร์รูปทรัพย์ ' + request.code + ' สำเร็จ' : (returning() ? 'นำทรัพย์ ' + request.code + ' กลับไปปล่อยเช่าสำเร็จ' : 'บันทึกว่าทรัพย์ ' + request.code + ' เช่าแล้วสำเร็จ'));
     } catch (err) {
       if (config.getToken() === token && detail && detail.code === request.code)
         report('ยังไม่ได้รับผลยืนยัน กรุณาโหลดข้อมูลใหม่หรือลองอีกครั้ง ระบบจะตรวจรายการเดิมก่อนทำต่อ', true);
@@ -110,17 +120,21 @@ window.PropertyRental = (function () {
       detail = property ? { code: String(property.code || '').trim().toUpperCase(), version: String(property.rentalVersion || '') } : null;
       var slot = document.getElementById('dRentalAction');
       if (!slot) return;
-      slot.textContent = ''; button = status = null;
+      slot.textContent = ''; button = deleteButton = status = null;
       if (!detail || !config.getToken()) return;
       button = document.createElement('button');
       button.type = 'button'; button.className = 'rental-action-button'; button.onclick = markRented;
       slot.appendChild(button);
+      deleteButton = document.createElement('button');
+      deleteButton.type = 'button'; deleteButton.className = 'rental-action-button rental-delete-button'; deleteButton.onclick = deleteRental;
+      slot.appendChild(deleteButton);
       status = document.createElement('p'); status.className = 'rental-action-status'; status.setAttribute('role', 'status');
       slot.appendChild(status); refresh();
       if (!/^[a-f0-9]{64}$/.test(detail.version)) report(messages.invalid_version, true);
       else if (active && active.saving && active.code === detail.code) report('กำลังคัดลอกข้อมูลและย้ายโฟลเดอร์ กรุณารอ…', false);
     },
     markRented: markRented,
+    deleteRental: deleteRental,
     cancelConfirmation: cancelConfirmation
   };
 })();
