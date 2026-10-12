@@ -520,10 +520,10 @@ body {
 .btn-copy:active{transform:scale(0.94)}
 .val-copy{display:flex;align-items:center;gap:2px;min-width:0}
 .val-copy .val{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.staff-contact-row{gap:12px;align-items:flex-start}
-.staff-contact-row .lbl{flex-shrink:0}
-.staff-contact-row .val-copy{flex:1;justify-content:flex-end}
-.staff-contact-row .val{white-space:pre-wrap;overflow-wrap:anywhere;text-align:right}
+.staff-contact-row,.staff-maps-row{gap:12px;align-items:flex-start}
+.staff-contact-row .lbl,.staff-maps-row .lbl{flex-shrink:0}
+.staff-contact-row .val-copy,.staff-maps-row .val-copy{flex:1;justify-content:flex-end}
+.staff-contact-row .val,.staff-maps-row .val{white-space:pre-wrap;overflow-wrap:anywhere;text-align:right}
 /* กล่อง caption {รหัส}-1.txt */
 .staff-section .caption-block{margin-top:10px;border-top:1px dashed #e3c97a;padding-top:8px}
 .caption-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
@@ -753,7 +753,7 @@ body {
       <div class="modal-row staff-contact-row"><span class="lbl">ช่องทางการติดต่อ</span>
         <span class="val-copy"><span class="val" id="dOwnerContact">–</span><button type="button" class="btn-copy" title="คัดลอกช่องทางการติดต่อ" onclick="copyText(document.getElementById('dOwnerContact').textContent)">📋</button></span></div>
       <div class="modal-row" id="dFacebookRow" style="display:none;"><span class="lbl">โพส FB</span> <span class="val" id="dFacebookVal">–</span></div>
-      <div class="modal-row"><span class="lbl">พิกัด</span>
+      <div class="modal-row staff-maps-row"><span class="lbl">Google Maps</span>
         <span class="val-copy"><span class="val" id="dCoords">–</span><button type="button" class="btn-copy" id="dCoordsCopy" title="คัดลอกลิงก์ Google Maps" onclick="copyCoords()">📋</button></span></div>
       <div id="dPhotoDownload"></div>
       <div id="dRentalAction"></div>
@@ -1616,11 +1616,11 @@ function openDetail(p) {
       var mapsHref = 'https://www.google.com/maps?q=' + p.lat + ',' + p.lng;
       _coordsHref = mapsHref;
       coordsEl.innerHTML = '<a href="' + mapsHref + '" target="_blank" rel="noopener">' +
-        p.lat.toFixed(6) + ', ' + p.lng.toFixed(6) + ' 🗺</a>';
+        mapsHref + '</a>';
       if (coordsCopy) coordsCopy.style.display = '';
     } else {
       _coordsHref = '';
-      coordsEl.textContent = '— ไม่ระบุพิกัด';
+      coordsEl.textContent = '— ไม่มีลิงก์แผนที่';
       if (coordsCopy) coordsCopy.style.display = 'none';
     }
     // ดึง caption {รหัส}-1.txt
