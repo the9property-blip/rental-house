@@ -465,9 +465,10 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
 .staff-btn:hover { background: rgba(255,255,255,0.25); }
 .staff-btn.logged-in { background: #f6c244; color: #1a1a2e; border-color: #f6c244; font-weight: 700; }
 
-/* กลุ่มลิงก์ทีมงานอยู่ใต้ปุ่ม Staff เพื่อไม่กินความสูงของส่วนหัว */
-.staff-controls { display: flex; flex-direction: column; gap: 5px; align-items: flex-end; flex-shrink: 0; }
-.staff-nav { display: flex; align-items: center; justify-content: flex-end; gap: 5px; }
+/* Staff และลิงก์ทีมงานใช้แถวเดียวกัน */
+.staff-controls { display:flex; flex-direction:row; align-items:center; gap:4px; flex-shrink:0; flex-wrap:nowrap; }
+.staff-nav { display:contents; }
+.staff-controls .staff-btn,.staff-nav > a { font-size:.66rem; padding:4px 8px; min-height:28px; line-height:1.2; white-space:nowrap; flex-shrink:0; }
 .sale-link-btn {
   background: linear-gradient(135deg, #c0392b, #962d22);
   color: white; border: 1.5px solid rgba(255,255,255,0.3);
@@ -478,17 +479,6 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
 }
 .sale-link-btn:hover { filter: brightness(1.18); }
 
-/* ปุ่มลิงก์ไปหน้า "ตารางโพสทรัพย์" — แสดงเฉพาะตอน login */
-.schedule-btn {
-  display: none;
-  background: linear-gradient(135deg, #2c7a4b, #1a365d);
-  color: white; border: 1.5px solid rgba(255,255,255,0.3);
-  padding: 4px 11px; border-radius: 50px; font-size: 0.73rem;
-  cursor: pointer; font-family: inherit; text-decoration: none;
-  align-items: center; justify-content: center; gap: 4px; white-space: nowrap;
-}
-.schedule-btn.visible { display: inline-flex; }
-.schedule-btn:hover { filter: brightness(1.15); }
 .customer-btn { display: none; background: linear-gradient(135deg, #6b3fa0, #3d2266); color: white; border: 1.5px solid rgba(255,255,255,0.3); border-radius: 50px; padding: 4px 11px; font-size: 0.73rem; text-decoration: none; align-items: center; justify-content: center; gap: 4px; white-space: nowrap; }
 .customer-btn.visible { display: inline-flex; }
 .customer-btn:hover { filter: brightness(1.15); }
@@ -582,12 +572,12 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
 .filter-clear-btn { min-height: 32px; font-weight: 700; }
 .search-tools {
   flex: 1; min-width: 0; display: grid;
-  grid-template-columns: minmax(0,1fr) minmax(0,1fr) auto; gap: 8px; align-items: center;
+  grid-template-columns: minmax(0,1.2fr) minmax(0,.8fr) auto; gap: 8px; align-items: center;
 }
 .search-tools .search-wrap, .search-tools .geo-search-container { min-width: 0; max-width: none; }
 .search-tools .search-wrap input, .search-tools .geo-input-wrap { height: 34px; }
-.search-tools .geo-input-wrap { padding: 3px 4px 3px 10px; }
-.search-tools .geo-input-wrap input { flex: 1; width: 0; height: 28px; }
+.search-tools .geo-input-wrap { padding: 3px 4px 3px 10px; min-width:0; }
+.search-tools .geo-input-wrap input { flex: 1; width: 0; min-width:0; height: 28px; }
 .search-tools .geo-dropdown { left: auto; right: 0; width: max(100%,280px); max-width: calc(100vw - 28px); }
 .search-tools .search-icon { pointer-events: none; }
 .search-tools .search-clear-btn {
@@ -604,10 +594,10 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
   .header { position: relative; top: auto; }
   .header-row1 { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 6px; align-items: center; }
   .header-row1 .header-logo { grid-column: 1; grid-row: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-  .header-row1 .staff-controls { grid-column: 2; grid-row: 1; flex-direction: row; align-items: center; max-width: 235px; overflow-x: auto; scrollbar-width: none; }
+  .header-row1 .staff-controls { grid-column: 2; grid-row: 1; flex-direction: row; align-items: center; max-width:min(80vw,300px); gap:2px; overflow-x:auto; scrollbar-width:none; }
   .header-row1 .staff-controls::-webkit-scrollbar { display: none; }
   .staff-nav { display: contents; }
-  .staff-controls .staff-btn, .staff-nav > a { font-size: 0.58rem; padding: 3px 6px; }
+  .staff-controls .staff-btn, .staff-nav > a { font-size: 0.58rem; padding: 3px 4px; }
   .header-row1 .search-tools { grid-column: 1 / -1; grid-row: 2; width: 100%; gap: 6px; }
   .header-row2 .filter-num { flex: 1 1 100px; max-width: none; min-width: 0; }
   .header-row2 .filter-select:not(.filter-num) { flex: 1 1 100px; max-width: none; min-width: 0; }
@@ -663,16 +653,13 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
       <button type="button" class="filter-clear-btn search-clear-btn" id="btnClearFilters" onclick="clearAllFilters()" title="ล้างการค้นหาและตัวกรองทั้งหมด">✕ ล้าง</button>
     </div>
     <div class="staff-controls">
-      <button class="staff-btn" id="staffBtn" onclick="staffBtnClick()">🔐 Staff</button>
       <div class="staff-nav">
         <a class="sale-link-btn" href="https://the9property-blip.github.io/SaelProperty/" target="_blank" rel="noopener" title="ไปยังเว็บทรัพย์ขาย">🏷️ ทรัพย์ขาย</a>
-        <a class="schedule-btn" id="scheduleBtn"
-           href="https://the9property-blip.github.io/property-posting-schedule/"
-           target="_blank" rel="noopener">📋 ตารางโพสทรัพย์</a>
         <a class="customer-btn" id="customerBtn"
            href="https://the9property-blip.github.io/costumer-rent/"
            target="_blank" rel="noopener">👥 ลูกค้าหาเช่า</a>
       </div>
+      <button class="staff-btn" id="staffBtn" onclick="staffBtnClick()">🔐 Staff</button>
     </div>
   </div>
   <div class="header-row2">
@@ -970,18 +957,15 @@ try {
 function isStaffLoggedIn() { return !!getStaffToken(); }
 function updateStaffBtn() {
   var btn = document.getElementById('staffBtn');
-  var sch = document.getElementById('scheduleBtn');
   var cust = document.getElementById('customerBtn');
   if (!btn) return;
   if (isStaffLoggedIn()) {
     btn.textContent = '⭐ Staff (ออก)';
     btn.classList.add('logged-in');
-    if (sch) sch.classList.add('visible');
     if (cust) cust.classList.add('visible');
   } else {
     btn.textContent = '🔐 Staff';
     btn.classList.remove('logged-in');
-    if (sch) sch.classList.remove('visible');
     if (cust) cust.classList.remove('visible');
   }
 }
