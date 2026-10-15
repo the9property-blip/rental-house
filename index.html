@@ -626,6 +626,57 @@ body { font-family: 'Segoe UI', 'Noto Sans Thai', sans-serif; background: #f5f6f
 #dRentalAction>.rental-action-status,#dRentalAction>.rental-confirmation{grid-column:1/-1!important}
 .rental-delete-code-label{font-size:0!important}
 .rental-delete-code-input{font-size:18px!important;line-height:normal!important}
+
+/* Minimal visual theme: shared across catalog and rental maps. */
+:root { --ui-ink:#20354b; --ui-muted:#64748b; --ui-line:#dce3eb; --ui-soft:#f4f7fa; --ui-accent:#244e72; }
+body { background:#f4f6f8; color:var(--ui-ink); }
+.header { background:#fff; color:var(--ui-ink); border-bottom:1px solid var(--ui-line); box-shadow:0 2px 8px rgba(24,44,64,.05); }
+.header-logo { font-weight:700; }
+.header-logo span { color:var(--ui-muted); opacity:1; }
+.back-btn { background:var(--ui-soft); color:var(--ui-ink); border:1px solid var(--ui-line); border-radius:10px; }
+.back-btn:hover { background:#e8eef4; }
+.search-tools .search-wrap input,.search-tools .geo-input-wrap { background:var(--ui-soft); border:1px solid var(--ui-line); border-radius:10px; color:var(--ui-ink); }
+.search-tools input::placeholder { color:#68798b; }
+.geo-btn-search { background:var(--ui-accent); border-radius:8px; }
+.header .filter-btn,.header .filter-select,.header .filter-num { background:#fff; border:1px solid var(--ui-line); border-radius:9px; color:#45576b; min-height:30px; }
+.header .filter-num::placeholder { color:#68798b; }
+.header .filter-btn:hover { background:var(--ui-soft); border-color:#afbfce; }
+.header .filter-btn.active { background:var(--ui-accent); color:#fff; border-color:var(--ui-accent); }
+.header .search-tools .search-clear-btn { background:#edf2f7; border:1px solid var(--ui-line); color:var(--ui-accent); border-radius:9px; font-weight:600; }
+.header .search-clear-btn:hover { background:#e1e9f1; }
+.header .staff-controls .staff-btn,.header .staff-nav > a { border:1px solid var(--ui-line); border-radius:8px; background:#f4f7fa; color:var(--ui-ink); font-weight:600; box-shadow:none; }
+.header .staff-nav > a:hover,.header .staff-btn:hover { background:#e8eef4; filter:none; }
+.header .staff-controls .staff-btn { background:var(--ui-accent); border-color:var(--ui-accent); color:#fff; }
+.header .staff-controls .staff-btn.logged-in { background:#e9f3ed; border-color:#c9ded0; color:#246044; }
+.stats-bar { color:var(--ui-muted); border-color:var(--ui-line); }
+.sort-select,.btn-refresh { border:1px solid var(--ui-line); border-radius:8px; }
+.card,.mini-card { border:1px solid var(--ui-line); border-radius:14px; box-shadow:0 2px 7px rgba(24,44,64,.04); }
+.card:hover,.mini-card:hover { box-shadow:0 6px 18px rgba(24,44,64,.1); transform:translateY(-2px); }
+.card-header { background:#fff; color:var(--ui-ink); border-bottom:1px solid #edf1f5; }
+.card-code,.card-location { color:var(--ui-muted); opacity:1; }
+.card-type-badge { background:#edf2f7; color:var(--ui-accent); border-color:var(--ui-line); }
+.card-footer { border-color:#edf1f5; }
+.mc-price,.modal-price { color:var(--ui-accent); }
+.mc-price small,.modal-price small { color:var(--ui-muted); }
+.status-ready { background:#26835d; box-shadow:none; }
+.count-pill,.toggle-pill { border:1px solid var(--ui-line); border-radius:10px; box-shadow:0 2px 8px rgba(24,44,64,.08); }
+.modal,.staff-modal { box-shadow:0 16px 48px rgba(24,44,64,.18); }
+.modal-row .lbl { color:var(--ui-muted); }
+.staff-section { background:#f7f9fc; border:1px solid var(--ui-line); border-radius:12px; }
+.staff-section .staff-title,.staff-section .modal-row .lbl { color:#53677d; }
+.staff-section .caption-block { border-color:var(--ui-line); }
+:where(button,a,input,select,textarea):focus-visible { outline:2px solid #3878b2; outline-offset:2px; }
+@media(max-width:600px) {
+  .header { padding:8px 10px; }
+  .header-row2 { margin-top:7px; }
+  .header .filter-btn,.header .filter-select,.header .filter-num { min-height:32px; }
+  .header .staff-controls .staff-btn { position:sticky; right:0; z-index:1; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .card,.mini-card,.card-photo img { transition:none; }
+  .card:hover,.mini-card:hover { transform:none; }
+}
+
 </style>
 <link rel="stylesheet" href="photo-download.css">
 <script src="photo-download.js"></script>
