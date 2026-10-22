@@ -722,15 +722,19 @@ body { background:#f4f6f8; color:var(--ui-ink); }
       <option value="all">🛏 ทุกขนาด</option>
       <option value="1">1 นอน</option>
       <option value="2">2 นอน</option>
-      <option value="3">3 นอน</option>
+      <option value="3+">3+ นอน</option>
       <option value="4+">4+ นอน</option>
+      <option value="5+">5+ นอน</option>
+      <option value="6+">6+ นอน</option>
     </select>
     <select class="filter-select" id="selBath" onchange="applyFilters()">
       <option value="all">🚿 ทุกห้องน้ำ</option>
       <option value="1">1 น้ำ</option>
       <option value="2">2 น้ำ</option>
-      <option value="3">3 น้ำ</option>
+      <option value="3+">3+ น้ำ</option>
       <option value="4+">4+ น้ำ</option>
+      <option value="5+">5+ น้ำ</option>
+      <option value="6+">6+ น้ำ</option>
     </select>
     <select class="filter-select room-feature-select" id="selMaidRoom" aria-label="ห้องแม่บ้าน" onchange="applyFilters()">
       <option value="all">ห้องแม่บ้าน: ทั้งหมด</option>
@@ -1451,13 +1455,13 @@ function passFilter(p) {
   if (pet === 'no'  && !(p.pet||'').includes('ไม่')) return false;
   if (bed !== 'all') {
     var br = parseInt(p.bedroom) || 0;
-    if (bed === '4+' && br < 4) return false;
-    if (bed !== '4+' && br !== parseInt(bed)) return false;
+    if (bed.endsWith('+') && br < parseInt(bed, 10)) return false;
+    if (!bed.endsWith('+') && br !== parseInt(bed, 10)) return false;
   }
   if (bath !== 'all') {
     var ba = parseInt(p.bathroom) || 0;
-    if (bath === '4+' && ba < 4) return false;
-    if (bath !== '4+' && ba !== parseInt(bath)) return false;
+    if (bath.endsWith('+') && ba < parseInt(bath, 10)) return false;
+    if (!bath.endsWith('+') && ba !== parseInt(bath, 10)) return false;
   }
   if (maidRoom !== 'all' && p.maidRoom !== (maidRoom === 'yes')) return false;
   if (downstairsBedroom !== 'all' && p.downstairsBedroom !== (downstairsBedroom === 'yes')) return false;
