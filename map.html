@@ -1245,14 +1245,14 @@ function buildPopup(p) {
       coBadge +
       surveyBadge +
     '</div>' +
-    '<div class="pp-body">' +
+    '<div class="pp-body" onclick="openDetailByCode(\'' + p.code + '\')">' +
       '<div class="pp-price">฿' + fmtPrice(p.price) + ' <small>/ เดือน</small></div>' +
       '<div class="pp-name">' + escapeHtml(p.project || 'ไม่ระบุโครงการ') + '</div>' +
       '<div class="pp-loc">📍 ' + escapeHtml(p.location || 'ไม่ระบุทำเล') + '</div>' +
       '<div class="pp-tags">' + tagsHtml(p, 'pp') + '</div>' +
       '<div class="pp-actions">' +
-        '<button class="pp-btn detail" onclick="openDetailByCode(\'' + p.code + '\')">📋 รายละเอียด</button>' +
-        '<a class="pp-btn maps" href="' + mapsHref + '" target="_blank" rel="noopener" title="Google Maps">🗺️</a>' +
+        '<button class="pp-btn detail" onclick="event.stopPropagation();openDetailByCode(\'' + p.code + '\')">📋 รายละเอียด</button>' +
+        '<a class="pp-btn maps" onclick="event.stopPropagation()" href="' + mapsHref + '" target="_blank" rel="noopener" title="Google Maps">🗺️</a>' +
       '</div>' +
     '</div>';
 }
@@ -1270,7 +1270,7 @@ function miniCardHtml(p) {
   var dist = (p._dist != null)
     ? '<div class="mc-dist' + (p._dist > 5 ? ' far' : '') + '">📍 ' + fmtDist(p._dist) + '</div>'
     : '';
-  return '<div class="mini-card" data-code="' + p.code + '" title="แตะเพื่อดูตำแหน่งบนแผนที่" onclick="focusMarker(\'' + p.code + '\')">' +
+  return '<div class="mini-card" data-code="' + p.code + '" title="เปิดรายละเอียดในแท็บใหม่" onclick="openDetailByCode(\'' + p.code + '\')">' +
     '<div class="mc-photo">' + photo + status + gradeBadge + coBadge + surveyBadge + '</div>' +
     '<div class="mc-info">' +
       dist +
@@ -1626,7 +1626,7 @@ function openDetailByCode(code) {
   if (!p) return;
   selectedCode = code;
   highlightCard(code, true);
-  openDetail(p);
+  window.open('property.html?code=' + encodeURIComponent(p.code) + '', '_blank', 'noopener');
 }
 function openDetail(p) {
   PropertyPhotos.setDetail(p.code);
