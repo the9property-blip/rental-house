@@ -1505,7 +1505,7 @@ function showError(msg) {
   document.getElementById('countDisplay').textContent = '!';
 }
 function openPropertyPage(property) {
-  window.location.href = 'property.html?code=' + encodeURIComponent(property.code || '');
+  window.open('property.html?code=' + encodeURIComponent(property.code || ''), '_blank', 'noopener');
 }
 // ─── DETAIL MODAL ─────────────────────────────────────────
 function openDetail(p) {

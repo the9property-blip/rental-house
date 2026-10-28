@@ -110,7 +110,7 @@ function selectNearbyProperties(property,properties){
 }
 function nearbyCard(item){
   var property=item.property,link=make('a','nearby-card');
-  link.href='property.html?code='+encodeURIComponent(property.code);
+  link.href='property.html?code='+encodeURIComponent(property.code);link.target='_blank';link.rel='noopener';
   var media=make('div','nearby-photo');
   if(property.thumb&&/^[A-Za-z0-9_-]+$/.test(property.thumb)){var img=image({id:property.thumb},480,true);img.alt=property.project||'';media.appendChild(img);}else media.appendChild(make('span',null,'ไม่มีรูปภาพ'));
   var status=make('span','nearby-availability',property.ready?'✓ พร้อมเข้าพัก':'ประกาศล่วงหน้า');media.appendChild(status);link.appendChild(media);
