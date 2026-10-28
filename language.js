@@ -165,10 +165,13 @@
   "เรียงบ้านตามระยะใกล้ ": "Sorted by distance from ",
   "เรียงตามระยะใกล้ ": "Sorted by distance from "
 });
+  Object.assign(phrases, {"เมนูรายละเอียดทรัพย์":"Property navigation","ภาพรวม":"Overview","สิ่งอำนวยความสะดวก":"Amenities","คัดลอกลิงก์ทรัพย์":"Copy listing link","รูปภาพทรัพย์":"Property photos","สรุปข้อมูลทรัพย์":"Property summary","ขนาดที่ดิน (ตร.ว.)":"Land area (sq.wah)","พื้นที่ใช้สอย (ตร.ม.)":"Floor area (m²)","ติดต่อ The 9 Property":"Contact The 9 Property","สนใจนัดชมทรัพย์หรือต้องการข้อมูลเพิ่มเติม":"Contact us to arrange a viewing or request more information.","ราคาเช่า":"Monthly rent","เข้าสู่ระบบเพื่อดูข้อมูลทีมงาน":"Sign in to view staff details","ดูรูปทั้งหมด":"View all photos","ดูรูปภาพ":"View photo","ปิดรูปภาพ":"Close photos","รูปก่อนหน้า":"Previous photo","รูปถัดไป":"Next photo","ยังไม่ระบุ":"Not specified","ชั้น":"Floor","เฟอร์นิเจอร์และเครื่องใช้ไฟฟ้า":"Furniture and appliances","เฟอร์นิเจอร์":"Furniture","เช่าระยะสั้น":"Short-term rental","ระยะสัญญา":"Lease term","เงินประกัน":"Deposit","รายละเอียดเพิ่มเติม":"Additional details","ความปลอดภัยและส่วนกลาง":"Security and shared facilities","จุดเด่นทำเล":"Location highlights","ไม่พบข้อมูลทรัพย์":"Property not found","โหลดรายละเอียดไม่สำเร็จ กรุณาลองใหม่":"Unable to load property details. Please try again.","ออกจากระบบทีมงาน?":"Sign out of your staff account?","รหัสผ่านไม่ถูกต้อง หรือระบบไม่พร้อมใช้งาน":"Incorrect password or service unavailable","ไม่ระบุ":"Not specified"});
   var originalTitle = document.title;
   var keys = Object.keys(phrases).sort(function(a,b) { return b.length - a.length; });
   function translate(text) {
     if (language !== 'en' || typeof text !== 'string' || !/[ก-๙]/.test(text)) return text;
+    var exactFlags = {'มี':'Yes','ไม่มี':'No','รับ':'Allowed','ได้':'Yes','ไม่ได้':'No'};
+    if (exactFlags[text.trim()]) return text.replace(text.trim(),exactFlags[text.trim()]);
     var output = text;
     keys.forEach(function(key) { output = output.split(key).join(phrases[key]); });
     return output.replace(/(\d+\+?)\s+นอน/g, '$1 beds').replace(/(\d+\+?)\s+น้ำ/g, '$1 baths')

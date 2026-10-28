@@ -1470,7 +1470,7 @@ function showGrid(data) {
     var codeContent = (isStaffLoggedIn() && p.folderUrl)
       ? '<a class="code-link" href="' + p.folderUrl + '" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="เปิดโฟลเดอร์ใน Drive">' + (p.code||'') + ' 📁</a>'
       : (p.code||'');
-    return '<div class="card" onclick=\'openDetail(' + pj + ')\'>' +
+    return '<div class="card" onclick=\'openPropertyPage(' + pj + ')\'>' +
       photoBlock +
       '<div class="card-header">' +
         '<div class="card-code">' + codeContent + '</div>' +
@@ -1488,7 +1488,7 @@ function showGrid(data) {
         '</div>' +
       '</div>' +
       '<div class="card-footer">' +
-        '<button class="btn-detail" onclick=\'event.stopPropagation();openDetail(' + pj + ')\'>📋 รายละเอียด</button>' +
+        '<button class="btn-detail" onclick=\'event.stopPropagation();openPropertyPage(' + pj + ')\'>📋 รายละเอียด</button>' +
         '<button class="btn-contact-card" onclick="event.stopPropagation();window.location.href=\'tel:' + BROKER_PHONE + '\'">📞 สอบถาม</button>' +
       '</div>' +
     '</div>';
@@ -1503,6 +1503,9 @@ function showError(msg) {
   document.getElementById('grid').innerHTML =
     '<div class="state-box"><div class="icon">⚠️</div><h3>โหลดข้อมูลไม่สำเร็จ</h3><p>' + msg + '</p></div>';
   document.getElementById('countDisplay').textContent = '!';
+}
+function openPropertyPage(property) {
+  window.location.href = 'property.html?code=' + encodeURIComponent(property.code || '');
 }
 // ─── DETAIL MODAL ─────────────────────────────────────────
 function openDetail(p) {
