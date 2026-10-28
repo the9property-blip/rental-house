@@ -47,7 +47,7 @@ function copyField(id){return copyText(el(id).textContent);}
 function copyMap(){return copyText(currentStaff && currentProperty ? currentProperty.mapsUrl : '');}
 function safeLink(node,url) {try{var parsed=new URL(url);if(parsed.protocol!=='https:' && parsed.protocol!=='http:')throw Error();node.href=parsed.href;node.hidden=false;return true;}catch(_){node.removeAttribute('href');node.hidden=true;return false;} }
 function updateStaffBtn(){var logged=currentStaff&&!!getStaffToken();el('staffBtn').textContent=logged?'⭐ Staff (ออก)':'🔐 Staff';el('staffBtn').classList.toggle('logged-in',logged);}
-function clearStaffDetails(){currentStaff=false;el('dStaffSection').hidden=true;el('staffInvite').hidden=false;['dOwnerName','dOwnerTel','dOwnerContact','dCaptionText'].forEach(function(id){el(id).textContent='';});['staffMapLink','staffFacebook'].forEach(function(id){el(id).removeAttribute('href');});if(window.PropertyRental)PropertyRental.setDetail(null);updateStaffBtn();}
+function clearStaffDetails(){currentStaff=false;hideLocationMap();el('dStaffSection').hidden=true;el('staffInvite').hidden=false;['dOwnerName','dOwnerTel','dOwnerContact','dCaptionText'].forEach(function(id){el(id).textContent='';});['staffMapLink','staffFacebook'].forEach(function(id){el(id).removeAttribute('href');});if(window.PropertyRental)PropertyRental.setDetail(null);updateStaffBtn();}
 async function loadProperty(){
   var generation=++detailGeneration;if(requestAbort)requestAbort.abort();requestAbort=new AbortController();
   var token=getStaffToken();clearStaffDetails();currentProperty=null;
@@ -121,7 +121,15 @@ function nearbyCard(item){
   if(item.distance!==null)specs.appendChild(make('span','nearby-distance',item.distance.toFixed(1)+' กม.'));
   content.appendChild(specs);link.appendChild(content);return link;
 }
+function hideLocationMap(){
+  el('propertyMapSection').hidden=true;el('propertyMapNav').hidden=true;
+  el('propertyLocationMap').hidden=true;el('largerPropertyMap').hidden=true;
+  el('largerPropertyMap').removeAttribute('href');
+  if(nearbyMap){nearbyMap.remove();nearbyMap=null;}
+}
 function renderLocationMap(origin){
+  if(!currentStaff || !getStaffToken()){hideLocationMap();return;}
+  el('propertyMapSection').hidden=false;el('propertyMapNav').hidden=false;
   var mapEl=el('propertyLocationMap'),status=el('propertyMapStatus'),larger=el('largerPropertyMap');
   if(nearbyMap){nearbyMap.remove();nearbyMap=null;}
   mapEl.hidden=true;larger.hidden=true;
