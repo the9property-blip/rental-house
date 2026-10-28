@@ -78,6 +78,84 @@ function renderProperty(p){
   renderGallery(p);
   if(currentStaff){el('dStaffSection').hidden=false;el('staffInvite').hidden=true;text('dOwnerName',p.ownerName);text('dOwnerTel',p.ownerTel);text('dOwnerContact',p.contact);el('staffMapRow').hidden=!safeLink(el('staffMapLink'),p.mapsUrl);safeLink(el('staffFacebook'),p.facebook);PropertyPhotos.setDetail(p.code);if(window.PropertyRental)PropertyRental.setDetail(p);loadCaption();}
   if(window.PropertyLanguage)PropertyLanguage.refresh();
+  loadNearbyProperties(p);
+}
+var nearbyMap = null;
+function propertyCoordinates(property){
+  if(!property || property.lat==null || property.lng==null || property.lat==='' || property.lng==='')return null;
+  var lat=Number(property.lat),lng=Number(property.lng);
+  if(!isFinite(lat)||!isFinite(lng)||Math.abs(lat)>90||Math.abs(lng)>180 || (lat===0&&lng===0))return null;
+  return {lat:lat,lng:lng};
+}
+function propertyDistance(a,b){
+  var radians=Math.PI/180,dLat=(b.lat-a.lat)*radians,dLng=(b.lng-a.lng)*radians;
+  var v=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(a.lat*radians)*Math.cos(b.lat*radians)*Math.sin(dLng/2)*Math.sin(dLng/2);
+  return 6371*2*Math.atan2(Math.sqrt(Math.min(1,v)),Math.sqrt(Math.max(0,1-v)));
+}
+function selectNearbyProperties(property,properties){
+  var code=String(property.code||'').toUpperCase(),record=properties.find(function(p){return String(p.code||'').toUpperCase()===code;})||property;
+  var origin=propertyCoordinates(record)||propertyCoordinates(property);
+  var location=String(record.location||property.location||'').trim().toLowerCase();
+  var residential=['บ้านเดี่ยว','ทาวน์เฮ้าส์','ทาวน์โฮม','พูลวิลล่า','บ้าน','คอนโด'];
+  var seen={};
+  var candidates=properties.filter(function(p){var key=String(p.code||'').toUpperCase();if(!key||key===code||seen[key]||residential.indexOf(p.type)<0)return false;seen[key]=true;return true;});
+  var selected=[];
+  candidates.forEach(function(p){
+    var coordinates=propertyCoordinates(p);
+    if(origin){if(!coordinates)return;var distance=propertyDistance(origin,coordinates);if(distance<=20)selected.push({property:p,distance:distance});}
+    else if(location&&String(p.location||'').trim().toLowerCase()===location)selected.push({property:p,distance:null});
+  });
+  if(origin)selected.sort(function(a,b){return a.distance-b.distance;});
+  return {origin:origin,items:selected.slice(0,6)};
+}
+function nearbyCard(item){
+  var property=item.property,link=make('a','nearby-card');
+  link.href='property.html?code='+encodeURIComponent(property.code);
+  var media=make('div','nearby-photo');
+  if(property.thumb&&/^[A-Za-z0-9_-]+$/.test(property.thumb)){var img=image({id:property.thumb},480,true);img.alt=property.project||'';media.appendChild(img);}else media.appendChild(make('span',null,'ไม่มีรูปภาพ'));
+  var status=make('span','nearby-availability',property.ready?'✓ พร้อมเข้าพัก':'ประกาศล่วงหน้า');media.appendChild(status);link.appendChild(media);
+  var content=make('div','nearby-info'),price=make('div','nearby-price','฿'+money(property.price));price.appendChild(make('small',null,' บาท / เดือน'));content.appendChild(price);
+  var title=make('h3',null,property.project||property.code);title.setAttribute('data-no-translate','');content.appendChild(title);
+  var location=make('p','nearby-location',property.location||'–');location.setAttribute('data-no-translate','');content.appendChild(location);
+  var specs=make('div','nearby-specs');specs.appendChild(make('span',null,'🛏 '+(property.bedroom||'–')+' นอน'));specs.appendChild(make('span',null,'🚿 '+(property.bathroom||'–')+' น้ำ'));
+  if(item.distance!==null)specs.appendChild(make('span','nearby-distance',item.distance.toFixed(1)+' กม.'));
+  content.appendChild(specs);link.appendChild(content);return link;
+}
+function renderLocationMap(origin){
+  var mapEl=el('propertyLocationMap'),status=el('propertyMapStatus'),larger=el('largerPropertyMap');
+  if(nearbyMap){nearbyMap.remove();nearbyMap=null;}
+  mapEl.hidden=true;larger.hidden=true;
+  if(!origin){status.hidden=false;status.textContent='ยังไม่มีพิกัดของทรัพย์นี้';return;}
+  larger.href='https://www.google.com/maps?q='+origin.lat+','+origin.lng;larger.hidden=false;
+  if(!window.L){status.hidden=false;status.textContent='โหลดแผนที่ไม่สำเร็จ กรุณาเปิดแผนที่ขนาดใหญ่';return;}
+  status.hidden=true;mapEl.hidden=false;
+  nearbyMap=L.map(mapEl,{scrollWheelZoom:false,dragging:!L.Browser.mobile,tap:false}).setView([origin.lat,origin.lng],14);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap contributors'}).addTo(nearbyMap);
+  L.circleMarker([origin.lat,origin.lng],{radius:9,color:'#fff',weight:3,fillColor:'#244e72',fillOpacity:1}).addTo(nearbyMap);
+  nearbyMap.invalidateSize();
+}
+async function loadNearbyProperties(property){
+  var generation=detailGeneration,signal=requestAbort.signal;
+  el('nearbyCards').replaceChildren();el('nearbyStatus').hidden=false;el('nearbyStatus').textContent='กำลังโหลดข้อมูล...';
+  try{
+    // Public catalog only: credentials and Staff token are intentionally omitted.
+    var response=await fetch(SCRIPT_URL,{cache:'no-store',credentials:'omit',signal:signal});var result=await response.json();
+    if(generation!==detailGeneration)return;
+    if(!response.ok||!result.ok||!Array.isArray(result.data))throw Error('unavailable');
+    var selection=selectNearbyProperties(property,result.data);
+    if(!selection.origin&&propertyDataset==='rented'){
+      var archived=await(await fetch(SCRIPT_URL+'?action=rentedMap',{credentials:'omit',cache:'no-store',signal:signal})).json();
+      if(generation!==detailGeneration)return;
+      var archivedProperty=(archived.data||[]).find(function(p){return String(p.code||'').toUpperCase()===propertyCode;});
+      if(archivedProperty)selection=selectNearbyProperties(archivedProperty,result.data);
+    }
+    el('nearbyTitle').textContent=selection.origin?'บ้านใกล้เคียง':'ทรัพย์ในทำเลเดียวกัน';
+    el('nearbyHint').textContent=selection.origin?'ภายในระยะ 20 กม.':'เรียงจากข้อมูลในทำเลเดียวกัน';
+    selection.items.forEach(function(item){el('nearbyCards').appendChild(nearbyCard(item));});
+    el('nearbyStatus').hidden=!!selection.items.length;
+    if(!selection.items.length)el('nearbyStatus').textContent='ยังไม่พบทรัพย์ใกล้เคียงในขณะนี้';
+    renderLocationMap(selection.origin);
+  }catch(error){if(generation!==detailGeneration||error.name==='AbortError')return;el('nearbyStatus').textContent='โหลดทรัพย์ใกล้เคียงไม่สำเร็จ กรุณาลองใหม่';renderLocationMap(propertyCoordinates(property));}
 }
 function image(photo,size,lazy){var img=make('img');img.src=photoUrl(photo.id,size);img.alt='';img.decoding='async';img.loading=lazy?'lazy':'eager';img.onerror=function(){if(!img.dataset.fallback){img.dataset.fallback='1';img.src='https://drive.google.com/thumbnail?id='+encodeURIComponent(photo.id)+'&sz=w'+size;}else{img.hidden=true;if(img.parentElement&&!img.parentElement.querySelector('.image-error'))img.parentElement.appendChild(make('span','image-error','ไม่มีรูปภาพ'));}};return img;}
 function renderGallery(p){
@@ -87,7 +165,16 @@ function renderGallery(p){
   el('showAllPhotos').hidden=!p.photos.length;el('showAllPhotos').textContent='ดูรูปทั้งหมด ('+p.photos.length+')';
   currentPhoto=0;
 }
-function openViewer(index){if(!currentProperty||!currentProperty.photos.length)return;var thumbs=el('photoThumbs');if(!thumbs.childNodes.length)currentProperty.photos.forEach(function(photo,i){var button=make('button');button.type='button';button.setAttribute('aria-label','ดูรูปภาพ '+(i+1));button.appendChild(image(photo,180,true));button.onclick=function(){activatePhoto(i);};thumbs.appendChild(button);});el('photoViewer').showModal();activatePhoto(index);}
+function fitPhotoViewer(){
+  var viewer=el('photoViewer');if(!viewer.open)return;
+  var viewport=window.visualViewport;
+  if(viewport && viewport.scale>1)return; // Preserve deliberate pinch zoom.
+  viewer.style.setProperty('--viewer-height',Math.floor(viewport?viewport.height:window.innerHeight)+'px');
+  viewer.style.setProperty('--viewer-width',Math.floor(viewport?viewport.width:window.innerWidth)+'px');
+}
+window.addEventListener('resize',fitPhotoViewer);
+if(window.visualViewport)window.visualViewport.addEventListener('resize',fitPhotoViewer);
+function openViewer(index){if(!currentProperty||!currentProperty.photos.length)return;var thumbs=el('photoThumbs');if(!thumbs.childNodes.length)currentProperty.photos.forEach(function(photo,i){var button=make('button');button.type='button';button.setAttribute('aria-label','ดูรูปภาพ '+(i+1));button.appendChild(image(photo,180,true));button.onclick=function(){activatePhoto(i);};thumbs.appendChild(button);});el('photoViewer').showModal();fitPhotoViewer();activatePhoto(index);}
 function activatePhoto(index){var photos=currentProperty.photos;currentPhoto=(index+photos.length)%photos.length;var img=image(photos[currentPhoto],1600,false);img.id='viewerImage';img.alt=translated('รูปภาพทรัพย์')+' '+(currentPhoto+1);el('viewerImageWrap').replaceChildren(img);text('photoCounter',(currentPhoto+1)+' / '+photos.length);Array.from(el('photoThumbs').children).forEach(function(button,i){button.setAttribute('aria-current',String(i===currentPhoto));});el('prevPhoto').disabled=el('nextPhoto').disabled=photos.length<2;}
 async function loadCaption(){var generation=detailGeneration,token=getStaffToken();text('dCaptionText','');try{var response=await fetch(SCRIPT_URL+'?action=caption&code='+encodeURIComponent(propertyCode)+'&dataset='+propertyDataset+'&token='+encodeURIComponent(token),{cache:'no-store'}),result=await response.json();if(generation!==detailGeneration||token!==getStaffToken()||!currentStaff)return;text('dCaptionText',result.caption||result.text||'— ยังไม่มีไฟล์ประกาศ (รหัส-1)');}catch(_){if(generation===detailGeneration&&currentStaff)text('dCaptionText','— โหลดไม่สำเร็จ');}}
 function openStaffModal(){el('staffLoginErr').textContent='';el('staffPasswordInput').value='';if(!el('staffLoginModal').open)el('staffLoginModal').showModal();el('staffPasswordInput').focus();}
