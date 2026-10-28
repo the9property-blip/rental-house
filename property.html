@@ -3,29 +3,29 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>รายละเอียดทรัพย์ | The 9 Property</title><meta name="description" content="รูปภาพและรายละเอียดทรัพย์ให้เช่า The 9 Property เชียงใหม่">
-<link rel="stylesheet" href="property.css?v=20261028-nearby"><link rel="stylesheet" href="language.css?v=20261028"><script defer src="language.js?v=20261028-nearby"></script>
+<link rel="stylesheet" href="property.css?v=20261029-listing"><link rel="stylesheet" href="language.css?v=20261028"><script defer src="language.js?v=20261029-listing"></script>
 <link rel="stylesheet" href="photo-download.css"><script defer src="photo-download.js?v=20261022-cache"></script>
 <link rel="stylesheet" href="property-rental.css?v=20261010-no-visible-pin"><script defer src="property-rental.js?v=20261010-no-visible-pin"></script>
 <script>const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbxu4qqxY58PGGIRBIfLWkCwj9TMIUdCB3DWg7xT2setU60hQsjDwisCplNVpka9UW-zFg/exec';</script>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-<script defer src="property.js?v=20261028-nearby"></script>
+<script defer src="property.js?v=20261029-listing"></script>
 </head>
 <body>
 <header class="page-header"><a class="brand" href="index.html">The 9 Property<span>บ้านเช่า เชียงใหม่</span></a><div class="staff-controls"><a href="index.html">แคตตาล็อก</a><a href="map.html">ดูแผนที่</a><button type="button" id="staffBtn" onclick="staffBtnClick()">🔐 Staff</button></div></header>
-<nav class="section-nav" aria-label="เมนูรายละเอียดทรัพย์"><a href="#overview">ภาพรวม</a><a href="#details">รายละเอียดทรัพย์</a><a href="#amenities">สิ่งอำนวยความสะดวก</a><a href="#contact">ติดต่อ</a><a href="#propertyMapSection">ทำเลและแผนที่</a><button type="button" id="shareListing">คัดลอกลิงก์ทรัพย์</button></nav>
 <main class="page-container">
 <div id="pageStatus" class="page-status" role="status">กำลังโหลดข้อมูล...</div>
 <div id="propertyContent" hidden>
+<div class="listing-breadcrumb"><a href="index.html">The 9 Property</a><span>›</span><a href="index.html">บ้านเช่า เชียงใหม่</a><span>›</span><span id="breadcrumbCode" data-no-translate></span></div>
 <section id="overview" class="gallery" aria-label="รูปภาพทรัพย์"><div id="galleryGrid" class="gallery-grid"></div><button type="button" id="showAllPhotos" class="all-photos" hidden>ดูรูปทั้งหมด</button></section>
-<section id="summaryFacts" class="summary-facts" aria-label="สรุปข้อมูลทรัพย์"></section>
+<nav class="section-nav" aria-label="เมนูรายละเอียดทรัพย์"><a href="#overview">ภาพรวม</a><a href="#details">รายละเอียดทรัพย์</a><a href="#amenities">สิ่งอำนวยความสะดวก</a><a href="#contact">ติดต่อ</a><a href="#propertyMapSection">ทำเลและแผนที่</a><button type="button" id="shareListing">คัดลอกลิงก์ทรัพย์</button></nav>
 <div class="detail-layout"><article>
-<section class="surface intro"><span id="availability" class="availability"></span><div id="propertyCode" data-no-translate></div><h1 id="dProject" data-no-translate></h1><p id="dLocation" data-no-translate></p><div class="intro-price">฿<span id="publicPrice"></span><small> บาท / เดือน</small></div></section>
+<section class="surface intro"><span id="availability" class="availability"></span><div id="propertyCode" data-no-translate></div><h1 id="dProject" data-no-translate></h1><p id="dLocation" data-no-translate></p><div class="intro-price">฿<span id="publicPrice"></span><small> บาท / เดือน</small></div><section id="summaryFacts" class="summary-facts" aria-label="สรุปข้อมูลทรัพย์"></section></section>
 <section id="details" class="surface"><h2>รายละเอียดทรัพย์</h2><dl id="propertyFacts" class="property-facts"></dl><div id="longDetails"></div></section>
 <section id="amenities" class="surface"><h2>สิ่งอำนวยความสะดวก</h2><div id="amenityList" class="amenity-list"></div></section>
 <section id="contact" class="surface"><h2>ติดต่อ The 9 Property</h2><p>สนใจนัดชมทรัพย์หรือต้องการข้อมูลเพิ่มเติม</p><a class="primary-button" href="tel:0809945497">📞 โทรสอบถาม 080-994-5497</a><a class="secondary-button" href="https://line.me/R/ti/p/%40the9property" target="_blank" rel="noopener">💬 Line @the9property</a></section>
-</article><aside class="detail-sidebar"><section class="surface price-panel"><p class="eyebrow">ราคาเช่า</p><div class="sidebar-price">฿<span id="dPrice"></span><small> บาท / เดือน</small></div><dl id="rentalTerms"></dl><a class="primary-button" href="tel:0809945497">📞 โทรสอบถาม</a></section>
+</article><aside class="detail-sidebar"><section class="surface price-panel"><div class="agency-mark">The 9 Property<span>บ้านเช่า เชียงใหม่</span></div><p class="eyebrow">ราคาเช่า</p><div class="sidebar-price">฿<span id="dPrice"></span><small> บาท / เดือน</small></div><dl id="rentalTerms"></dl><a class="primary-button" href="tel:0809945497">📞 โทรสอบถาม</a><a class="secondary-button" href="https://line.me/R/ti/p/%40the9property" target="_blank" rel="noopener">💬 Line @the9property</a></section>
 <section class="surface staff-section" id="dStaffSection" hidden><h2>⭐ ข้อมูลทีมงาน (Staff Only)</h2><div class="staff-row"><span>เจ้าของ</span><div><span id="dOwnerName" data-no-translate></span><button type="button" onclick="copyField('dOwnerName')" aria-label="คัดลอกชื่อเจ้าของ">📋</button></div></div><div class="staff-row"><span>เบอร์โทร</span><div><span id="dOwnerTel" data-no-translate></span><button type="button" onclick="copyField('dOwnerTel')" aria-label="คัดลอกเบอร์โทร">📋</button></div></div><div class="staff-row"><span>ช่องทางการติดต่อ</span><div><span id="dOwnerContact" data-no-translate></span><button type="button" onclick="copyField('dOwnerContact')" aria-label="คัดลอกช่องทางการติดต่อ">📋</button></div></div><div class="staff-row" id="staffMapRow"><span>Google Maps</span><div><a id="staffMapLink" target="_blank" rel="noopener" data-no-translate>Google Maps ↗</a><button type="button" onclick="copyMap()" aria-label="คัดลอกลิงก์ Google Maps">📋</button></div></div><a id="staffFacebook" target="_blank" rel="noopener" hidden>เปิดโพสต์ ↗</a><div id="dPhotoDownload"></div><div id="dRentalAction"></div><div class="caption-head"><h3>ข้อความประกาศ</h3><button type="button" onclick="copyField('dCaptionText')">คัดลอกทั้งหมด</button></div><pre id="dCaptionText" data-no-translate></pre></section>
 <section id="staffInvite" class="surface"><h2>ข้อมูลทีมงาน (Staff Only)</h2><p>เข้าสู่ระบบเพื่อดูข้อมูลทีมงาน</p><button type="button" class="secondary-button" onclick="openStaffModal()">🔐 เข้าสู่ระบบทีมงาน</button></section></aside></div>
 <section id="nearbyProperties" class="nearby-section"><div class="section-heading"><h2 id="nearbyTitle">บ้านใกล้เคียง</h2><span id="nearbyHint">ภายในระยะ 20 กม.</span></div><p id="nearbyStatus" role="status">กำลังโหลดข้อมูล...</p><div id="nearbyCards" class="nearby-cards"></div></section>

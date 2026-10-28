@@ -65,7 +65,7 @@ async function loadProperty(){
 }
 function fact(container,label,value,raw){var row=make('div');row.appendChild(make('dt',null,label));var data=make('dd',null,value==null||value===''?'–':String(value));if(raw)data.setAttribute('data-no-translate','');row.appendChild(data);container.appendChild(row);}
 function renderProperty(p){
-  text('dProject',p.project);text('dLocation',p.location);text('propertyCode',p.code);text('publicPrice',money(p.price));text('dPrice',money(p.price));
+  text('breadcrumbCode',p.code);text('dProject',p.project);text('dLocation',p.location);text('propertyCode',p.code);text('publicPrice',money(p.price));text('dPrice',money(p.price));
   var status=propertyDataset==='rented'?'เช่าแล้ว':p.ready?'✓ พร้อมเข้าพัก':'📅 พร้อมเข้าพัก '+(p.availableDate||'เร็วๆ นี้');text('availability',status);
   el('summaryFacts').replaceChildren();
   [[p.code,'รหัสทรัพย์',true],[p.type,'ประเภท',false],[p.bedroom,'ห้องนอน',false],[p.bathroom,'ห้องน้ำ',false],[p.land,'ขนาดที่ดิน (ตร.ว.)',false],[p.usable,'พื้นที่ใช้สอย (ตร.ม.)',false]].forEach(function(pair){var box=make('div'),value=make('b',null,pair[0]||'–');if(pair[2])value.setAttribute('data-no-translate','');box.appendChild(value);box.appendChild(make('span',null,pair[1]));el('summaryFacts').appendChild(box);});
