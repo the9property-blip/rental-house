@@ -654,6 +654,7 @@ body { background:#f4f6f8; color:var(--ui-ink); }
   .card:hover,.mini-card:hover { transform:none; }
 }
 
+.property-page-link{display:block;margin:14px 0;padding:11px 15px;background:#244e72;color:#fff!important;border-radius:9px;text-align:center;font-size:13px;font-weight:600}
 </style>
 <link rel="stylesheet" href="photo-download.css">
 <script src="photo-download.js?v=20261022-cache"></script>
@@ -801,6 +802,7 @@ body { background:#f4f6f8; color:var(--ui-ink); }
     <div class="modal-info">
       <div class="modal-title" id="dProject"></div>
       <div class="modal-sub" id="dSub"></div>
+      <a id="dPropertyPage" class="property-page-link" target="_blank" rel="noopener">เปิดหน้าเว็บทรัพย์ ↗</a>
       <div class="modal-price">฿<span id="dPrice"></span><small> บาท / เดือน</small></div>
       <div class="modal-rows">
         <div class="modal-row"><span class="lbl">สถานะ</span><span class="val" id="dStatus"></span></div>
@@ -1274,7 +1276,7 @@ function miniCardHtml(p) {
   var dist = (p._dist != null)
     ? '<div class="mc-dist' + (p._dist > 5 ? ' far' : '') + '">📍 ' + fmtDist(p._dist) + '</div>'
     : '';
-  return '<div class="mini-card" data-code="' + p.code + '" title="เปิดรายละเอียดในแท็บใหม่" onclick="openDetailByCode(\'' + p.code + '\')">' +
+  return '<div class="mini-card" data-code="' + p.code + '" title="แตะเพื่อดูตำแหน่งบนแผนที่" onclick="focusMarker(\'' + p.code + '\')">' +
     '<div class="mc-photo">' + photo + status + gradeBadge + coBadge + surveyBadge + '</div>' +
     '<div class="mc-info">' +
       dist +
@@ -1630,9 +1632,10 @@ function openDetailByCode(code) {
   if (!p) return;
   selectedCode = code;
   highlightCard(code, true);
-  window.open('property.html?code=' + encodeURIComponent(p.code) + '&dataset=rented', '_blank', 'noopener');
+  openDetail(p);
 }
 function openDetail(p) {
+  document.getElementById('dPropertyPage').href = 'property.html?code=' + encodeURIComponent(p.code) + '&dataset=rented';
   PropertyPhotos.setDetail(p.code);
   if (window.PropertyRental) {
     PropertyRental.setDetail(p);
