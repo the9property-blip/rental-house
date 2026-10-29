@@ -3,6 +3,7 @@ var currentProperty = null, currentStaff = false, detailGeneration = 0, requestA
 var query = new URLSearchParams(location.search), propertyCode = String(query.get('code') || '').trim().toUpperCase();
 var propertyDataset = query.get('dataset') === 'rented' ? 'rented' : 'active';
 function getStaffToken() {
+  if (window.PropertyStaffSession) return PropertyStaffSession.get();
   try {
     var prefix = 'staff_token=';
     var cookie = document.cookie.split(';').map(function(value) { return value.trim(); }).find(function(value) { return value.indexOf(prefix) === 0; });
@@ -10,15 +11,18 @@ function getStaffToken() {
   } catch(e) { return ''; }
 }
 function setStaffToken(token) {
+  if (window.PropertyStaffSession) { PropertyStaffSession.set(token); return; }
   var path = location.pathname.slice(0, location.pathname.lastIndexOf('/') + 1) || '/';
   document.cookie = 'staff_token=' + encodeURIComponent(token) + '; path=' + path + '; SameSite=Strict' + (location.protocol === 'https:' ? '; Secure' : '');
 }
 function clearStaffToken() {
+  if (window.PropertyStaffSession) { PropertyStaffSession.clear(); return; }
   var path = location.pathname.slice(0, location.pathname.lastIndexOf('/') + 1) || '/';
   document.cookie = 'staff_token=; path=' + path + '; Max-Age=0; SameSite=Strict' + (location.protocol === 'https:' ? '; Secure' : '');
   try { sessionStorage.removeItem('staff_token'); } catch(e) {}
 }
 function notifyStaffSessionChange() {
+  if (window.PropertyStaffSession) PropertyStaffSession.publish();
   try { localStorage.setItem('staff_auth_changed', String(Date.now())); } catch(e) {}
 }
 // Upgrade the current tab's old login to a session shared by new tabs.
